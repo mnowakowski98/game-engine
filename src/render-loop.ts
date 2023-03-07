@@ -26,7 +26,10 @@ function renderFrame() {
 
     for(const rendering of renderings) {
         _context.save()
-        rendering.render(_context)
+
+        const didRender = rendering.render(_context)
+        if (!didRender) console.warn(`Rendering ${rendering.id} failed to render`)
+
         _context.restore()
     }
 
