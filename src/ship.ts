@@ -2,28 +2,39 @@ import Updateable from './updatable'
 import Renderable from './renderable'
 
 export default class Ship implements Updateable, Renderable {
+    private length = 50
+    private width = 25
+
     public readonly id: number
 
-    public positionX = 50
-    public positionY = 50
+    private positionX = 50
+    private positionY = 50
+    private rotation = 90
 
     public constructor(id: number) {
         this.id = id
     }
 
     public update(): boolean {
-        this.positionX += 1
-        this.positionY += 1
         return true
     }
 
     public render(context: CanvasRenderingContext2D): boolean {
         context.beginPath()
-        context.arc(this.positionX, this.positionY, 20, 0, 2*Math.PI)
+
+        context.translate(this.positionX, this.positionY)
+        context.rotate((this.rotation * Math.PI) / 180)
+        context.translate(-this.positionX, -this.positionY)
+
+        context.moveTo(this.positionX - this.width / 2, this.positionY + this.length / 2)
+        context.lineTo(this.positionX + this.width / 2, this.positionY + this.length / 2)
+        context.lineTo(this.positionX, this.positionY - this.length / 2)
+
         context.closePath()
 
-        context.strokeStyle = "red"
         context.lineWidth = 2
+        context.fillStyle = "red"
+        context.fill()
         context.stroke()
         return true
     }
