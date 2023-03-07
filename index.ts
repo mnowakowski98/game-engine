@@ -1,4 +1,6 @@
-import { startRendering } from './src/render-loop'
+import { addRendering, startRendering } from './src/render-loop'
+import Ship from './src/ship'
+import { addUpdatable, startUpdating } from './src/update-loop'
 
 addEventListener('load', () => {
     const canvas = document.createElement('canvas')
@@ -18,5 +20,10 @@ addEventListener('load', () => {
         return
     }
 
+    const ship = new Ship(Math.random() * 1000)
+    addRendering(ship)
+    addUpdatable(ship)
+
+    startUpdating()
     startRendering(context)
 })

@@ -1,15 +1,41 @@
+import Renderable from './renderable'
+
 let requestId: number
 
-function renderFrame(context: CanvasRenderingContext2D) {
-    const canvasWidth = context.canvas.width
-    const canvasHeight = context.canvas.height
-    context.clearRect(0, 0, canvasWidth, canvasHeight)
+const renderings: Renderable[] = []
 
-    requestId = requestAnimationFrame(() => renderFrame(context))
+export function addRendering(rendering: Renderable) {
+    renderings.push(rendering)
+}
+
+export function removeRendering(rendering: Renderable) {
+    renderings.splice(renderings.findIndex(_ => rendering.id === _.id))
+}
+
+let _context: CanvasRenderingContext2D | null
+
+function renderFrame() {
+    if(_context == null) {
+        console.error('renderFrame called while context is null')
+        return
+    }
+
+    const canvasWidth = _context.canvas.width
+    const canvasHeight = _context.canvas.height
+    _context.clearRect(0, 0, canvasWidth, canvasHeight)
+
+    for(const rendering of renderings) {
+        _context.save()
+        rendering.render(_context)
+        _context.restore()
+    }
+
+    requestId = requestAnimationFrame(renderFrame)
 }
 
 export function startRendering(context: CanvasRenderingContext2D) {
-    renderFrame(context)
+    _context = context
+    renderFrame()
 }
 
 export function stopRendering() {
