@@ -15,7 +15,12 @@ export default class Ship implements Updateable, Renderable {
         this.id = id
     }
 
-    public update(): boolean {
+    public setPosition(x: number, y: number) {
+        this.positionX = x
+        this.positionY = y
+    }
+
+    public update(deltaTime: number): boolean {
         return true
     }
 

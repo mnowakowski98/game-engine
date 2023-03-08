@@ -21,6 +21,7 @@ addEventListener('load', () => {
     }
 
     const ship = new Ship(Math.random() * 1000)
+    canvas.addEventListener('mousemove', event => ship.setPosition(event.offsetX, event.offsetY))
     addRendering(ship)
     addUpdatable(ship)
 
