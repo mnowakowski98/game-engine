@@ -1,7 +1,6 @@
-import Asteroid from './src/asteroid'
-import Collidable from './src/collidable'
-import { addRendering, removeRendering, startRendering } from './src/render-loop'
-import Ship from './src/ship'
+import { Asteroid, renderAsteroid, checkCollision } from './src/asteroid'
+import { addRendering, startRendering } from './src/render-loop'
+import { renderShip, Ship } from './src/ship'
 import { addUpdatable, startUpdating } from './src/update-loop'
 
 addEventListener('load', () => {
@@ -24,17 +23,21 @@ addEventListener('load', () => {
 
     const ship: Ship = {
         id: 0,
-        update: () => true,
-        render: () => true,
+        colliding: false,
         position: {
             x: 50,
             y: canvas.height / 2
-        }
+        },
+        rotation: 90,
+        width: 25,
+        length: 50,
+        render: context => renderShip(ship, context),
+        update: () => true
     }
 
     canvas.addEventListener('mousemove', event => {
         ship.position.x = event.offsetX
-        ship.position.y =event.offsetY
+        ship.position.y = event.offsetY
     })
 
     addRendering(ship)
@@ -43,17 +46,16 @@ addEventListener('load', () => {
     const asteroid: Asteroid = {
         id: 1,
         boundingRadius: 25,
-        update: () => true,
-        render: () => true,
-        isCollidingWith: position => {
-            const differenceX = position.x - asteroid.position.x
-            const differenceY = position.y - asteroid.position.y
-            const distance = (differenceX * differenceX + differenceY * differenceY)
-            return distance <= asteroid.boundingRadius
+        update: (deltaTime: number) => {
+            if(asteroid.isCollidingWith(ship.position)) ship.colliding = true
+            else ship.colliding = false
+            return true
         },
+        render: context => renderAsteroid(asteroid, context),
+        isCollidingWith: position => checkCollision(asteroid, position),
         position: {
-            x: 250,
-            y: 250
+            x: canvas.width / 2,
+            y: canvas.height / 2
         }
     }
 
