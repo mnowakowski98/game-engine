@@ -1,5 +1,6 @@
 import Updateable from './updatable'
 import Renderable from './renderable'
+import Position from './position'
 
 export default class Ship implements Updateable, Renderable {
     private length = 50
@@ -7,8 +8,11 @@ export default class Ship implements Updateable, Renderable {
 
     public readonly id: number
 
-    private positionX = 50
-    private positionY = 50
+    private position: Position = {
+        x: 50,
+        y: 50
+    }
+
     private rotation = 90
 
     public constructor(id: number) {
@@ -16,8 +20,8 @@ export default class Ship implements Updateable, Renderable {
     }
 
     public setPosition(x: number, y: number) {
-        this.positionX = x
-        this.positionY = y
+        this.position.x = x
+        this.position.y = y
     }
 
     public update(deltaTime: number): boolean {
@@ -27,13 +31,13 @@ export default class Ship implements Updateable, Renderable {
     public render(context: CanvasRenderingContext2D): boolean {
         context.beginPath()
 
-        context.translate(this.positionX, this.positionY)
+        context.translate(this.position.x, this.position.y)
         context.rotate((this.rotation * Math.PI) / 180)
-        context.translate(-this.positionX, -this.positionY)
+        context.translate(-this.position.x, -this.position.y)
 
-        context.moveTo(this.positionX - this.width / 2, this.positionY + this.length / 2)
-        context.lineTo(this.positionX + this.width / 2, this.positionY + this.length / 2)
-        context.lineTo(this.positionX, this.positionY - this.length / 2)
+        context.moveTo(this.position.x - this.width / 2, this.position.y + this.length / 2)
+        context.lineTo(this.position.x + this.width / 2, this.position.y + this.length / 2)
+        context.lineTo(this.position.x, this.position.y - this.length / 2)
 
         context.closePath()
 
