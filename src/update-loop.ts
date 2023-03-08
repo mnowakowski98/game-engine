@@ -8,7 +8,7 @@ export function addUpdatable(updatable: Updateable) {
 }
 
 export function removeUpdatable(updatable: Updateable) {
-    updateables.slice(updateables.findIndex(_ => updatable.id === _.id))
+    updateables.splice(updateables.findIndex(_ => updatable.id === _.id), 1)
 }
 
 let isUpdating = false

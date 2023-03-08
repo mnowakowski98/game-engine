@@ -1,34 +1,34 @@
-import Collidable, { RadialPositionDistanceCollidable } from './collidable'
-import Position from './position'
+import Collidable from './collidable'
+import { Position } from './positionable'
 import Renderable from './renderable'
+import Rotatable from './rotatable'
+import Updateable from './updatable'
 
-export default class Asteroid extends RadialPositionDistanceCollidable implements Renderable, Collidable {
+export interface Asteroid extends Collidable, Renderable, Updateable, Rotatable {
+    boundingRadius: number
+    speed: number
+}
 
-    public readonly id: number
+export function checkCollision(asteroid: Asteroid, position: Position): boolean {
+    const differenceX = position.x - asteroid.position.x
+    const differenceY = position.y - asteroid.position.y
+    const distance = Math.sqrt(differenceX * differenceX + differenceY * differenceY)
+    return distance <= asteroid.boundingRadius
+}
 
-    private path = new Path2D()
+export function updateAsteroid(asteroid: Asteroid, deltaTime: number): boolean {
+    asteroid.position.x += Math.sin(asteroid.rotation) * (asteroid.speed / deltaTime)
+    asteroid.position.y += Math.cos(asteroid.rotation) * (asteroid.speed / deltaTime)
+    return true
+}
 
-    private readonly radius = 17
+export function renderAsteroid(asteroid: Asteroid, context: CanvasRenderingContext2D): boolean {
+    context.beginPath()
+    context.arc(asteroid.position.x, asteroid.position.y, asteroid.boundingRadius, 0, Math.PI * 2)
+    context.closePath()
 
-    protected boundingRadius = this.radius
-
-    protected position: Position = {
-        x: 250,
-        y: 250
-    }
-
-    public constructor(id: number) {
-        super()
-        this.id = id
-    }
-
-    public render(context: CanvasRenderingContext2D): boolean {
-        this.path = new Path2D()
-        this.path.arc(this.position.x, this.position.y, this.radius, 0, Math.PI * 2)
-        this.path.closePath()
-        context.fillStyle = "#c2a07c"
-        context.fill(this.path)
-        context.stroke(this.path)
-        return true
-    }
+    context.fillStyle = "#c2a07c"
+    context.fill()
+    context.stroke()
+    return true
 }

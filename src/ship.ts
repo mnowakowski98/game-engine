@@ -1,61 +1,34 @@
 import Updateable from './updatable'
 import Renderable from './renderable'
-import Position from './position'
-import Collidable, { RadialPositionDistanceCollidable } from './collidable'
+import Positionable from './positionable'
+import Rotatable from './rotatable'
 
-export default class Ship extends RadialPositionDistanceCollidable implements Updateable, Renderable, Collidable {
-    
+export interface Ship extends Updateable, Renderable, Positionable, Rotatable {
+    colliding: boolean,
+    width: number,
+    length: number
+}
 
-    public readonly id: number
+export function renderShip(ship: Ship, context: CanvasRenderingContext2D): boolean {
+    context.translate(ship.position.x, ship.position.y)
+    context.rotate((ship.rotation * Math.PI) / 180)
+    context.translate(-ship.position.x, -ship.position.y)
 
-    public constructor(id: number) {
-        super()
-        this.id = id
-    }
+    context.beginPath()
 
-    private length = 50
-    private width = 25
+    const halfWidth = ship.length / 2
+    const halfLength = ship.length / 2
 
-    protected boundingRadius = 35
+    context.moveTo(ship.position.x - halfWidth, ship.position.y + halfLength)
+    context.lineTo(ship.position.x + halfWidth, ship.position.y + halfLength)
+    context.lineTo(ship.position.x, ship.position.y - halfLength)
 
-    protected position: Position = {
-        x: 50,
-        y: 50
-    }
+    context.closePath()
 
-    public setPosition(x: number, y: number) {
-        this.position.x = x
-        this.position.y = y
-    }
-
-    private rotation = 90
-
-    public update(deltaTime: number): boolean {
-        return true
-    }
-
-    public colliding = false
-
-    private path = new Path2D()
-
-    public render(context: CanvasRenderingContext2D): boolean {
-        this.path = new Path2D()
-
-        context.translate(this.position.x, this.position.y)
-        context.rotate((this.rotation * Math.PI) / 180)
-        context.translate(-this.position.x, -this.position.y)
-
-        this.path.moveTo(this.position.x - this.width / 2, this.position.y + this.length / 2)
-        this.path.lineTo(this.position.x + this.width / 2, this.position.y + this.length / 2)
-        this.path.lineTo(this.position.x, this.position.y - this.length / 2)
-
-        this.path.closePath()
-
-        context.lineWidth = 2
-        if (this.colliding) context.fillStyle = "red"
-        else context.fillStyle = "green"
-        context.fill(this.path)
-        context.stroke(this.path)
-        return true
-    }
+    context.lineWidth = 2
+    if (ship.colliding) context.fillStyle = 'red'
+    else context.fillStyle = 'green'
+    context.fill()
+    context.stroke()
+    return true
 }

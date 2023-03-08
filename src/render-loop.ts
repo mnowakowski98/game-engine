@@ -9,7 +9,7 @@ export function addRendering(rendering: Renderable) {
 }
 
 export function removeRendering(rendering: Renderable) {
-    renderings.splice(renderings.findIndex(_ => rendering.id === _.id))
+    renderings.splice(renderings.findIndex(_ => rendering.id === _.id), 1)
 }
 
 let _context: CanvasRenderingContext2D | null
