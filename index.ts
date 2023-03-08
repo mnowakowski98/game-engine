@@ -1,3 +1,4 @@
+import Asteroid from './src/asteroid'
 import { addRendering, startRendering } from './src/render-loop'
 import Ship from './src/ship'
 import { addUpdatable, startUpdating } from './src/update-loop'
@@ -24,6 +25,9 @@ addEventListener('load', () => {
     canvas.addEventListener('mousemove', event => ship.setPosition(event.offsetX, event.offsetY))
     addRendering(ship)
     addUpdatable(ship)
+
+    const asteroid = new Asteroid(1)
+    addRendering(asteroid)
 
     startUpdating()
     startRendering(context)
