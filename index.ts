@@ -32,7 +32,7 @@ addEventListener('load', () => {
         width: 25,
         length: 50,
         render: context => renderShip(ship, context),
-        update: () => true
+        update: () => ship.colliding = false
     }
 
     canvas.addEventListener('mousemove', event => {
@@ -46,18 +46,18 @@ addEventListener('load', () => {
     const asteroids: Asteroid[] = []
 
     const makeAsteroid = (id: number) => {
+
         const asteroid: Asteroid = {
             id: id,
             boundingRadius: 25,
             position: {
-                x: canvas.width / 2,
-                y: canvas.height / 2
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height
             },
-            rotation: (90 * Math.PI) / 180,
-            speed: 10,
+            rotation: ((Math.random() * 360) * Math.PI) / 180,
+            speed: (Math.random() * 10) + 5,
             update: deltaTime => {
                 if(asteroid.isCollidingWith(ship.position)) ship.colliding = true
-                else ship.colliding = false
     
                 if ((asteroid.position.x < asteroid.boundingRadius || asteroid.position.x > canvas.width - asteroid.boundingRadius)
                 || (asteroid.position.y < 0 || asteroid.position.y > canvas.height - asteroid.boundingRadius)) {
@@ -79,8 +79,8 @@ addEventListener('load', () => {
 
     let nextAsteroidId = 1
     setInterval(() => {
-        if(asteroids.length < 5) asteroids.push(makeAsteroid(nextAsteroidId++))
-    }, 500)
+        if(asteroids.length < 20) asteroids.push(makeAsteroid(nextAsteroidId++))
+    })
 
     startUpdating()
     startRendering(context)
