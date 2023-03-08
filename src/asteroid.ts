@@ -1,8 +1,8 @@
-import Collidable, { BaseCollidable } from './collidable'
+import Collidable, { RadialPositionDistanceCollidable } from './collidable'
 import Position from './position'
 import Renderable from './renderable'
 
-export default class Asteroid extends BaseCollidable implements Renderable, Collidable {
+export default class Asteroid extends RadialPositionDistanceCollidable implements Renderable, Collidable {
 
     public readonly id: number
 
@@ -10,8 +10,7 @@ export default class Asteroid extends BaseCollidable implements Renderable, Coll
 
     private readonly radius = 17
 
-    protected boundingWidth = this.radius * 2
-    protected boundingLength = this.radius * 2
+    protected boundingRadius = this.radius
 
     protected position: Position = {
         x: 250,

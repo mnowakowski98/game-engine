@@ -30,7 +30,7 @@ addEventListener('load', () => {
     addRendering(asteroid)
 
     setInterval(() => {
-        if (ship.isCollidingWith(asteroid) || asteroid.isCollidingWith(ship)) ship.colliding = true
+        if (ship.isCollidingWith(asteroid)) ship.colliding = true
         else ship.colliding = false
         // ship.colliding = asteroid.isColliding(ship, context)
     }, 10)

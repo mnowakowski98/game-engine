@@ -1,9 +1,9 @@
 import Updateable from './updatable'
 import Renderable from './renderable'
 import Position from './position'
-import Collidable, { BaseCollidable } from './collidable'
+import Collidable, { RadialPositionDistanceCollidable } from './collidable'
 
-export default class Ship extends BaseCollidable implements Updateable, Renderable, Collidable {
+export default class Ship extends RadialPositionDistanceCollidable implements Updateable, Renderable, Collidable {
     
 
     public readonly id: number
@@ -16,8 +16,7 @@ export default class Ship extends BaseCollidable implements Updateable, Renderab
     private length = 50
     private width = 25
 
-    protected boundingWidth = this.width
-    protected boundingLength = this.length
+    protected boundingRadius = 35
 
     protected position: Position = {
         x: 50,
