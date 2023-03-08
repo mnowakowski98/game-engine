@@ -1,5 +1,6 @@
 import Asteroid from './src/asteroid'
-import { addRendering, startRendering } from './src/render-loop'
+import Collidable from './src/collidable'
+import { addRendering, removeRendering, startRendering } from './src/render-loop'
 import Ship from './src/ship'
 import { addUpdatable, startUpdating } from './src/update-loop'
 
@@ -21,19 +22,43 @@ addEventListener('load', () => {
         return
     }
 
-    const ship = new Ship(0)
-    canvas.addEventListener('mousemove', event => ship.setPosition(event.offsetX, event.offsetY))
+    const ship: Ship = {
+        id: 0,
+        update: () => true,
+        render: () => true,
+        position: {
+            x: 50,
+            y: canvas.height / 2
+        }
+    }
+
+    canvas.addEventListener('mousemove', event => {
+        ship.position.x = event.offsetX
+        ship.position.y =event.offsetY
+    })
+
     addRendering(ship)
     addUpdatable(ship)
 
-    const asteroid = new Asteroid(1)
-    addRendering(asteroid)
+    const asteroid: Asteroid = {
+        id: 1,
+        boundingRadius: 25,
+        update: () => true,
+        render: () => true,
+        isCollidingWith: position => {
+            const differenceX = position.x - asteroid.position.x
+            const differenceY = position.y - asteroid.position.y
+            const distance = (differenceX * differenceX + differenceY * differenceY)
+            return distance <= asteroid.boundingRadius
+        },
+        position: {
+            x: 250,
+            y: 250
+        }
+    }
 
-    setInterval(() => {
-        if (ship.isCollidingWith(asteroid)) ship.colliding = true
-        else ship.colliding = false
-        // ship.colliding = asteroid.isColliding(ship, context)
-    }, 10)
+    addRendering(asteroid)
+    addUpdatable(asteroid)
 
     startUpdating()
     startRendering(context)
