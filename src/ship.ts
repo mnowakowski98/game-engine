@@ -1,22 +1,27 @@
 import Updateable from './updatable'
 import Renderable from './renderable'
 import Position from './position'
+import Collidable, { BaseCollidable } from './collidable'
 
-export default class Ship implements Updateable, Renderable {
-    private length = 50
-    private width = 25
+export default class Ship extends BaseCollidable implements Updateable, Renderable, Collidable {
+    
 
     public readonly id: number
 
-    private position: Position = {
-        x: 50,
-        y: 50
+    public constructor(id: number) {
+        super()
+        this.id = id
     }
 
-    private rotation = 90
+    private length = 50
+    private width = 25
 
-    public constructor(id: number) {
-        this.id = id
+    protected boundingWidth = this.width
+    protected boundingLength = this.length
+
+    protected position: Position = {
+        x: 50,
+        y: 50
     }
 
     public setPosition(x: number, y: number) {
@@ -24,27 +29,34 @@ export default class Ship implements Updateable, Renderable {
         this.position.y = y
     }
 
+    private rotation = 90
+
     public update(deltaTime: number): boolean {
         return true
     }
 
+    public colliding = false
+
+    private path = new Path2D()
+
     public render(context: CanvasRenderingContext2D): boolean {
-        context.beginPath()
+        this.path = new Path2D()
 
         context.translate(this.position.x, this.position.y)
         context.rotate((this.rotation * Math.PI) / 180)
         context.translate(-this.position.x, -this.position.y)
 
-        context.moveTo(this.position.x - this.width / 2, this.position.y + this.length / 2)
-        context.lineTo(this.position.x + this.width / 2, this.position.y + this.length / 2)
-        context.lineTo(this.position.x, this.position.y - this.length / 2)
+        this.path.moveTo(this.position.x - this.width / 2, this.position.y + this.length / 2)
+        this.path.lineTo(this.position.x + this.width / 2, this.position.y + this.length / 2)
+        this.path.lineTo(this.position.x, this.position.y - this.length / 2)
 
-        context.closePath()
+        this.path.closePath()
 
         context.lineWidth = 2
-        context.fillStyle = "red"
-        context.fill()
-        context.stroke()
+        if (this.colliding) context.fillStyle = "red"
+        else context.fillStyle = "green"
+        context.fill(this.path)
+        context.stroke(this.path)
         return true
     }
 }
