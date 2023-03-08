@@ -21,13 +21,19 @@ addEventListener('load', () => {
         return
     }
 
-    const ship = new Ship(Math.random() * 1000)
+    const ship = new Ship(0)
     canvas.addEventListener('mousemove', event => ship.setPosition(event.offsetX, event.offsetY))
     addRendering(ship)
     addUpdatable(ship)
 
     const asteroid = new Asteroid(1)
     addRendering(asteroid)
+
+    setInterval(() => {
+        if (ship.isCollidingWith(asteroid)) ship.colliding = true
+        else ship.colliding = false
+        // ship.colliding = asteroid.isColliding(ship, context)
+    }, 10)
 
     startUpdating()
     startRendering(context)

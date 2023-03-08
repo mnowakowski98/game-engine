@@ -1,3 +1,4 @@
+import Collidable from './collidable'
 import Updateable from './updatable'
 
 const updateables: Updateable[] = []
