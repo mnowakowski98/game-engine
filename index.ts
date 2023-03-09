@@ -1,4 +1,5 @@
 import { Asteroid, renderAsteroid, checkCollision, updateAsteroid } from './src/asteroid'
+import GameTimer, { renderGameTimer } from './src/game-timer'
 import { addRendering, removeRendering, startRendering } from './src/render-loop'
 import { renderShip, Ship } from './src/ship'
 import { addUpdatable, removeUpdatable, startUpdating } from './src/update-loop'
@@ -22,7 +23,7 @@ addEventListener('load', () => {
     }
 
     const ship: Ship = {
-        id: 0,
+        id: 'ship',
         colliding: false,
         position: {
             x: 50,
@@ -45,7 +46,7 @@ addEventListener('load', () => {
 
     const asteroids: Asteroid[] = []
 
-    const makeAsteroid = (id: number) => {
+    const makeAsteroid = (id: string) => {
 
         const asteroid: Asteroid = {
             id: id,
@@ -79,9 +80,23 @@ addEventListener('load', () => {
 
     let nextAsteroidId = 1
     setInterval(() => {
-        if(asteroids.length < 20) asteroids.push(makeAsteroid(nextAsteroidId++))
+        if(asteroids.length < 20) asteroids.push(makeAsteroid(`asteroid-${nextAsteroidId++}`))
     })
 
-    startUpdating()
+    const startTime = startUpdating()
+    const timer: GameTimer = {
+        id: "game-timer",
+        startTime: startTime,
+        endTime: startTime,
+        totalTime: () => timer.endTime - timer.startTime,
+        update: deltaTime => {
+            timer.endTime += deltaTime
+            return true
+        },
+        render: context => renderGameTimer(timer, context)
+    }
+    addUpdatable(timer)
+    addRendering(timer)
+
     startRendering(context)
 })

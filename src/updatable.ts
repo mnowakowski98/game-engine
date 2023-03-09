@@ -1,4 +1,4 @@
 export default interface Updateable {
-    id: number
+    id: string
     update: (deltaTime: number) => boolean
 }
