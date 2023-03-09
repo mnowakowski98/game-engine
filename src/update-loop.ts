@@ -1,4 +1,3 @@
-import Collidable from './collidable'
 import Updateable from './updatable'
 
 const updateables: Updateable[] = []
@@ -17,7 +16,7 @@ function tick(deltaTime: number) {
     for (const updatable of updateables) updatable.update(deltaTime)
 }
 
-export function startUpdating() {
+export function startUpdating(): number {
     const startTime = performance.now()
     let lastUpdateTime = startTime
     isUpdating = true
@@ -28,9 +27,12 @@ export function startUpdating() {
             return
         }
 
-        tick(lastUpdateTime - performance.now())
-        lastUpdateTime = performance.now()
+        const now = performance.now()
+        tick(now - lastUpdateTime)
+        lastUpdateTime = now
     })
+
+    return startTime
 }
 
 export function stopUpdateLoop() {
