@@ -1,8 +1,8 @@
 import { Asteroid, renderAsteroid, checkCollision, updateAsteroid } from './src/asteroid'
 import GameTimer, { renderGameTimer } from './src/game-timer'
 import { addRendering, removeRendering, startRendering } from './src/render-loop'
-import { renderShip, Ship } from './src/ship'
-import { addUpdatable, removeUpdatable, startUpdating } from './src/update-loop'
+import { renderShip, Ship, updateShip } from './src/ship'
+import { addUpdatable, removeUpdatable, startUpdating, stopUpdateLoop } from './src/update-loop'
 
 addEventListener('load', () => {
     const canvas = document.createElement('canvas')
@@ -22,6 +22,37 @@ addEventListener('load', () => {
         return
     }
 
+    const startTime = startUpdating()
+    const timer: GameTimer = {
+        id: "game-timer",
+        startTime: startTime,
+        endTime: startTime,
+        totalTime: () => timer.endTime - timer.startTime,
+        update: deltaTime => {
+            timer.endTime += deltaTime
+            return true
+        },
+        render: context => renderGameTimer(timer, context)
+    }
+    addUpdatable(timer)
+    addRendering(timer)
+
+    let isPaused = false
+
+    const pause = () => {
+        stopUpdateLoop()
+        isPaused = true
+    }
+
+    const unpause = () => {
+        const timeShift = performance.now() - timer.endTime
+        timer.startTime += timeShift
+        timer.endTime += timeShift
+
+        startUpdating()
+        isPaused = false
+    }
+
     const ship: Ship = {
         id: 'ship',
         colliding: false,
@@ -29,16 +60,24 @@ addEventListener('load', () => {
             x: 50,
             y: canvas.height / 2
         },
+        targetPosition: {
+            x: 50,
+            y: canvas.height / 2
+        },
         rotation: 90,
         width: 25,
         length: 50,
         render: context => renderShip(ship, context),
-        update: () => ship.colliding = false
+        update: () => {
+            ship.colliding = false
+            updateShip(ship)
+            return true
+        }
     }
 
     canvas.addEventListener('mousemove', event => {
-        ship.position.x = event.offsetX
-        ship.position.y = event.offsetY
+        ship.targetPosition.x = event.offsetX
+        ship.targetPosition.y = event.offsetY
     })
 
     addRendering(ship)
@@ -58,7 +97,14 @@ addEventListener('load', () => {
             rotation: ((Math.random() * 360) * Math.PI) / 180,
             speed: (Math.random() * 10) + 5,
             update: deltaTime => {
-                if(asteroid.isCollidingWith(ship.position)) ship.colliding = true
+                if(asteroid.isCollidingWith(ship.position)) {
+                    ship.colliding = true
+                    pause()
+                    context.save()
+                    context.scale(3, 4)
+                    context.fillText('You dieadeded', canvas.width / 2, canvas.height / 2)
+                    context.restore()
+                }
     
                 if ((asteroid.position.x < asteroid.boundingRadius || asteroid.position.x > canvas.width - asteroid.boundingRadius)
                 || (asteroid.position.y < 0 || asteroid.position.y > canvas.height - asteroid.boundingRadius)) {
@@ -83,20 +129,12 @@ addEventListener('load', () => {
         if(asteroids.length < 20) asteroids.push(makeAsteroid(`asteroid-${nextAsteroidId++}`))
     })
 
-    const startTime = startUpdating()
-    const timer: GameTimer = {
-        id: "game-timer",
-        startTime: startTime,
-        endTime: startTime,
-        totalTime: () => timer.endTime - timer.startTime,
-        update: deltaTime => {
-            timer.endTime += deltaTime
-            return true
-        },
-        render: context => renderGameTimer(timer, context)
-    }
-    addUpdatable(timer)
-    addRendering(timer)
+    addEventListener('keyup', event => {
+        if (event.code == 'Space') {
+            if(isPaused) unpause()
+            else pause()
+        }
+    })
 
     startRendering(context)
 })

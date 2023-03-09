@@ -1,12 +1,18 @@
 import Updateable from './updatable'
 import Renderable from './renderable'
-import Positionable from './positionable'
+import Positionable, { Position } from './positionable'
 import Rotatable from './rotatable'
 
 export interface Ship extends Updateable, Renderable, Positionable, Rotatable {
-    colliding: boolean,
-    width: number,
+    colliding: boolean
+    width: number
     length: number
+    targetPosition: Position
+}
+
+export function updateShip(ship: Ship) {
+    ship.position.x = ship.targetPosition.x
+    ship.position.y = ship.targetPosition.y
 }
 
 export function renderShip(ship: Ship, context: CanvasRenderingContext2D): boolean {
