@@ -26,5 +26,12 @@ addEventListener('load', () => {
     startRenderLoop(context)
     registerInputs(canvas)
     startGame(canvas.width, canvas.height)
-    addEventListener('end-game', () => showGameOver(canvas.width, canvas.height))
+    addEventListener('game-end', () => {
+        showGameOver(canvas.width, canvas.height)
+        const restartGame = () => {
+            removeEventListener('game-over-reset', restartGame)
+            startGame(canvas.width, canvas.height)
+        }
+        addEventListener('game-over-reset', restartGame)
+    })
 })

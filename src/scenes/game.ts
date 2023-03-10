@@ -8,14 +8,6 @@ import { getMousePosition } from '../inputs'
 export function startGame(canvasWidth: number, canvasHeight: number) {
     let isPaused = false
 
-    const pause = () => {
-        isPaused = true
-    }
-
-    const unpause = () => {
-        isPaused = false
-    }
-
     const timer: GameTimer = {
         id: "game-timer",
         time: 0,
@@ -96,12 +88,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         if (asteroids.length < 20) asteroids.push(makeAsteroid(`asteroid-${nextAsteroidId++}`))
     })
 
-    addEventListener('keyup', event => {
-        if (event.code == 'Space') {
-            if (isPaused) unpause()
-            else pause()
-        }
-    })
+    const togglePauseState = () => isPaused = !isPaused
+    addEventListener('game-pause', togglePauseState)
 
     const endGame = () => {
         clearInterval(spawnTimer)
@@ -116,7 +104,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             removeUpdatable(asteroid)
             removeRendering(asteroid)
         }
+
+        removeEventListener('game-pause', togglePauseState)
         
-        dispatchEvent(new Event('end-game'))
+        dispatchEvent(new Event('game-end'))
     }
+
+    dispatchEvent(new Event('game-start'))
 }
