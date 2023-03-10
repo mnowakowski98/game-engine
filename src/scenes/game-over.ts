@@ -7,6 +7,10 @@ export function showGameOver(canvasWidth: number, canvasHeight: number) {
         text: 'You deadeded',
         color: 'white',
         size: 14,
+        position: {
+            x: canvasWidth / 2,
+            y: canvasHeight / 2
+        },
         render: context => renderText(text, context)
     }
     addRendering(text)

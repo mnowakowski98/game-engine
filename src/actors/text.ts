@@ -7,5 +7,5 @@ export default interface Text extends Renderable {
 }
 
 export function renderText(text: Text, context: CanvasRenderingContext2D) {
-    context.fillText(text.text, context.canvas.width / 2, context.canvas.height / 2)
+    context.fillText(text.text, text.position.x, text.position.y)
 }

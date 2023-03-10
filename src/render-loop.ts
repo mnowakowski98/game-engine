@@ -26,6 +26,7 @@ function renderFrame() {
 
     for(const rendering of renderings) {
         _context.save()
+        _context.translate(rendering.position.x, rendering.position.y)
         rendering.render(_context)
         _context.restore()
     }

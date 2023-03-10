@@ -1,9 +1,10 @@
-import { Asteroid, renderAsteroid, checkCollision, updateAsteroid } from '../actors/asteroid'
 import GameTimer, { renderGameTimer } from '../actors/game-timer'
 import { addRendering, removeRendering } from '../render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable, removeUpdatable } from '../update-loop'
 import { getMousePosition } from '../inputs'
+import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
+import { Asteroid } from '../actors/asteroid'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
     let isPaused = false
@@ -11,6 +12,10 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const timer: GameTimer = {
         id: "game-timer",
         time: 0,
+        position: {
+            x: 10,
+            y: 10
+        },
         update: deltaTime => {
             if(!isPaused) timer.time += deltaTime
         },
@@ -21,7 +26,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const ship: Ship = {
         id: 'ship',
-        colliding: false,
         position: {
             x: 50,
             y: canvasHeight / 2
@@ -37,7 +41,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         update: () => {
             if(isPaused) return
             ship.targetPosition = getMousePosition()
-            ship.colliding = false
             updateShip(ship)
         }
     }
@@ -45,70 +48,46 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addRendering(ship)
     addUpdatable(ship)
 
-    const asteroids: Asteroid[] = []
-
-    const makeAsteroid = (id: string) => {
-        const asteroid: Asteroid = {
-            id: id,
-            boundingRadius: 25,
-            position: {
-                x: Math.random() * canvasWidth,
-                y: Math.random() * canvasHeight
-            },
-            rotation: ((Math.random() * 360) * Math.PI) / 180,
-            speed: (Math.random() * 10) + 5,
-            update: deltaTime => {
-                if(isPaused) return
-
-                if (asteroid.isCollidingWith(ship.position)) {
-                    ship.colliding = true
-                    endGame()
-                }
-
-                if ((asteroid.position.x < asteroid.boundingRadius || asteroid.position.x > canvasWidth - asteroid.boundingRadius)
-                    || (asteroid.position.y < 0 || asteroid.position.y > canvasHeight - asteroid.boundingRadius)) {
-                    removeUpdatable(asteroid)
-                    removeRendering(asteroid)
-                    asteroids.splice(asteroids.findIndex(_ => _.id === asteroid.id), 1)
-                }
-
-                return updateAsteroid(asteroid, deltaTime)
-            },
-            render: context => renderAsteroid(asteroid, context),
-            isCollidingWith: position => checkCollision(asteroid, position)
-        }
-
-        addRendering(asteroid)
-        addUpdatable(asteroid)
-        return asteroid
-    }
-
-    let nextAsteroidId = 1
-    const spawnTimer = setInterval(() => {
-        if (asteroids.length < 20) asteroids.push(makeAsteroid(`asteroid-${nextAsteroidId++}`))
-    })
-
     const togglePauseState = () => isPaused = !isPaused
     addEventListener('game-pause', togglePauseState)
 
     const endGame = () => {
-        clearInterval(spawnTimer)
-
         removeUpdatable(timer)
         removeRendering(timer)
 
         removeUpdatable(ship)
         removeRendering(ship)
 
-        for(const asteroid of asteroids) {
-            removeUpdatable(asteroid)
-            removeRendering(asteroid)
-        }
+        removeUpdatable(asteroidSpawner)
 
         removeEventListener('game-pause', togglePauseState)
         
         dispatchEvent(new Event('game-end'))
     }
+
+    let nextAsteroidId = 0
+    let numAsteroids = 0
+    let lastAsteroidSpawnTime = 0
+    const asteroidSpawner: AsteroidSpawner = {
+        id: 'asteroid-spawner',
+        maxSpeed: 5,
+        minSpeed: 3,
+        maxRadius: 10,
+        minRadius: 5,
+        checkCollisionsWith: ship,
+        onAsteroidCollision: endGame,
+        onAsteroidDespawn: () => numAsteroids--,
+        update: () => {
+            if (isPaused) return
+            if (performance.now() - lastAsteroidSpawnTime < 750) return
+            if (numAsteroids > 10) return
+
+            spawnAsteroid(asteroidSpawner, `asteroid-${nextAsteroidId++}`, canvasWidth, canvasHeight, () => isPaused)
+            numAsteroids++
+            lastAsteroidSpawnTime = performance.now()
+        }
+    }
+    addUpdatable(asteroidSpawner)
 
     dispatchEvent(new Event('game-start'))
 }
