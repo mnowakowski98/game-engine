@@ -1,7 +1,8 @@
-import { startGame } from './src/screens/game'
+import { startGame } from './src/scenes/game'
 import { startRenderLoop } from './src/render-loop'
 import { startUpdateLoop } from './src/update-loop'
 import { registerInputs } from './src/inputs'
+import { showGameOver } from './src/scenes/game-over'
 
 addEventListener('load', () => {
     const canvas = document.createElement('canvas')
@@ -25,4 +26,5 @@ addEventListener('load', () => {
     startRenderLoop(context)
     registerInputs(canvas)
     startGame(canvas.width, canvas.height)
+    addEventListener('end-game', () => showGameOver(canvas.width, canvas.height))
 })
