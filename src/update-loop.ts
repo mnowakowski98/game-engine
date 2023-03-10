@@ -16,7 +16,7 @@ function tick(deltaTime: number) {
     for (const updatable of updateables) updatable.update(deltaTime)
 }
 
-export function startUpdating(): number {
+export function startUpdateLoop() {
     const startTime = performance.now()
     let lastUpdateTime = startTime
     isUpdating = true
@@ -31,10 +31,4 @@ export function startUpdating(): number {
         tick(now - lastUpdateTime)
         lastUpdateTime = now
     })
-
-    return startTime
-}
-
-export function stopUpdateLoop() {
-    isUpdating = false
 }

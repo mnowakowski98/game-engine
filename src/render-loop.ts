@@ -26,21 +26,14 @@ function renderFrame() {
 
     for(const rendering of renderings) {
         _context.save()
-
-        const didRender = rendering.render(_context)
-        if (!didRender) console.warn(`Rendering ${rendering.id} failed to render`)
-
+        rendering.render(_context)
         _context.restore()
     }
 
     requestId = requestAnimationFrame(renderFrame)
 }
 
-export function startRendering(context: CanvasRenderingContext2D) {
+export function startRenderLoop(context: CanvasRenderingContext2D) {
     _context = context
     renderFrame()
-}
-
-export function stopRendering() {
-    cancelAnimationFrame(requestId)
 }

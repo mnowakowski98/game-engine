@@ -1,7 +1,7 @@
-import Updateable from './updatable'
-import Renderable from './renderable'
-import Positionable, { Position } from './positionable'
-import Rotatable from './rotatable'
+import Updateable from '../updatable'
+import Renderable from '../renderable'
+import Positionable, { Position } from '../positionable'
+import Rotatable from '../rotatable'
 
 export interface Ship extends Updateable, Renderable, Positionable, Rotatable {
     colliding: boolean
@@ -15,7 +15,7 @@ export function updateShip(ship: Ship) {
     ship.position.y = ship.targetPosition.y
 }
 
-export function renderShip(ship: Ship, context: CanvasRenderingContext2D): boolean {
+export function renderShip(ship: Ship, context: CanvasRenderingContext2D): void {
     context.translate(ship.position.x, ship.position.y)
     context.rotate((ship.rotation * Math.PI) / 180)
     context.translate(-ship.position.x, -ship.position.y)
@@ -36,5 +36,4 @@ export function renderShip(ship: Ship, context: CanvasRenderingContext2D): boole
     else context.fillStyle = 'green'
     context.fill()
     context.stroke()
-    return true
 }
