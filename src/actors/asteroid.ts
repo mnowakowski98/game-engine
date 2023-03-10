@@ -1,8 +1,8 @@
-import Collidable from './collidable'
-import { Position } from './positionable'
-import Renderable from './renderable'
-import Rotatable from './rotatable'
-import Updateable from './updatable'
+import Collidable from '../collidable'
+import { Position } from '../positionable'
+import Renderable from '../renderable'
+import Rotatable from '../rotatable'
+import Updateable from '../updatable'
 
 export interface Asteroid extends Collidable, Renderable, Updateable, Rotatable {
     boundingRadius: number
@@ -16,13 +16,12 @@ export function checkCollision(asteroid: Asteroid, position: Position): boolean 
     return distance <= asteroid.boundingRadius
 }
 
-export function updateAsteroid(asteroid: Asteroid, deltaTime: number): boolean {
+export function updateAsteroid(asteroid: Asteroid, deltaTime: number): void {
     asteroid.position.x += Math.sin(asteroid.rotation) * (asteroid.speed / deltaTime)
     asteroid.position.y += Math.cos(asteroid.rotation) * (asteroid.speed / deltaTime)
-    return true
 }
 
-export function renderAsteroid(asteroid: Asteroid, context: CanvasRenderingContext2D): boolean {
+export function renderAsteroid(asteroid: Asteroid, context: CanvasRenderingContext2D): void {
     context.beginPath()
     context.arc(asteroid.position.x, asteroid.position.y, asteroid.boundingRadius, 0, Math.PI * 2)
     context.closePath()
@@ -30,5 +29,4 @@ export function renderAsteroid(asteroid: Asteroid, context: CanvasRenderingConte
     context.fillStyle = "#c2a07c"
     context.fill()
     context.stroke()
-    return true
 }

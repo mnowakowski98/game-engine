@@ -1,4 +1,4 @@
 export default interface Renderable {
     id: string
-    render: (context: CanvasRenderingContext2D) => boolean
+    render: (context: CanvasRenderingContext2D) => void
 }
