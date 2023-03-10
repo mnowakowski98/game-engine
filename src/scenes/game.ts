@@ -8,14 +8,6 @@ import { getMousePosition } from '../inputs'
 export function startGame(canvasWidth: number, canvasHeight: number) {
     let isPaused = false
 
-    const pause = () => {
-        isPaused = true
-    }
-
-    const unpause = () => {
-        isPaused = false
-    }
-
     const timer: GameTimer = {
         id: "game-timer",
         time: 0,
@@ -56,7 +48,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const asteroids: Asteroid[] = []
 
     const makeAsteroid = (id: string) => {
-
         const asteroid: Asteroid = {
             id: id,
             boundingRadius: 25,
@@ -71,7 +62,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
                 if (asteroid.isCollidingWith(ship.position)) {
                     ship.colliding = true
-                    pause()
+                    endGame()
                 }
 
                 if ((asteroid.position.x < asteroid.boundingRadius || asteroid.position.x > canvasWidth - asteroid.boundingRadius)
@@ -93,14 +84,31 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     }
 
     let nextAsteroidId = 1
-    setInterval(() => {
+    const spawnTimer = setInterval(() => {
         if (asteroids.length < 20) asteroids.push(makeAsteroid(`asteroid-${nextAsteroidId++}`))
     })
 
-    addEventListener('keyup', event => {
-        if (event.code == 'Space') {
-            if (isPaused) unpause()
-            else pause()
+    const togglePauseState = () => isPaused = !isPaused
+    addEventListener('game-pause', togglePauseState)
+
+    const endGame = () => {
+        clearInterval(spawnTimer)
+
+        removeUpdatable(timer)
+        removeRendering(timer)
+
+        removeUpdatable(ship)
+        removeRendering(ship)
+
+        for(const asteroid of asteroids) {
+            removeUpdatable(asteroid)
+            removeRendering(asteroid)
         }
-    })
+
+        removeEventListener('game-pause', togglePauseState)
+        
+        dispatchEvent(new Event('game-end'))
+    }
+
+    dispatchEvent(new Event('game-start'))
 }
