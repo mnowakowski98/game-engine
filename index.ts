@@ -25,9 +25,19 @@ addEventListener('load', () => {
     controlContainer.style.justifyContent = 'center'
     container.appendChild(controlContainer)
 
+
+    const speedSpliderLabel = document.createElement('label')
+    speedSpliderLabel.htmlFor = 'asteroids-maxspeed'
+    speedSpliderLabel.innerHTML = 'Max speed: '
+
     const speedSlider = document.createElement('input')
     speedSlider.type = 'range'
     speedSlider.id = 'asteroids-maxspeed'
+    speedSlider.value = '10'
+    speedSlider.min = '0'
+    speedSlider.max = '25'
+
+    controlContainer.appendChild(speedSpliderLabel)
     controlContainer.appendChild(speedSlider)
     
     const context = canvas.getContext('2d')

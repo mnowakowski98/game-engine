@@ -59,10 +59,14 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     let nextAsteroidId = 0
     let numAsteroids = 0
     let lastAsteroidSpawnTime = 0
+
+    const speedInput = document.querySelector('#asteroids-maxspeed') as HTMLInputElement
+    if (!speedInput) return
+
     const asteroidSpawner: AsteroidSpawner = {
         id: 'asteroid-spawner',
-        maxSpeed: 5,
-        minSpeed: 3,
+        maxSpeed: 10,
+        minSpeed: 0,
         maxRadius: 10,
         minRadius: 5,
         checkCollisionsWith: ship,
@@ -72,6 +76,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (isPaused) return
             if (performance.now() - lastAsteroidSpawnTime < 750) return
             if (numAsteroids > 10) return
+
+            asteroidSpawner.maxSpeed = speedInput.valueAsNumber
 
             spawnAsteroid(asteroidSpawner, `${nextAsteroidId++}`, canvasWidth, canvasHeight, () => isPaused)
             numAsteroids++
