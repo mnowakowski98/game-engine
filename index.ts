@@ -1,19 +1,34 @@
-import { startGame } from './src/scenes/game'
-import { registerInputs } from './src/inputs'
-import { showGameOver } from './src/scenes/game-over'
-import Scene, { startScene } from './src/engine/scene/scene'
+import { start } from './src/startup'
 
 addEventListener('load', () => {
-    const canvas = document.createElement('canvas')
-    const canvasPadding = 100
-    canvas.width = innerWidth - canvasPadding
-    canvas.height = innerHeight - canvasPadding
-    canvas.style.margin = `${canvasPadding / 2}px`
-    canvas.style.border = '1px solid black'
-
     document.body.style.margin = '0'
     document.body.style.backgroundColor = '#a3a3a3'
-    document.body.appendChild(canvas)
+
+    const container = document.createElement('div')
+    const containerPadding = 100
+    container.style.width = `${innerWidth - containerPadding}px`
+    container.style.height = `${innerHeight - containerPadding}px`
+    container.style.margin = `${containerPadding / 2}px`
+    container.style.border = '1px solid blue'
+    document.body.appendChild(container)
+
+    const canvas = document.createElement('canvas')
+    
+    canvas.width = container.clientWidth
+    canvas.height = container.clientHeight - containerPadding
+    canvas.style.border = '1px solid black'
+
+    container.appendChild(canvas)
+
+    const controlContainer = document.createElement('div')
+    controlContainer.style.display = 'flex'
+    controlContainer.style.justifyContent = 'center'
+    container.appendChild(controlContainer)
+
+    const speedSlider = document.createElement('input')
+    speedSlider.type = 'range'
+    speedSlider.id = 'asteroids-maxspeed'
+    controlContainer.appendChild(speedSlider)
     
     const context = canvas.getContext('2d')
     if(context == null) {
@@ -21,19 +36,5 @@ addEventListener('load', () => {
         return
     }
 
-    registerInputs(canvas)
-
-    const game: Scene = {
-        endSceneEventType: 'game-end',
-        init: () => startGame(canvas.width, canvas.height),
-        onSceneEnd: () => startScene(gameOver, context)
-    }
-
-    const gameOver: Scene = {
-        endSceneEventType: 'game-over-reset',
-        init: () => showGameOver(canvas.width, canvas.height),
-        onSceneEnd: () => startScene(game, context)
-    }
-
-    startScene(game, context)
+    start(context)
 })
