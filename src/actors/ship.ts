@@ -1,7 +1,7 @@
-import Updatable from '../updatable'
-import Renderable from '../renderable'
-import { Position } from '../positionable'
-import Rotatable from '../rotatable'
+import Updatable from '../engine/scene/updatable'
+import Renderable from '../engine/scene/renderable'
+import { Position } from '../engine/scene/positionable'
+import Rotatable from '../engine/scene/rotatable'
 import { deg2rad } from '../angle-utils'
 
 export interface Ship extends Updatable, Renderable, Rotatable {

@@ -1,4 +1,4 @@
-import Renderable from '../renderable'
+import Renderable from '../engine/scene/renderable'
 
 export default interface Text extends Renderable {
     text: string

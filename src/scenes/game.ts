@@ -1,7 +1,7 @@
 import GameTimer, { renderGameTimer } from '../actors/game-timer'
-import { addRendering } from '../render-loop'
+import { addRendering } from '../engine/render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
-import { addUpdatable } from '../update-loop'
+import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition } from '../inputs'
 import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
 

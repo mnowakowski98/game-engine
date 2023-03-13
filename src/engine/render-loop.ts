@@ -1,4 +1,4 @@
-import Renderable from './renderable'
+import Renderable from './scene/renderable'
 
 const renderings: Renderable[] = []
 

@@ -1,8 +1,8 @@
-import Collidable from '../collidable'
-import { Position } from '../positionable'
-import Renderable from '../renderable'
-import Rotatable from '../rotatable'
-import Updatable from '../updatable'
+import Collidable from '../engine/scene/collidable'
+import { Position } from '../engine/scene/positionable'
+import Renderable from '../engine/scene/renderable'
+import Rotatable from '../engine/scene/rotatable'
+import Updatable from '../engine/scene/updatable'
 
 export interface Asteroid extends Collidable, Renderable, Updatable, Rotatable {
     boundingRadius: number

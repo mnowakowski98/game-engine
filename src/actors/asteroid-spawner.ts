@@ -1,8 +1,8 @@
 import { deg2rad } from '../angle-utils'
-import Positionable from '../positionable'
-import { addRendering, removeRendering } from '../render-loop'
-import Updatable from '../updatable'
-import { addUpdatable, removeUpdatable } from '../update-loop'
+import Positionable from '../engine/scene/positionable'
+import { addRendering, removeRendering } from '../engine/render-loop'
+import Updatable from '../engine/scene/updatable'
+import { addUpdatable, removeUpdatable } from '../engine/update-loop'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
 
 export interface AsteroidSpawner extends Updatable {

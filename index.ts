@@ -1,9 +1,7 @@
 import { startGame } from './src/scenes/game'
-import { removeAllRenderings, startRenderLoop } from './src/render-loop'
-import { removeAllUpdatables, startUpdateLoop } from './src/update-loop'
 import { registerInputs } from './src/inputs'
 import { showGameOver } from './src/scenes/game-over'
-import Scene, { startScene } from './src/scene'
+import Scene, { startScene } from './src/engine/scene/scene'
 
 addEventListener('load', () => {
     const canvas = document.createElement('canvas')

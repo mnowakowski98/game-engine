@@ -1,4 +1,4 @@
-import Updatable from './updatable'
+import Updatable from './scene/updatable'
 
 const updatables: Updatable[] = []
 

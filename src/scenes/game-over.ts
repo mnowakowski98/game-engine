@@ -1,5 +1,5 @@
 import Text, { renderText } from '../actors/text'
-import { addRendering } from '../render-loop'
+import { addRendering } from '../engine/render-loop'
 
 export function showGameOver(canvasWidth: number, canvasHeight: number) {
     const text: Text = {

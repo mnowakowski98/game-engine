@@ -1,5 +1,5 @@
-import Renderable from '../renderable';
-import Updatable from '../updatable';
+import Renderable from '../engine/scene/renderable';
+import Updatable from '../engine/scene/updatable';
 
 export default interface GameTimer extends Renderable, Updatable {
     time: number
