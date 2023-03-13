@@ -2,9 +2,9 @@ import Collidable from '../collidable'
 import { Position } from '../positionable'
 import Renderable from '../renderable'
 import Rotatable from '../rotatable'
-import Updateable from '../updatable'
+import Updatable from '../updatable'
 
-export interface Asteroid extends Collidable, Renderable, Updateable, Rotatable {
+export interface Asteroid extends Collidable, Renderable, Updatable, Rotatable {
     boundingRadius: number
     speed: number
 }

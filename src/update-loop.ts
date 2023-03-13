@@ -1,25 +1,28 @@
-import Updateable from './updatable'
+import Updatable from './updatable'
 
-const updateables: Updateable[] = []
+const updatables: Updatable[] = []
 
-export function addUpdatable(updatable: Updateable) {
-    updateables.push(updatable)
+export function addUpdatable(updatable: Updatable) {
+    updatables.push(updatable)
 }
 
-export function removeUpdatable(updatable: Updateable) {
-    updateables.splice(updateables.findIndex(_ => updatable.id === _.id), 1)
+export function removeUpdatable(updatable: Updatable) {
+    updatables.splice(updatables.findIndex(_ => updatable.id === _.id), 1)
 }
 
-let isUpdating = false
-
-function tick(deltaTime: number) {
-    for (const updatable of updateables) updatable.update(deltaTime)
+export function removeAllUpdatables() {
+    while (updatables.length > 0) updatables.pop()
 }
 
-export function startUpdateLoop() {
-    const startTime = performance.now()
-    let lastUpdateTime = startTime
-    isUpdating = true
+export function startUpdateLoop(): () => void {
+    let lastUpdateTime = performance.now()
+    let isUpdating = true
+
+    const tick = (deltaTime: number) => {
+        for (const updatable of updatables) {
+            if (isUpdating) updatable.update(deltaTime)
+        }
+    }
 
     const timer = setInterval(() => {
         if(!isUpdating) {
@@ -31,4 +34,6 @@ export function startUpdateLoop() {
         tick(now - lastUpdateTime)
         lastUpdateTime = now
     })
+
+    return () => isUpdating = false
 }

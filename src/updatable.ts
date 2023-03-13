@@ -1,4 +1,4 @@
-export default interface Updateable {
+export default interface Updatable {
     id: string
     update: (deltaTime: number) => void
 }

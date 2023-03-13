@@ -1,5 +1,5 @@
 import Text, { renderText } from '../actors/text'
-import { addRendering, removeRendering } from '../render-loop'
+import { addRendering } from '../render-loop'
 
 export function showGameOver(canvasWidth: number, canvasHeight: number) {
     const text: Text = {
@@ -16,7 +16,6 @@ export function showGameOver(canvasWidth: number, canvasHeight: number) {
     addRendering(text)
 
     const reset = () => {
-        removeRendering(text)
         removeEventListener('game-pause', reset)
         dispatchEvent(new Event('game-over-reset'))
     }

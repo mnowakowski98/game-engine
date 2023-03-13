@@ -1,8 +1,9 @@
 import { startGame } from './src/scenes/game'
-import { startRenderLoop } from './src/render-loop'
-import { startUpdateLoop } from './src/update-loop'
+import { removeAllRenderings, startRenderLoop } from './src/render-loop'
+import { removeAllUpdatables, startUpdateLoop } from './src/update-loop'
 import { registerInputs } from './src/inputs'
 import { showGameOver } from './src/scenes/game-over'
+import Scene, { startScene } from './src/scene'
 
 addEventListener('load', () => {
     const canvas = document.createElement('canvas')
@@ -22,16 +23,19 @@ addEventListener('load', () => {
         return
     }
 
-    startUpdateLoop()
-    startRenderLoop(context)
     registerInputs(canvas)
-    startGame(canvas.width, canvas.height)
-    addEventListener('game-end', () => {
-        showGameOver(canvas.width, canvas.height)
-        const restartGame = () => {
-            removeEventListener('game-over-reset', restartGame)
-            startGame(canvas.width, canvas.height)
-        }
-        addEventListener('game-over-reset', restartGame)
-    })
+
+    const game: Scene = {
+        endSceneEventType: 'game-end',
+        init: () => startGame(canvas.width, canvas.height),
+        onSceneEnd: () => startScene(gameOver, context)
+    }
+
+    const gameOver: Scene = {
+        endSceneEventType: 'game-over-reset',
+        init: () => showGameOver(canvas.width, canvas.height),
+        onSceneEnd: () => startScene(game, context)
+    }
+
+    startScene(game, context)
 })

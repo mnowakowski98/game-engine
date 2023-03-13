@@ -1,11 +1,11 @@
 import { deg2rad } from '../angle-utils'
 import Positionable from '../positionable'
 import { addRendering, removeRendering } from '../render-loop'
-import Updateable from '../updatable'
+import Updatable from '../updatable'
 import { addUpdatable, removeUpdatable } from '../update-loop'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
 
-export interface AsteroidSpawner extends Updateable {
+export interface AsteroidSpawner extends Updatable {
     maxSpeed: number
     minSpeed: number
     maxRadius: number
@@ -20,13 +20,13 @@ export function spawnAsteroid(spawner: AsteroidSpawner, id: string,
 
     const asteroid: Asteroid = {
         id: `asteroid-${id}`,
-        boundingRadius: Math.random() * 25,
+        boundingRadius: (Math.random() * (spawner.maxRadius - spawner.minRadius)) + spawner.minRadius,
         position: {
             x: canvasWidth / 2,
             y: canvasHeight / 2
         },
-        rotation: deg2rad(90),
-        speed: (Math.random() * 10) + 5,
+        rotation: deg2rad(Math.random() * 360),
+        speed: (Math.random() * (spawner.maxSpeed - spawner.minSpeed)) + spawner.minSpeed,
         update: deltaTime => {
             if (isPaused()) return
             updateAsteroid(asteroid, deltaTime, isPaused())

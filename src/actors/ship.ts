@@ -1,10 +1,10 @@
-import Updateable from '../updatable'
+import Updatable from '../updatable'
 import Renderable from '../renderable'
-import Positionable, { Position } from '../positionable'
+import { Position } from '../positionable'
 import Rotatable from '../rotatable'
 import { deg2rad } from '../angle-utils'
 
-export interface Ship extends Updateable, Renderable, Positionable, Rotatable {
+export interface Ship extends Updatable, Renderable, Rotatable {
     width: number
     length: number
     targetPosition: Position

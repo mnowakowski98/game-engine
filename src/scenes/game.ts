@@ -1,10 +1,9 @@
 import GameTimer, { renderGameTimer } from '../actors/game-timer'
-import { addRendering, removeRendering } from '../render-loop'
+import { addRendering } from '../render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
-import { addUpdatable, removeUpdatable } from '../update-loop'
+import { addUpdatable } from '../update-loop'
 import { getMousePosition } from '../inputs'
 import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
-import { Asteroid } from '../actors/asteroid'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
     let isPaused = false
@@ -52,16 +51,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addEventListener('game-pause', togglePauseState)
 
     const endGame = () => {
-        removeUpdatable(timer)
-        removeRendering(timer)
-
-        removeUpdatable(ship)
-        removeRendering(ship)
-
-        removeUpdatable(asteroidSpawner)
-
+        isPaused = true
         removeEventListener('game-pause', togglePauseState)
-        
         dispatchEvent(new Event('game-end'))
     }
 
@@ -82,7 +73,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (performance.now() - lastAsteroidSpawnTime < 750) return
             if (numAsteroids > 10) return
 
-            spawnAsteroid(asteroidSpawner, `asteroid-${nextAsteroidId++}`, canvasWidth, canvasHeight, () => isPaused)
+            spawnAsteroid(asteroidSpawner, `${nextAsteroidId++}`, canvasWidth, canvasHeight, () => isPaused)
             numAsteroids++
             lastAsteroidSpawnTime = performance.now()
         }
