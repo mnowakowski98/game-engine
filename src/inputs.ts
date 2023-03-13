@@ -1,4 +1,4 @@
-import { Position } from './positionable';
+import { Position } from './engine/scene/positionable';
 
 const mousePosition: Position = {
     x: 0,

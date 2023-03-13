@@ -1,10 +1,10 @@
-import Updateable from '../updatable'
-import Renderable from '../renderable'
-import Positionable, { Position } from '../positionable'
-import Rotatable from '../rotatable'
+import Updatable from '../engine/scene/updatable'
+import Renderable from '../engine/scene/renderable'
+import { Position } from '../engine/scene/positionable'
+import Rotatable from '../engine/scene/rotatable'
+import { deg2rad } from '../angle-utils'
 
-export interface Ship extends Updateable, Renderable, Positionable, Rotatable {
-    colliding: boolean
+export interface Ship extends Updatable, Renderable, Rotatable {
     width: number
     length: number
     targetPosition: Position
@@ -16,24 +16,21 @@ export function updateShip(ship: Ship) {
 }
 
 export function renderShip(ship: Ship, context: CanvasRenderingContext2D): void {
-    context.translate(ship.position.x, ship.position.y)
-    context.rotate((ship.rotation * Math.PI) / 180)
-    context.translate(-ship.position.x, -ship.position.y)
+    
+    context.rotate(deg2rad(ship.rotation))
 
     context.beginPath()
 
     const halfWidth = ship.length / 2
     const halfLength = ship.length / 2
 
-    context.moveTo(ship.position.x - halfWidth, ship.position.y + halfLength)
-    context.lineTo(ship.position.x + halfWidth, ship.position.y + halfLength)
-    context.lineTo(ship.position.x, ship.position.y - halfLength)
+    context.moveTo(-halfWidth, halfLength)
+    context.lineTo(halfWidth, halfLength)
+    context.lineTo(0, -halfLength)
 
     context.closePath()
 
     context.lineWidth = 2
-    if (ship.colliding) context.fillStyle = 'red'
-    else context.fillStyle = 'green'
     context.fill()
     context.stroke()
 }
