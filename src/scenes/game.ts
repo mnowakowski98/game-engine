@@ -2,9 +2,10 @@ import GameTimer, { renderGameTimer } from '../actors/game-timer'
 import { addRendering } from '../engine/render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
-import { getMousePosition } from '../inputs'
+import { getMousePosition } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
 import { movementDistance } from '../math-utils'
+import Command, { registerCommand, unregisterCommand } from '../engine/command'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
     let isPaused = false
@@ -17,7 +18,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             y: 10
         },
         update: deltaTime => {
-            if(!isPaused) timer.time += deltaTime
+            if (!isPaused) timer.time += deltaTime
         },
         render: context => renderGameTimer(timer, context)
     }
@@ -39,7 +40,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         length: 50,
         render: context => renderShip(ship, context),
         update: () => {
-            if(isPaused) return
+            if (isPaused) return
             ship.targetPosition = getMousePosition()
             updateShip(ship)
         }
@@ -60,11 +61,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         rotation: -90,
         render: context => renderShip(ship2, context),
         update: deltaTime => {
-            if(isPaused) return
-            
+            if (isPaused) return
+
             if (deltaTime == 0) deltaTime = 1 // Prevent speed / time becoming invalid
 
-            if(ship2.position.x > ship2.targetPosition.x) ship2.position.x -= movementDistance(1, deltaTime)
+            if (ship2.position.x > ship2.targetPosition.x) ship2.position.x -= movementDistance(1, deltaTime)
         }
     }
 
@@ -74,12 +75,14 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addUpdatable(ship2)
     addRendering(ship2)
 
-    const togglePauseState = () => isPaused = !isPaused
-    addEventListener('game-pause', togglePauseState)
+    const pauseCommand: Command = {
+        id: 'game-pause',
+        execute: () => isPaused = !isPaused
+    }
+
+    registerCommand(pauseCommand)
 
     const endGame = () => {
-        isPaused = true
-        removeEventListener('game-pause', togglePauseState)
         dispatchEvent(new Event('game-end'))
     }
 
