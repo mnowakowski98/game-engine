@@ -96,7 +96,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         minSpeed: 10,
         maxRadius: 10,
         minRadius: 5,
-        checkCollisionsWith: ship,
+        checkCollisionsWith: [ship, ship2],
         onAsteroidCollision: endGame,
         onAsteroidDespawn: () => numAsteroids--,
         update: () => {

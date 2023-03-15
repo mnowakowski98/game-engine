@@ -10,7 +10,7 @@ export interface AsteroidSpawner extends Updatable {
     minSpeed: number
     maxRadius: number
     minRadius: number,
-    checkCollisionsWith: Positionable,
+    checkCollisionsWith: Positionable[],
     onAsteroidCollision: () => void,
     onAsteroidDespawn: () => void
 }
@@ -31,7 +31,8 @@ export function spawnAsteroid(spawner: AsteroidSpawner, id: string,
             if (isPaused()) return
             updateAsteroid(asteroid, deltaTime, isPaused())
 
-            if (asteroid.isCollidingWith(spawner.checkCollisionsWith.position)) spawner.onAsteroidCollision()
+            for (const positionable of spawner.checkCollisionsWith)
+                if (asteroid.isCollidingWith(positionable.position)) spawner.onAsteroidCollision()
 
             const isPastLeftBound = asteroid.position.x < asteroid.boundingRadius
             const isPastRightBound = asteroid.position.x > canvasWidth + asteroid.boundingRadius
