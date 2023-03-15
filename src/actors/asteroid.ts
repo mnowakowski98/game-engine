@@ -3,6 +3,7 @@ import { Position } from '../engine/scene/positionable'
 import Renderable from '../engine/scene/renderable'
 import Rotatable from '../engine/scene/rotatable'
 import Updatable from '../engine/scene/updatable'
+import { movementDistance } from '../math-utils'
 
 export interface Asteroid extends Collidable, Renderable, Updatable, Rotatable {
     boundingRadius: number
@@ -29,6 +30,7 @@ export function renderAsteroid(asteroid: Asteroid, context: CanvasRenderingConte
 export function updateAsteroid(asteroid: Asteroid, deltaTime: number, isPaused: boolean) {
     if (isPaused) return
 
-    asteroid.position.x += Math.sin(asteroid.rotation) * (asteroid.speed / deltaTime)
-    asteroid.position.y += Math.cos(asteroid.rotation) * (asteroid.speed / deltaTime)
+    const distance = movementDistance(asteroid.speed, deltaTime)
+    asteroid.position.x += Math.sin(asteroid.rotation) * distance
+    asteroid.position.y += Math.cos(asteroid.rotation) * distance
 }

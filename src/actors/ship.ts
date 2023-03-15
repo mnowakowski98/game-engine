@@ -2,7 +2,7 @@ import Updatable from '../engine/scene/updatable'
 import Renderable from '../engine/scene/renderable'
 import { Position } from '../engine/scene/positionable'
 import Rotatable from '../engine/scene/rotatable'
-import { deg2rad } from '../angle-utils'
+import { deg2rad } from '../math-utils'
 
 export interface Ship extends Updatable, Renderable, Rotatable {
     width: number

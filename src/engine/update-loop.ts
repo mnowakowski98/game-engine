@@ -19,6 +19,10 @@ export function startUpdateLoop(): () => void {
     let isUpdating = true
 
     const tick = (deltaTime: number) => {
+        // Deny the possibility that two updates were called in the same second
+        // as it was causing some issues with distance calculations
+        if(deltaTime == 0) deltaTime++
+
         for (const updatable of updatables) {
             if (isUpdating) updatable.update(deltaTime)
         }

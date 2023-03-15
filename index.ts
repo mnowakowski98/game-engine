@@ -34,7 +34,7 @@ addEventListener('load', () => {
     speedSlider.type = 'range'
     speedSlider.id = 'asteroids-maxspeed'
     speedSlider.value = '10'
-    speedSlider.min = '0'
+    speedSlider.min = '10'
     speedSlider.max = '25'
 
     controlContainer.appendChild(speedSpliderLabel)
