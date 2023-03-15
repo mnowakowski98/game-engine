@@ -1,4 +1,4 @@
-import { deg2rad } from '../angle-utils'
+import { deg2rad } from '../math-utils'
 import Positionable from '../engine/scene/positionable'
 import { addRendering, removeRendering } from '../engine/render-loop'
 import Updatable from '../engine/scene/updatable'

@@ -4,6 +4,7 @@ import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition } from '../inputs'
 import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
+import { movementDistance } from '../math-utils'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
     let isPaused = false
@@ -44,8 +45,34 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
+    const ship2: Ship = {
+        id: 'ship2',
+        position: {
+            x: canvasWidth - 50,
+            y: canvasHeight / 2
+        },
+        targetPosition: {
+            x: 50,
+            y: canvasHeight / 2
+        },
+        width: 25,
+        length: 50,
+        rotation: -90,
+        render: context => renderShip(ship2, context),
+        update: deltaTime => {
+            if(isPaused) return
+            
+            if (deltaTime == 0) deltaTime = 1 // Prevent speed / time becoming invalid
+
+            if(ship2.position.x > ship2.targetPosition.x) ship2.position.x -= movementDistance(1, deltaTime)
+        }
+    }
+
     addRendering(ship)
     addUpdatable(ship)
+
+    addUpdatable(ship2)
+    addRendering(ship2)
 
     const togglePauseState = () => isPaused = !isPaused
     addEventListener('game-pause', togglePauseState)
@@ -66,7 +93,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const asteroidSpawner: AsteroidSpawner = {
         id: 'asteroid-spawner',
         maxSpeed: 10,
-        minSpeed: 0,
+        minSpeed: 10,
         maxRadius: 10,
         minRadius: 5,
         checkCollisionsWith: ship,
