@@ -1,5 +1,5 @@
 import { startGame } from './scenes/game'
-import { registerInputs } from './inputs'
+import { registerInputs } from './engine/inputs'
 import { showGameOver } from './scenes/game-over'
 import Scene, { startScene } from './engine/scene/scene'
 

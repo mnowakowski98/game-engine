@@ -2,7 +2,7 @@ import GameTimer, { renderGameTimer } from '../actors/game-timer'
 import { addRendering } from '../engine/render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
-import { getMousePosition } from '../inputs'
+import { getMousePosition } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
 import { movementDistance } from '../math-utils'
 
@@ -75,6 +75,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addRendering(ship2)
 
     const togglePauseState = () => isPaused = !isPaused
+
+
     addEventListener('game-pause', togglePauseState)
 
     const endGame = () => {
