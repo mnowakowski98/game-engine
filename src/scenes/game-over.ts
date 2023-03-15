@@ -1,4 +1,5 @@
 import Text, { renderText } from '../actors/text'
+import Command, { registerCommand } from '../engine/command'
 import { addRendering } from '../engine/render-loop'
 
 export function showGameOver(canvasWidth: number, canvasHeight: number) {
@@ -15,10 +16,12 @@ export function showGameOver(canvasWidth: number, canvasHeight: number) {
     }
     addRendering(text)
 
-    const reset = () => {
-        removeEventListener('game-pause', reset)
-        dispatchEvent(new Event('game-over-reset'))
+    const reset: Command = {
+        id: 'game-over-reset',
+        execute: () => {
+            dispatchEvent(new Event('game-over-reset'))
+        }
     }
 
-    addEventListener('game-pause', reset)
+    registerCommand(reset)
 }
