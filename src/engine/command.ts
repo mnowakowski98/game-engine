@@ -17,3 +17,15 @@ export function unregisterCommand(command: Command) {
 export function clearCommands() {
     while (commands.length > 0) commands.pop()
 }
+
+const findCommand = (commandId: string) => commands.find(command => command.id === commandId)
+
+export function executeCommand(commandId: string) {
+    const command = findCommand(commandId)
+    if (command) command.execute()
+}
+
+export function undoCommand(commandId: string) {
+    const command = findCommand(commandId)
+    if (command && command.undo) command.undo()
+}

@@ -1,3 +1,4 @@
+import { executeCommand } from './command';
 import { Position } from './scene/positionable';
 
 const mousePosition: Position = {
@@ -9,25 +10,26 @@ export function getMousePosition(): Position {
     return mousePosition
 }
 
-let isPauseKeyPressed = false
-export function pauseKeyPressed(): boolean {
-    return isPauseKeyPressed
-}
-
 export function registerInputs(canvas: HTMLCanvasElement) {
     canvas.addEventListener('mousemove', event => {
         mousePosition.x = event.offsetX
         mousePosition.y = event.offsetY
     })
 
-    addEventListener('keydown', event => {
-        if (event.code == 'Space') isPauseKeyPressed = true
-    })
-
     addEventListener('keyup', event => {
-        if (event.code == 'Space') {
-            isPauseKeyPressed = false
-            dispatchEvent(new Event('game-pause'))
+        let matched = true
+
+        switch (event.code) {
+            case 'Space':
+                executeCommand('game-pause')
+                executeCommand('game-over-reset')
+                break
+
+            default:
+                matched = false
+                break 
         }
+
+        if (matched) event.preventDefault()
     })
 }

@@ -1,3 +1,4 @@
+import { clearCommands } from '../command'
 import { removeAllRenderings, startRenderLoop } from '../render-loop'
 import { removeAllUpdatables, startUpdateLoop } from '../update-loop'
 
@@ -17,6 +18,8 @@ export function startScene(scene: Scene, context: CanvasRenderingContext2D) {
 
         stopRendering()
         removeAllRenderings()
+
+        clearCommands()
 
         removeEventListener(scene.endSceneEventType, stopScene)
 
