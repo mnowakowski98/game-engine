@@ -18,9 +18,7 @@ export function showGameOver(canvasWidth: number, canvasHeight: number) {
 
     const reset: Command = {
         id: 'game-over-reset',
-        execute: () => {
-            dispatchEvent(new Event('game-over-reset'))
-        }
+        actions: [() => dispatchEvent(new Event('game-over-reset'))]
     }
 
     registerCommand(reset)

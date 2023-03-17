@@ -77,7 +77,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const pauseCommand: Command = {
         id: 'game-pause',
-        execute: () => isPaused = !isPaused
+        actions: [() => isPaused = !isPaused]
     }
 
     registerCommand(pauseCommand)

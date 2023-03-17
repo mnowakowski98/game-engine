@@ -1,10 +1,14 @@
 export default interface Command {
     id: string
-    execute: () => void
+    actions: [() => void]
     undo?: () => void
 }
 
 const commands: Command[] = []
+
+export function addCommandAction(command: Command, action: () => void) {
+    command.actions.push(action)
+}
 
 export function registerCommand(command: Command) {
     commands.push(command)
@@ -22,7 +26,8 @@ const findCommand = (commandId: string) => commands.find(command => command.id =
 
 export function executeCommand(commandId: string) {
     const command = findCommand(commandId)
-    if (command) command.execute()
+    if (command)
+        for (const action of command.actions) action()
 }
 
 export function undoCommand(commandId: string) {

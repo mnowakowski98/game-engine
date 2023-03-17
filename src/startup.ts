@@ -7,7 +7,7 @@ import { showMenu } from './engine/scene/menu'
 export function start(context: CanvasRenderingContext2D) {
     const canvas = context.canvas
     registerInputs(canvas)
-
+    
     const game: Scene = {
         endSceneEventType: 'game-end',
         init: () => startGame(canvas.width, canvas.height),
