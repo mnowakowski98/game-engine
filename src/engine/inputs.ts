@@ -32,4 +32,8 @@ export function registerInputs(canvas: HTMLCanvasElement) {
 
         if (matched) event.preventDefault()
     })
+
+    canvas.addEventListener('click', event => {
+        executeCommand('input-mouse-click')
+    })
 }
