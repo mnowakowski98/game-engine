@@ -1,10 +1,10 @@
 import Updatable from '../engine/scene/updatable'
 import Renderable from '../engine/scene/renderable'
-import Positionable, { Position } from '../engine/scene/positionable'
+import { Position } from '../engine/scene/positionable'
 import Rotatable from '../engine/scene/rotatable'
 import { deg2rad } from '../math-utils'
 
-export interface Ship extends Updatable, Renderable, Rotatable, Positionable {
+export interface Ship extends Updatable, Renderable, Rotatable {
     width: number
     length: number
     targetPosition: Position
