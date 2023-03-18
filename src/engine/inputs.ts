@@ -25,6 +25,10 @@ export function registerInputs(canvas: HTMLCanvasElement) {
                 executeCommand('game-over-reset')
                 break
 
+            case 'Escape':
+                executeCommand('global-show-menu-scene')
+                break
+
             default:
                 matched = false
                 break 
@@ -33,7 +37,7 @@ export function registerInputs(canvas: HTMLCanvasElement) {
         if (matched) event.preventDefault()
     })
 
-    canvas.addEventListener('click', event => {
+    canvas.addEventListener('click', () => {
         executeCommand('input-mouse-click')
     })
 }

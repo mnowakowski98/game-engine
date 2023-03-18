@@ -8,6 +8,12 @@ export default interface Scene {
     onSceneEnd: () => void
 }
 
+let currentScene: Scene
+
+export function getCurrentScene(): Scene {
+    return currentScene
+}
+
 export function startScene(scene: Scene, context: CanvasRenderingContext2D) {
     const stopUpdating = startUpdateLoop()
     const stopRendering = startRenderLoop(context)
@@ -26,6 +32,7 @@ export function startScene(scene: Scene, context: CanvasRenderingContext2D) {
         scene.onSceneEnd()
     }
 
+    currentScene = scene
     scene.init()
     addEventListener(scene.endSceneEventType, stopScene)
 }
