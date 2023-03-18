@@ -13,7 +13,25 @@ import Camera, { renderCamera } from '../actors/camera'
 import Renderable from '../engine/scene/renderable'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
+
+    //#region Commands
+
     let isPaused = false
+
+    const pauseCommand: Command = {
+        id: 'game-pause',
+        actions: [() => isPaused = !isPaused]
+    }
+
+    registerCommand(pauseCommand)
+
+    const endGame = () => {
+        dispatchEvent(new Event('game-end'))
+    }
+
+    //#endregion
+
+    //#region HUD
 
     const timer: GameTimer = {
         id: 'game-timer',
@@ -27,49 +45,57 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         },
         render: context => renderGameTimer(timer, context)
     }
-    addUpdatable(timer)
-    addRendering(timer)
+    
+    // addUpdatable(timer)
+    // addRendering(timer)
+
+    //#endregion
+
+    //#region World
+
+    const worldWidth = 3000
+    const worldHeight = 3000
 
     const camera: Camera = {
         id: 'camera',
-        fov: 70,
+        fov: 1,
         position: {
-            x: 100,
-            y: 100
+            x: worldWidth / 2,
+            y: worldHeight / 2
         },
         render: context => renderCamera(camera, context),
         update: deltaTime => undefined
     }
 
-    addUpdatable(camera)
-
-    const testMesh: Renderable = {
-        id: 'test-ball',
-        render: context => {
-            context.beginPath()
-            context.arc(0, 0, 10, 0, Math.PI * 2)
-            context.closePath()
-            context.fill()
-        },
-        position: {
-            x: 10,
-            y: 150
-        }
-    }
-
     const world: World = {
         id: 'game-world',
-        width: 50,
-        height: 50,
-        render: context => renderWorld(world, context, camera),
+        width: worldWidth,
+        height: worldHeight,
+        render: context => renderWorld(world, context),
         update: deltaTime => undefined,
         position: defaultWorldPosition,
-        meshes: [testMesh],
-        actors: []
+        meshes: [{
+            id: 'mesh-center',
+            position: {
+                x: worldWidth / 2,
+                y: worldHeight / 2
+            },
+            render: context => {
+                context.beginPath()
+                context.arc(0, 0, 15, 0, Math.PI * 2)
+                context.closePath()
+            }
+        }],
+        actors: [],
+        camera: camera
     }
 
     addRendering(world)
     addUpdatable(world)
+
+    //#endregion
+
+    //#region Actors
 
     const ship: Ship = {
         id: 'ship',
@@ -94,41 +120,24 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    // const ship2: Ship = {
-    //     id: 'ship2',
-    //     position: {
-    //         x: canvasWidth - 50,
-    //         y: canvasHeight / 2
-    //     },
-    //     targetPosition: {
-    //         x: 50,
-    //         y: canvasHeight / 2
-    //     },
-    //     width: 25,
-    //     length: 50,
-    //     rotation: -90,
-    //     render: context => renderShip(ship2, context),
-    //     update: deltaTime => {
-    //         if (isPaused) return
-    //         if (ship2.position.x > ship2.targetPosition.x) ship2.position.x -= movementDistance(1, deltaTime)
-    //     }
-    // }
-
-    addRendering(ship)
-    addUpdatable(ship)
-
-    // addUpdatable(ship2)
-    // addRendering(ship2)
-
-    const pauseCommand: Command = {
-        id: 'game-pause',
-        actions: [() => isPaused = !isPaused]
-    }
-
-    registerCommand(pauseCommand)
-
-    const endGame = () => {
-        dispatchEvent(new Event('game-end'))
+    const ship2: Ship = {
+        id: 'ship2',
+        position: {
+            x: canvasWidth - 50,
+            y: canvasHeight / 2
+        },
+        targetPosition: {
+            x: 50,
+            y: canvasHeight / 2
+        },
+        width: 25,
+        length: 50,
+        rotation: -90,
+        render: context => renderShip(ship2, context),
+        update: deltaTime => {
+            if (isPaused) return
+            if (ship2.position.x > ship2.targetPosition.x) ship2.position.x -= movementDistance(1, deltaTime)
+        }
     }
 
     let nextAsteroidId = 0
@@ -141,8 +150,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         minSpeed: 10,
         maxRadius: 10,
         minRadius: 5,
-        checkCollisionsWith: [ship],
-        // checkCollisionsWith: [ship, ship2],
+        checkCollisionsWith: [ship, ship2],
         onAsteroidCollision: endGame,
         onAsteroidDespawn: () => numAsteroids--,
         update: () => {
@@ -155,7 +163,16 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             lastAsteroidSpawnTime = performance.now()
         }
     }
-    addUpdatable(asteroidSpawner)
+
+    // addUpdatable(asteroidSpawner)
+
+    // addRendering(ship)
+    // addUpdatable(ship)
+
+    // addUpdatable(ship2)
+    // addRendering(ship2)
+
+    //#endregion
 
     dispatchEvent(new Event('game-start'))
 }
