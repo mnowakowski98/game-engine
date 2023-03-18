@@ -56,22 +56,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const worldWidth = 3000
     const worldHeight = 3000
 
-    const camera: Camera = {
-        id: 'camera',
-        fov: 1,
-        position: {
-            x: worldWidth / 2,
-            y: worldHeight / 2
-        },
-        render: context => renderCamera(camera, context),
-        update: deltaTime => undefined
-    }
-
     const world: World = {
         id: 'game-world',
         width: worldWidth,
         height: worldHeight,
-        render: context => renderWorld(world, context),
+        render: context => renderWorld(world, camera.position, context),
         update: deltaTime => undefined,
         position: defaultWorldPosition,
         meshes: [{
@@ -84,14 +73,27 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
                 context.beginPath()
                 context.arc(0, 0, 15, 0, Math.PI * 2)
                 context.closePath()
+                context.fill()
             }
         }],
-        actors: [],
-        camera: camera
+        actors: []
     }
 
-    addRendering(world)
     addUpdatable(world)
+
+    const camera: Camera = {
+        id: 'camera',
+        fov: 1,
+        position: {
+            x: worldWidth / 2,
+            y: worldHeight / 2
+        },
+        world: world,
+        render: context => renderCamera(camera, context),
+        update: deltaTime => undefined
+    }
+
+    addRendering(camera)
 
     //#endregion
 

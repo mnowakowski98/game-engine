@@ -1,4 +1,3 @@
-import Camera from '../actors/camera'
 import Collidable from './scene/collidable'
 import { Position } from './scene/positionable'
 import Renderable from './scene/renderable'
@@ -20,14 +19,21 @@ export const defaultWorldPosition: Position = {
     y: 0
 }
 
-export function renderWorld(world: World, context: CanvasRenderingContext2D, camera: Camera) {
-    context.translate(world.position.x, world.position.y)
-    
-    camera.render(context)
+export function renderWorld(world: World, offSet: Position, context: CanvasRenderingContext2D) {
+    const { width, height, position } = world
+    const { x, y } = position
+
+    context.save()
+    context.lineWidth = 5
+    context.strokeStyle = 'blue'
+    context.strokeRect(x, y, width, height)
+    context.restore()
+
+    context.translate(x, y)
 
     for (const mesh of world.meshes) {
         context.save()
-        context.translate(mesh.position.x - camera.position.x, mesh.position.y - camera.position.y)
+        context.translate(mesh.position.x - offSet.x, mesh.position.y - offSet.y)
         mesh.render(context)
         context.restore()
     }
