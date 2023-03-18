@@ -1,11 +1,11 @@
 import Camera from '../actors/camera'
 import Collidable from './scene/collidable'
-import { Position } from './scene/positionable'
+import Positionable, { Position } from './scene/positionable'
 import Renderable from './scene/renderable'
 import Updatable from './scene/updatable'
 
-type Actor = Renderable | Updatable
-type Mesh = Renderable | (Renderable & Collidable)
+type Actor = (Renderable | Updatable) & Positionable
+type Mesh = (Renderable | (Renderable & Collidable)) & Positionable
 
 export default interface World extends Renderable, Updatable {
     id: string

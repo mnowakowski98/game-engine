@@ -7,7 +7,7 @@ import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
 import { movementDistance } from '../math-utils'
 import Command, { registerCommand } from '../engine/command'
 import World, { defaultWorldPosition, renderWorld } from '../engine/world'
-import { Position } from '../engine/scene/positionable'
+import Positionable, { Position } from '../engine/scene/positionable'
 import Updatable from '../engine/scene/updatable'
 import Camera from '../actors/camera'
 import Renderable from '../engine/scene/renderable'
@@ -42,7 +42,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     addUpdatable(camera)
 
-    const testMesh: Renderable = {
+    const testMesh: Renderable & Positionable = {
         id: 'test-ball',
         render: context => {
             context.beginPath()
@@ -62,7 +62,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         height: 50,
         render: context => renderWorld(world, context, camera),
         update: deltaTime => undefined,
-        position: defaultWorldPosition,
         meshes: [testMesh],
         actors: []
     }

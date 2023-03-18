@@ -1,6 +1,4 @@
-import Positionable from './positionable'
-
-export default interface Renderable extends Positionable {
+export default interface Renderable {
     id: string
     render: (context: CanvasRenderingContext2D) => void
 }
