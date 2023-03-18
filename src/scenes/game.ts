@@ -9,7 +9,7 @@ import Command, { registerCommand } from '../engine/command'
 import World, { defaultWorldPosition, renderWorld } from '../engine/world'
 import { Position } from '../engine/scene/positionable'
 import Updatable from '../engine/scene/updatable'
-import Camera from '../actors/camera'
+import Camera, { renderCamera } from '../actors/camera'
 import Renderable from '../engine/scene/renderable'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
@@ -37,6 +37,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: 100,
             y: 100
         },
+        render: context => renderCamera(camera, context),
         update: deltaTime => undefined
     }
 

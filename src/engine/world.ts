@@ -21,7 +21,9 @@ export const defaultWorldPosition: Position = {
 }
 
 export function renderWorld(world: World, context: CanvasRenderingContext2D, camera: Camera) {
-    context.translate(camera.position.x, camera.position.y)
+    context.translate(world.position.x, world.position.y)
+    
+    camera.render(context)
 
     for (const mesh of world.meshes) {
         context.save()
