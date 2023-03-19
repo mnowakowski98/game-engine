@@ -29,7 +29,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         id: 'ship',
         position: {
             x: 50,
-            y: canvasHeight / 2
+            y: canvasHeight / 2,
         },
         targetPosition: {
             x: 50,
@@ -38,7 +38,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         rotation: 90,
         width: 25,
         length: 50,
-        render: context => renderShip(ship, context),
+        zIndex: 1,
+        render: context => {
+            context.fillStyle = 'orange'
+            renderShip(ship, context)
+        },
         update: () => {
             if (isPaused) return
             ship.targetPosition = getMousePosition()
@@ -59,6 +63,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         width: 25,
         length: 50,
         rotation: -90,
+        zIndex: 2,
         render: context => renderShip(ship2, context),
         update: deltaTime => {
             if (isPaused) return
