@@ -1,4 +1,4 @@
-import { executeCommand } from './command';
+import Command, { executeCommand, registerCommand } from './command';
 import { Position } from './scene/positionable';
 
 const mousePosition: Position = {
@@ -8,6 +8,11 @@ const mousePosition: Position = {
 
 export function getMousePosition(): Position {
     return mousePosition
+}
+
+export const mouseClickCommand: Command = {
+    id: 'input-mouse-click',
+    actions: []
 }
 
 export function registerInputs(canvas: HTMLCanvasElement) {
@@ -29,6 +34,10 @@ export function registerInputs(canvas: HTMLCanvasElement) {
                 executeCommand('global-show-menu-scene')
                 break
 
+            case 'Backquote':
+                executeCommand('game-show-debug-menu')
+                break
+
             default:
                 matched = false
                 break 
@@ -37,7 +46,9 @@ export function registerInputs(canvas: HTMLCanvasElement) {
         if (matched) event.preventDefault()
     })
 
+    registerCommand(mouseClickCommand)
+
     canvas.addEventListener('click', () => {
-        executeCommand('input-mouse-click')
+        executeCommand(mouseClickCommand.id)
     })
 }

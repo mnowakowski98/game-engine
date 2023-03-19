@@ -2,18 +2,20 @@ import GameTimer, { renderGameTimer } from '../actors/game-timer'
 import { addRendering } from '../engine/render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
-import { getMousePosition } from '../engine/inputs'
+import { getMousePosition, mouseClickCommand } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawner'
-import Command, { registerCommand } from '../engine/command'
+import Command, { addCommandAction, registerCommand } from '../engine/command'
 import World, { defaultWorldPosition, renderWorld, updateWorld } from '../engine/world'
 import Camera, { renderCamera, updateCamera } from '../actors/camera'
-import { addPositions } from '../engine/scene/positionable'
+import { addPositions, subtractPositions } from '../engine/scene/positionable'
 import { movementDistance } from '../math-utils'
+import DebugMenu from '../actors/debug-menu'
+import Checkbox, { isPointInCheckBox, renderCheckBox } from '../actors/checkbox'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
-    const worldWidth = 500
-    const worldHeight = 500
+    const worldWidth = canvasWidth - 150
+    const worldHeight = canvasHeight - 75
 
     //#region Commands
 
@@ -25,6 +27,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     }
 
     registerCommand(pauseCommand)
+
+    let showDebugMenu = true
+
+    registerCommand({
+        id: 'game-show-debug-menu',
+        actions: [() => showDebugMenu = !showDebugMenu]
+    })
 
     const endGame = () => {
         dispatchEvent(new Event('game-end'))
@@ -41,6 +50,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: 10,
             y: 10
         },
+        zIndex: 50,
         update: deltaTime => {
             if (!isPaused) timer.time += deltaTime
         },
@@ -49,6 +59,64 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     addUpdatable(timer)
     addRendering(timer)
+
+    let drawCameraRange = false
+    const shouldDrawCameraRangeCheckBox: Checkbox = {
+        id: 'debug-menu-should-draw-camera-range',
+        width: 10,
+        height: 10,
+        text: 'Draw camera range',
+        position: {
+            x: 10,
+            y: 10
+        },
+        render: context => renderCheckBox(shouldDrawCameraRangeCheckBox, drawCameraRange, context),
+        onUpdate: () => drawCameraRange = !drawCameraRange
+
+    }
+
+    addCommandAction(mouseClickCommand, () => {
+        if (!showDebugMenu) return
+        
+        if (isPointInCheckBox(shouldDrawCameraRangeCheckBox, subtractPositions(getMousePosition(), debugMenu.position)))
+            shouldDrawCameraRangeCheckBox.onUpdate()
+    })
+
+    const debugMenu: DebugMenu = {
+        id: 'debug-menu',
+        width: 200,
+        height: 400,
+        position: {
+            x: canvasWidth - 250,
+            y: 50
+        },
+        controls: [shouldDrawCameraRangeCheckBox],
+        zIndex: 100,
+        render: context => {
+            if (!showDebugMenu) return
+
+            context.save()
+
+            context.fillStyle = 'rgb(14, 188, 194, .2)'
+            context.fillRect(0, 0, debugMenu.width, debugMenu.height)
+            context.strokeRect(0, 0, debugMenu.width, debugMenu.height)
+
+            context.restore()
+
+            for (const control of debugMenu.controls) {
+                const { x, y } = control.position
+
+                context.save()
+                context.translate(x, y)
+                control.render(context)
+                context.restore()
+            }
+
+        },
+        onShouldDrawCameraRangeChange: shouldDrawCameraRange => undefined
+    }
+
+    addRendering(debugMenu)
 
     //#endregion
 
@@ -73,24 +141,24 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    const ship2: Ship = {
-        id: 'ship2',
-        position: defaultWorldPosition,
-        targetPosition: {
-            x: worldWidth,
-            y: worldHeight
-        },
-        width: 15,
-        length: 15,
-        rotation: 135,
-        zIndex: 1,
-        render: context => renderShip(ship2, context),
-        update: deltaTime => {
-            if (isPaused) return
-            if (ship2.position.x < ship2.targetPosition.x) ship2.position.x += movementDistance(1, deltaTime)
-            if (ship2.position.y < ship2.targetPosition.y) ship2.position.y += movementDistance(1, deltaTime)
-        }
-    }
+    // const ship2: Ship = {
+    //     id: 'ship2',
+    //     position: defaultWorldPosition,
+    //     targetPosition: {
+    //         x: worldWidth,
+    //         y: worldHeight
+    //     },
+    //     width: 15,
+    //     length: 15,
+    //     rotation: 135,
+    //     zIndex: 1,
+    //     render: context => renderShip(ship2, context),
+    //     update: deltaTime => {
+    //         if (isPaused) return
+    //         if (ship2.position.x < ship2.targetPosition.x) ship2.position.x += movementDistance(1, deltaTime)
+    //         if (ship2.position.y < ship2.targetPosition.y) ship2.position.y += movementDistance(1, deltaTime)
+    //     }
+    // }
 
     let nextAsteroidId = 0
     let numAsteroids = 0
@@ -102,7 +170,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         minSpeed: 10,
         maxRadius: 10,
         minRadius: 5,
-        checkCollisionsWith: [ship, ship2],
+        checkCollisionsWith: [ship],
         position: {
             x: worldWidth / 2,
             y: worldHeight / 2
@@ -137,15 +205,15 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
                 updater: ship,
                 rendering: ship
             },
-            {
-                id: ship2.id,
-                updater: ship2,
-                rendering: ship2
-            },
-            {
-                id: asteroidSpawner.id,
-                updater: asteroidSpawner
-            }
+            // {
+            //     id: ship2.id,
+            //     updater: ship2,
+            //     rendering: ship2
+            // },
+            // {
+            //     id: asteroidSpawner.id,
+            //     updater: asteroidSpawner
+            // }
         ]
     }
 
@@ -158,7 +226,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         },
         world: world,
         zIndex: -1000,
-        render: context => renderCamera(camera, context),
+        render: context => renderCamera(camera, drawCameraRange, context),
         update: deltaTime => updateCamera(camera, deltaTime)
     }
 

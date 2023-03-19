@@ -1,11 +1,8 @@
+import Control from '../engine/scene/control'
 import { Position } from '../engine/scene/positionable'
-import Renderable from '../engine/scene/renderable'
 
-export default interface Button extends Renderable {
-    id: string
+export default interface Button extends Control {
     text: string
-    width: number
-    height: number
     onActivate: () => void
 }
 
