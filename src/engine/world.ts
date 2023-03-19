@@ -29,8 +29,7 @@ export function renderWorld(world: World, screenOrigin: Position, context: Canva
     context.save()
     context.lineWidth = 5
     context.strokeStyle = 'blue'
-    //context.translate(-screenOrigin.x, -screenOrigin.y)
-    //context.strokeRect(x - screenOrigin.x, y - screenOrigin.y, width, height)
+    context.translate(-screenOrigin.x, -screenOrigin.y)
     context.strokeRect(0, 0, width, height)
     context.restore()
 

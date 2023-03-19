@@ -11,9 +11,20 @@ export default interface Camera extends Updatable, Renderable {
 export function renderCamera(camera: Camera, context: CanvasRenderingContext2D) {
     console.log(`Rendering camera  ${getContextDataString(context)}`)
 
+    const { x, y } = camera.position
+    context.translate(-x, -y)
+
     context.save()
+
+    const { width, height } = context.canvas
     context.fillStyle = '#0d540f'
-    context.fillRect(0, 0, context.canvas.width, context.canvas.height)
+    context.fillRect(0, 0, width, height)
+
+    context.lineWidth = 10
+    context.strokeStyle = 'red'
+    context.strokeRect(0, 0, width, height)
+
     context.restore()
+
     camera.world.render(context)
 }

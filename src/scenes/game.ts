@@ -50,8 +50,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     //#region World
 
-    const worldWidth = 500
-    const worldHeight = 500
+    const worldWidth = 3000
+    const worldHeight = 3000
 
     const world: World = {
         id: 'game-world',
@@ -85,8 +85,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         id: 'camera',
         fov: 1,
         position: {
-            x: worldWidth / 2,
-            y: worldHeight / 2
+            x: worldWidth / 2 - canvasWidth / 2,
+            y: worldHeight / 2 - canvasHeight / 2
         },
         world: world,
         render: context => renderCamera(camera, context),
