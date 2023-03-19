@@ -33,6 +33,8 @@ export function startRenderLoop(context: CanvasRenderingContext2D): () => void {
         const canvasHeight = context.canvas.height
         context.clearRect(0, 0, canvasWidth, canvasHeight)
 
+        renderings.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
+
         for (const rendering of renderings) {
             console.log(`Starting render for ${rendering.id} ${getContextDataString(context)}`)
 
