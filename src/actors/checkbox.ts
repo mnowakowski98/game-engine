@@ -9,7 +9,7 @@ export default interface Checkbox extends Control {
 export function renderCheckBox(checkbox: Checkbox, isChecked: boolean, context: CanvasRenderingContext2D) {
     context.strokeRect(0, 0, checkbox.width, checkbox.height)
     if (isChecked) context.fillRect(0, 0, checkbox.width, checkbox.height)
-    context.fillText(checkbox.text, checkbox.width + 2, checkbox.height / 2)
+    context.fillText(checkbox.text, checkbox.width + 5, checkbox.height * .8)
 }
 
 export function isPointInCheckBox(checkbox: Checkbox, position: Position) {

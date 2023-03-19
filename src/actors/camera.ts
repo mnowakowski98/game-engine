@@ -8,23 +8,25 @@ export default interface Camera extends Updatable, Renderable {
     world: World
 }
 
-export function renderCamera(camera: Camera, context: CanvasRenderingContext2D) {
+export function renderCamera(camera: Camera, drawRange: boolean, context: CanvasRenderingContext2D) {
     // console.log(`Rendering camera  ${getContextDataString(context)}`)
 
     const { x, y } = camera.position
     context.translate(-x, -y)
 
-    context.save()
+    if (drawRange) {
+        context.save()
 
-    const { width, height } = context.canvas
-    context.fillStyle = 'rgb(13, 84, 15, .5)'
-    context.fillRect(0, 0, width, height)
+        const { width, height } = context.canvas
+        context.fillStyle = 'rgb(13, 84, 15, .5)'
+        context.fillRect(0, 0, width, height)
 
-    context.lineWidth = 10
-    context.strokeStyle = 'red'
-    context.strokeRect(0, 0, width, height)
+        context.lineWidth = 10
+        context.strokeStyle = 'red'
+        context.strokeRect(0, 0, width, height)
 
-    context.restore()
+        context.restore()
+    }
 
     camera.world.render(context)
 }
