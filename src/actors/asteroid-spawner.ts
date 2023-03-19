@@ -1,11 +1,10 @@
-import { deg2rad } from '../math-utils'
+import { deg2rad, positionDistance } from '../math-utils'
 import Positionable from '../engine/scene/positionable'
-import { addRendering, removeRendering } from '../engine/render-loop'
 import Updatable from '../engine/scene/updatable'
-import { addUpdatable, removeUpdatable } from '../engine/update-loop'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
+import World from '../engine/world'
 
-export interface AsteroidSpawner extends Updatable {
+export interface AsteroidSpawner extends Updatable, Positionable {
     maxSpeed: number
     minSpeed: number
     maxRadius: number
@@ -15,18 +14,17 @@ export interface AsteroidSpawner extends Updatable {
     onAsteroidDespawn: () => void
 }
 
-export function spawnAsteroid(spawner: AsteroidSpawner, id: string,
-    canvasWidth: number, canvasHeight: number, isPaused: () => boolean) {
-
+export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id: string, maxDistance: number, isPaused: () => boolean) {
     const asteroid: Asteroid = {
         id: `asteroid-${id}`,
         boundingRadius: (Math.random() * (spawner.maxRadius - spawner.minRadius)) + spawner.minRadius,
         position: {
-            x: canvasWidth / 2,
-            y: canvasHeight / 2
+            x: spawner.position.x,
+            y: spawner.position.y
         },
         rotation: deg2rad(Math.random() * 360),
         speed: (Math.random() * (spawner.maxSpeed - spawner.minSpeed)) + spawner.minSpeed,
+        zIndex: 2,
         update: deltaTime => {
             if (isPaused()) return
             updateAsteroid(asteroid, deltaTime, isPaused())
@@ -34,17 +32,8 @@ export function spawnAsteroid(spawner: AsteroidSpawner, id: string,
             for (const positionable of spawner.checkCollisionsWith)
                 if (asteroid.isCollidingWith(positionable.position)) spawner.onAsteroidCollision()
 
-            const isPastLeftBound = asteroid.position.x < asteroid.boundingRadius
-            const isPastRightBound = asteroid.position.x > canvasWidth + asteroid.boundingRadius
-            const isOutsideXBounds = isPastLeftBound || isPastRightBound
-
-            const isPastTopBound = asteroid.position.y < -asteroid.boundingRadius
-            const isPastBottomBound = asteroid.position.y > canvasHeight + asteroid.boundingRadius
-            const isOutsideYBounds = isPastTopBound || isPastBottomBound
-
-            if (isOutsideXBounds || isOutsideYBounds) {
-                removeUpdatable(asteroid)
-                removeRendering(asteroid)
+            if (positionDistance(spawner.position, asteroid.position) > maxDistance) {
+                world.actors.splice(world.actors.findIndex(_ => asteroid.id === _.id), 1)
                 spawner.onAsteroidDespawn()
             }
         },
@@ -52,6 +41,5 @@ export function spawnAsteroid(spawner: AsteroidSpawner, id: string,
         isCollidingWith: position => checkCollision(asteroid, position)
     }
 
-    addUpdatable(asteroid)
-    addRendering(asteroid)
+    world.actors.push({ id: asteroid.id, updater: asteroid, rendering: asteroid })
 }

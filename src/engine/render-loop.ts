@@ -27,7 +27,7 @@ export function startRenderLoop(context: CanvasRenderingContext2D): () => void {
     const renderFrame = () => {
         if(!isRendering) return
 
-        console.log(`Starting frame for request id ${requestId} ${getContextDataString(context)}`)
+        // console.log(`Starting frame for request id ${requestId} ${getContextDataString(context)}`)
 
         const canvasWidth = context.canvas.width
         const canvasHeight = context.canvas.height
@@ -36,7 +36,7 @@ export function startRenderLoop(context: CanvasRenderingContext2D): () => void {
         renderings.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
 
         for (const rendering of renderings) {
-            console.log(`Starting render for ${rendering.id} ${getContextDataString(context)}`)
+            // console.log(`Starting render for ${rendering.id} ${getContextDataString(context)}`)
 
             context.save()
             context.translate(rendering.position.x, rendering.position.y)
