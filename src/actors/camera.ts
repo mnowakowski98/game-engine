@@ -28,3 +28,7 @@ export function renderCamera(camera: Camera, context: CanvasRenderingContext2D) 
 
     camera.world.render(context)
 }
+
+export function updateCamera(camera: Camera, deltaTime: number) {
+    camera.world.update(deltaTime)
+}

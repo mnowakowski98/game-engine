@@ -1,17 +1,19 @@
 import { getContextDataString } from './render-loop'
 import Collidable from './scene/collidable'
-import { Position } from './scene/positionable'
+import { Position, subtractPositions } from './scene/positionable'
 import Renderable from './scene/renderable'
 import Updatable from './scene/updatable'
 
-type Actor = Renderable | Updatable
-type Mesh = Renderable | (Renderable & Collidable)
+type Actor = Updatable
+type Brush = Renderable & {
+    collision?: Collidable
+}
 
 export default interface World extends Renderable, Updatable {
     id: string
     width: number
     height: number
-    meshes: Mesh[]
+    brushes: Brush[]
     actors: Actor[]
 }
 
@@ -24,7 +26,6 @@ export function renderWorld(world: World, screenOrigin: Position, context: Canva
     console.log(`Rendering world ${getContextDataString(context)}`)
 
     const { width, height, position } = world
-    const { x, y } = position
 
     context.save()
     context.lineWidth = 5
@@ -33,10 +34,19 @@ export function renderWorld(world: World, screenOrigin: Position, context: Canva
     context.strokeRect(0, 0, width, height)
     context.restore()
 
-    for (const mesh of world.meshes) {
+    const render = (rendering: Brush) => {
+        console.log(`Starting rendering ${rendering.id} ${getContextDataString(context)}`)
+
         context.save()
-        context.translate(mesh.position.x - screenOrigin.x, mesh.position.y - screenOrigin.y)
-        mesh.render(context)
+        const renderPosition = subtractPositions(rendering.position, screenOrigin) 
+        context.translate(renderPosition.x, renderPosition.y)
+        rendering.render(context)
         context.restore()
     }
+
+    for (const mesh of world.brushes) render(mesh)
+}
+
+export function updateWorld(world: World, deltaTime: number) {
+    for (const actor of world.actors) actor.update(deltaTime)
 }
