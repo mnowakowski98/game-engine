@@ -1,5 +1,5 @@
 import GameTimer, { renderGameTimer } from '../actors/game-timer'
-import { addRendering } from '../engine/render-loop'
+import { addRendering, getContextDataString } from '../engine/render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition } from '../engine/inputs'
@@ -7,10 +7,7 @@ import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
 import { movementDistance } from '../math-utils'
 import Command, { registerCommand } from '../engine/command'
 import World, { defaultWorldPosition, renderWorld } from '../engine/world'
-import { Position } from '../engine/scene/positionable'
-import Updatable from '../engine/scene/updatable'
 import Camera, { renderCamera } from '../actors/camera'
-import Renderable from '../engine/scene/renderable'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
@@ -53,8 +50,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     //#region World
 
-    const worldWidth = 3000
-    const worldHeight = 3000
+    const worldWidth = 500
+    const worldHeight = 500
 
     const world: World = {
         id: 'game-world',
@@ -70,9 +67,12 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
                 y: worldHeight / 2
             },
             render: context => {
+                console.log(`Rendering mesh-center ${getContextDataString(context)}`)
+
                 context.beginPath()
                 context.arc(0, 0, 15, 0, Math.PI * 2)
                 context.closePath()
+                context.fillStyle = 'red'
                 context.fill()
             }
         }],
