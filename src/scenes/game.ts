@@ -5,13 +5,34 @@ import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
 import { movementDistance } from '../math-utils'
-import Command, { registerCommand, unregisterCommand } from '../engine/command'
+import Command, { registerCommand } from '../engine/command'
+import World, { defaultWorldPosition, renderWorld, updateWorld } from '../engine/world'
+import Camera, { renderCamera, updateCamera } from '../actors/camera'
+import { addPositions } from '../engine/scene/positionable'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
+
+    //#region Commands
+
     let isPaused = false
 
+    const pauseCommand: Command = {
+        id: 'game-pause',
+        actions: [() => isPaused = !isPaused]
+    }
+
+    registerCommand(pauseCommand)
+
+    const endGame = () => {
+        dispatchEvent(new Event('game-end'))
+    }
+
+    //#endregion
+
+    //#region HUD
+
     const timer: GameTimer = {
-        id: "game-timer",
+        id: 'game-timer',
         time: 0,
         position: {
             x: 10,
@@ -22,8 +43,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         },
         render: context => renderGameTimer(timer, context)
     }
+
     addUpdatable(timer)
     addRendering(timer)
+
+    //#endregion
+
+    //#region Actors
 
     const ship: Ship = {
         id: 'ship',
@@ -36,8 +62,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             y: canvasHeight / 2
         },
         rotation: 90,
-        width: 25,
-        length: 50,
+        width: 10,
+        length: 15,
         zIndex: 1,
         render: context => {
             context.fillStyle = 'orange'
@@ -45,7 +71,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         },
         update: () => {
             if (isPaused) return
-            ship.targetPosition = getMousePosition()
+            ship.targetPosition = addPositions(camera.position, getMousePosition())
             updateShip(ship)
         }
     }
@@ -60,35 +86,15 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: 50,
             y: canvasHeight / 2
         },
-        width: 25,
-        length: 50,
+        width: 15,
+        length: 15,
         rotation: -90,
         zIndex: 2,
         render: context => renderShip(ship2, context),
         update: deltaTime => {
             if (isPaused) return
-
-            if (deltaTime == 0) deltaTime = 1 // Prevent speed / time becoming invalid
-
             if (ship2.position.x > ship2.targetPosition.x) ship2.position.x -= movementDistance(1, deltaTime)
         }
-    }
-
-    addRendering(ship)
-    addUpdatable(ship)
-
-    addUpdatable(ship2)
-    addRendering(ship2)
-
-    const pauseCommand: Command = {
-        id: 'game-pause',
-        actions: [() => isPaused = !isPaused]
-    }
-
-    registerCommand(pauseCommand)
-
-    const endGame = () => {
-        dispatchEvent(new Event('game-end'))
     }
 
     let nextAsteroidId = 0
@@ -114,7 +120,65 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             lastAsteroidSpawnTime = performance.now()
         }
     }
+
     addUpdatable(asteroidSpawner)
+
+    addUpdatable(ship2)
+    addRendering(ship2)
+
+    //#endregion
+
+    //#region World
+
+    const worldWidth = 3000
+    const worldHeight = 3000
+
+    const world: World = {
+        id: 'game-world',
+        width: worldWidth,
+        height: worldHeight,
+        render: context => renderWorld(world, camera.position, context),
+        update: deltaTime => updateWorld(world, deltaTime),
+        position: defaultWorldPosition,
+        brushes: [
+            {
+                id: 'mesh-center',
+                position: {
+                    x: worldWidth / 2,
+                    y: worldHeight / 2
+                },
+                render: context => {
+                    context.beginPath()
+                    context.arc(0, 0, 15, 0, Math.PI * 2)
+                    context.closePath()
+                    context.fillStyle = 'red'
+                    context.fill()
+                }
+            },
+            ship
+        ],
+        actors: [ship]
+    }
+
+    addUpdatable(world)
+
+    const camera: Camera = {
+        id: 'camera',
+        fov: 1,
+        position: {
+            x: worldWidth / 2 - canvasWidth / 2,
+            y: worldHeight / 2 - canvasHeight / 2
+        },
+        world: world,
+        zIndex: -1000,
+        render: context => renderCamera(camera, context),
+        update: deltaTime => updateCamera(camera, deltaTime)
+    }
+
+    addUpdatable(camera)
+    addRendering(camera)
+
+    //#endregion
 
     dispatchEvent(new Event('game-start'))
 }

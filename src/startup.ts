@@ -36,4 +36,5 @@ export function start(context: CanvasRenderingContext2D) {
     })
 
     startScene(menu, context)
+    // startScene(game, context)
 }
