@@ -1,19 +1,18 @@
 import { getContextDataString } from './render-loop'
-import Collidable from './scene/collidable'
 import { Position, subtractPositions } from './scene/positionable'
 import Renderable from './scene/renderable'
 import Updatable from './scene/updatable'
 
-type Actor = Updatable
-type Brush = Renderable & {
-    collision?: Collidable
+type Actor = {
+    id: string
+    rendering?: Renderable
+    updater?: Updatable
 }
 
 export default interface World extends Renderable, Updatable {
     id: string
     width: number
     height: number
-    brushes: Brush[]
     actors: Actor[]
 }
 
@@ -23,9 +22,9 @@ export const defaultWorldPosition: Position = {
 }
 
 export function renderWorld(world: World, screenOrigin: Position, context: CanvasRenderingContext2D) {
-    console.log(`Rendering world ${getContextDataString(context)}`)
+    // console.log(`Rendering world ${getContextDataString(context)}`)
 
-    const { width, height, position } = world
+    const { width, height } = world
 
     context.save()
     context.lineWidth = 5
@@ -34,8 +33,8 @@ export function renderWorld(world: World, screenOrigin: Position, context: Canva
     context.strokeRect(0, 0, width, height)
     context.restore()
 
-    const render = (rendering: Brush) => {
-        console.log(`Starting rendering ${rendering.id} ${getContextDataString(context)}`)
+    const render = (rendering: Renderable) => {
+        // console.log(`Starting rendering ${rendering.id} ${getContextDataString(context)}`)
 
         context.save()
         const renderPosition = subtractPositions(rendering.position, screenOrigin) 
@@ -44,9 +43,11 @@ export function renderWorld(world: World, screenOrigin: Position, context: Canva
         context.restore()
     }
 
-    for (const mesh of world.brushes) render(mesh)
+    for (const actor of world.actors) 
+        if (actor.rendering) render(actor.rendering)
 }
 
 export function updateWorld(world: World, deltaTime: number) {
-    for (const actor of world.actors) actor.update(deltaTime)
+    for (const actor of world.actors)
+        if (actor.updater) actor.updater.update(deltaTime)
 }

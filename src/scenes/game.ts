@@ -3,14 +3,17 @@ import { addRendering } from '../engine/render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition } from '../engine/inputs'
-import { AsteroidSpawner, spawnAsteroid } from '../actors/asteroid-spawner'
-import { movementDistance } from '../math-utils'
+import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawner'
 import Command, { registerCommand } from '../engine/command'
 import World, { defaultWorldPosition, renderWorld, updateWorld } from '../engine/world'
 import Camera, { renderCamera, updateCamera } from '../actors/camera'
 import { addPositions } from '../engine/scene/positionable'
+import { movementDistance } from '../math-utils'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
+
+    const worldWidth = 500
+    const worldHeight = 500
 
     //#region Commands
 
@@ -53,14 +56,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const ship: Ship = {
         id: 'ship',
-        position: {
-            x: 50,
-            y: canvasHeight / 2,
-        },
-        targetPosition: {
-            x: 50,
-            y: canvasHeight / 2
-        },
+        position: defaultWorldPosition,
+        targetPosition: defaultWorldPosition,
         rotation: 90,
         width: 10,
         length: 15,
@@ -78,22 +75,20 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const ship2: Ship = {
         id: 'ship2',
-        position: {
-            x: canvasWidth - 50,
-            y: canvasHeight / 2
-        },
+        position: defaultWorldPosition,
         targetPosition: {
-            x: 50,
-            y: canvasHeight / 2
+            x: worldWidth,
+            y: worldHeight
         },
         width: 15,
         length: 15,
-        rotation: -90,
-        zIndex: 2,
+        rotation: 135,
+        zIndex: 1,
         render: context => renderShip(ship2, context),
         update: deltaTime => {
             if (isPaused) return
-            if (ship2.position.x > ship2.targetPosition.x) ship2.position.x -= movementDistance(1, deltaTime)
+            if (ship2.position.x < ship2.targetPosition.x) ship2.position.x += movementDistance(1, deltaTime)
+            if (ship2.position.y < ship2.targetPosition.y) ship2.position.y += movementDistance(1, deltaTime)
         }
     }
 
@@ -108,6 +103,10 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         maxRadius: 10,
         minRadius: 5,
         checkCollisionsWith: [ship, ship2],
+        position: {
+            x: worldWidth / 2,
+            y: worldHeight / 2
+        },
         onAsteroidCollision: endGame,
         onAsteroidDespawn: () => numAsteroids--,
         update: () => {
@@ -115,23 +114,15 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (performance.now() - lastAsteroidSpawnTime < 750) return
             if (numAsteroids > 10) return
 
-            spawnAsteroid(asteroidSpawner, `${nextAsteroidId++}`, canvasWidth, canvasHeight, () => isPaused)
+            spawnAsteroidInWorld(asteroidSpawner, world, `${nextAsteroidId++}`, 500, () => isPaused)
             numAsteroids++
             lastAsteroidSpawnTime = performance.now()
         }
     }
 
-    addUpdatable(asteroidSpawner)
-
-    addUpdatable(ship2)
-    addRendering(ship2)
-
     //#endregion
 
     //#region World
-
-    const worldWidth = 3000
-    const worldHeight = 3000
 
     const world: World = {
         id: 'game-world',
@@ -140,27 +131,23 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         render: context => renderWorld(world, camera.position, context),
         update: deltaTime => updateWorld(world, deltaTime),
         position: defaultWorldPosition,
-        brushes: [
+        actors: [
             {
-                id: 'mesh-center',
-                position: {
-                    x: worldWidth / 2,
-                    y: worldHeight / 2
-                },
-                render: context => {
-                    context.beginPath()
-                    context.arc(0, 0, 15, 0, Math.PI * 2)
-                    context.closePath()
-                    context.fillStyle = 'red'
-                    context.fill()
-                }
+                id: ship.id,
+                updater: ship,
+                rendering: ship
             },
-            ship
-        ],
-        actors: [ship]
+            {
+                id: ship2.id,
+                updater: ship2,
+                rendering: ship2
+            },
+            {
+                id: asteroidSpawner.id,
+                updater: asteroidSpawner
+            }
+        ]
     }
-
-    addUpdatable(world)
 
     const camera: Camera = {
         id: 'camera',
