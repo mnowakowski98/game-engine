@@ -166,13 +166,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    // addUpdatable(asteroidSpawner)
+    addUpdatable(asteroidSpawner)
 
-    // addRendering(ship)
-    // addUpdatable(ship)
+    addRendering(ship)
+    addUpdatable(ship)
 
-    // addUpdatable(ship2)
-    // addRendering(ship2)
+    addUpdatable(ship2)
+    addRendering(ship2)
 
     //#endregion
 
