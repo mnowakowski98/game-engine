@@ -35,7 +35,7 @@ export function renderWorld(world: World, context: CanvasRenderingContext2D) {
     renderableActors.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
 
     for (const actor of renderableActors) {
-        console.log(`Starting rendering ${actor.id}: ${getContextDataString(context)}`)
+        // console.log(`Starting rendering ${actor.id}: ${getContextDataString(context)}`)
 
         context.save()
         context.translate(actor.position.x, actor.position.y)
