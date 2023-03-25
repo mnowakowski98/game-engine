@@ -2,7 +2,7 @@ import { startGame } from './scenes/game'
 import { registerInputs } from './engine/inputs'
 import { showGameOver } from './scenes/game-over'
 import Scene, { getCurrentScene, startScene } from './engine/scene/scene'
-import { showMenu } from './engine/scene/menu'
+import { showMenu } from './scenes/menu'
 import { addGlobalCommand } from './engine/command'
 
 export function start(context: CanvasRenderingContext2D) {
@@ -35,6 +35,6 @@ export function start(context: CanvasRenderingContext2D) {
         }]
     })
 
-    startScene(menu, context)
-    // startScene(game, context)
+    // startScene(menu, context)
+    startScene(game, context)
 }

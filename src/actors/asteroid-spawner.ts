@@ -45,5 +45,5 @@ export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id:
         isCollidingWith: position => checkCollision(asteroid, position)
     }
 
-    world.actors.push({ id: asteroid.id, updater: asteroid, rendering: asteroid })
+    world.actors.push(asteroid)
 }

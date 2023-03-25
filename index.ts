@@ -5,11 +5,9 @@ addEventListener('load', () => {
     document.body.style.backgroundColor = '#a3a3a3'
 
     const canvas = document.createElement('canvas')
-    
-    canvas.style.boxSizing = 'border-box'
-    canvas.width = innerWidth - 6
-    canvas.height = innerHeight - 6
-    canvas.style.border = '3px dashed black'
+    canvas.width = innerWidth
+    canvas.height = innerHeight - 3
+    canvas.style.borderBottom = '3px solid black'
 
     document.body.appendChild(canvas)
     
