@@ -5,7 +5,7 @@ import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, registerCommand } from '../engine/command'
-import World, { defaultWorldPosition, renderWorld, updateWorld } from '../engine/world'
+import World, { defaultWorldPosition, renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { renderCamera, updateCamera } from '../actors/camera'
 import { addPositions, subtractPositions } from '../engine/scene/positionable'
 import { movementDistance } from '../math-utils'
@@ -28,7 +28,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     registerCommand(pauseCommand)
 
-    let showDebugMenu = true
+    let showDebugMenu = false
 
     registerCommand({
         id: 'game-show-debug-menu',
@@ -124,8 +124,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const ship: Ship = {
         id: 'ship',
-        position: defaultWorldPosition,
-        targetPosition: defaultWorldPosition,
+        position: defaultWorldPosition(),
+        targetPosition: defaultWorldPosition(),
         rotation: 90,
         width: 10,
         length: 15,
@@ -141,50 +141,88 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    // const ship2: Ship = {
-    //     id: 'ship2',
-    //     position: defaultWorldPosition,
-    //     targetPosition: {
-    //         x: worldWidth,
-    //         y: worldHeight
-    //     },
-    //     width: 15,
-    //     length: 15,
-    //     rotation: 135,
-    //     zIndex: 1,
-    //     render: context => renderShip(ship2, context),
-    //     update: deltaTime => {
-    //         if (isPaused) return
-    //         if (ship2.position.x < ship2.targetPosition.x) ship2.position.x += movementDistance(1, deltaTime)
-    //         if (ship2.position.y < ship2.targetPosition.y) ship2.position.y += movementDistance(1, deltaTime)
-    //     }
-    // }
+    const ship2: Ship = {
+        id: 'ship2',
+        position: defaultWorldPosition(),
+        targetPosition: {
+            x: worldWidth,
+            y: worldHeight
+        },
+        width: 15,
+        length: 15,
+        rotation: 135,
+        zIndex: 1,
+        render: context => renderShip(ship2, context),
+        update: deltaTime => {
+            if (isPaused) return
+            if (ship2.position.x < ship2.targetPosition.x) ship2.position.x += movementDistance(1, deltaTime)
+            if (ship2.position.y < ship2.targetPosition.y) ship2.position.y += movementDistance(1, deltaTime)
+        }
+    }
+
+    const players = [ship, ship2]
 
     let nextAsteroidId = 0
     let numAsteroids = 0
     let lastAsteroidSpawnTime = 0
+    let timeSinceLastSpawn = 0
 
     const asteroidSpawner: AsteroidSpawner = {
         id: 'asteroid-spawner',
-        maxSpeed: 15,
-        minSpeed: 10,
+        maxSpeed: 5,
+        minSpeed: 2,
         maxRadius: 10,
         minRadius: 5,
-        checkCollisionsWith: [ship],
+        checkCollisionsWith: players,
         position: {
-            x: worldWidth / 2,
+            x: worldWidth / 4,
             y: worldHeight / 2
         },
         onAsteroidCollision: endGame,
         onAsteroidDespawn: () => numAsteroids--,
-        update: () => {
+        update: deltaTime => {
             if (isPaused) return
-            if (performance.now() - lastAsteroidSpawnTime < 750) return
+
+            timeSinceLastSpawn += deltaTime
+            if (timeSinceLastSpawn - lastAsteroidSpawnTime < 750) return
             if (numAsteroids > 10) return
 
-            spawnAsteroidInWorld(asteroidSpawner, world, `${nextAsteroidId++}`, 500, () => isPaused)
+            spawnAsteroidInWorld(asteroidSpawner, world, `${nextAsteroidId++}`, 1500, () => isPaused)
             numAsteroids++
             lastAsteroidSpawnTime = performance.now()
+            timeSinceLastSpawn = 0
+        }
+    }
+
+    let nextAsteroidId2 = 0
+    let numAsteroids2 = 0
+    let lastAsteroidSpawnTime2 = 0
+    let timeSinceLastSpawn2 = 0
+
+    const asteroidSpawner2: AsteroidSpawner = {
+        id: 'asteroid-spawner2',
+        maxSpeed: 15,
+        minSpeed: 10,
+        maxRadius: 10,
+        minRadius: 5,
+        checkCollisionsWith: players,
+        position: {
+            x: worldWidth - (worldWidth / 4),
+            y: worldHeight / 3
+        },
+        onAsteroidCollision: endGame,
+        onAsteroidDespawn: () => numAsteroids2--,
+        update: deltaTime => {
+            if (isPaused) return
+
+            timeSinceLastSpawn2 += deltaTime
+            if (timeSinceLastSpawn2 - lastAsteroidSpawnTime2 < 200) return
+            if (numAsteroids2 > 5) return
+
+            spawnAsteroidInWorld(asteroidSpawner2, world, `${nextAsteroidId2++}`, 1500, () => isPaused)
+            numAsteroids++
+            lastAsteroidSpawnTime = performance.now()
+            timeSinceLastSpawn2 = 0
         }
     }
 
@@ -198,22 +236,26 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         height: worldHeight,
         render: context => renderWorld(world, camera.position, context),
         update: deltaTime => updateWorld(world, deltaTime),
-        position: defaultWorldPosition,
+        position: defaultWorldPosition(),
         actors: [
             {
                 id: ship.id,
                 updater: ship,
                 rendering: ship
             },
-            // {
-            //     id: ship2.id,
-            //     updater: ship2,
-            //     rendering: ship2
-            // },
-            // {
-            //     id: asteroidSpawner.id,
-            //     updater: asteroidSpawner
-            // }
+            {
+                id: ship2.id,
+                updater: ship2,
+                rendering: ship2
+            },
+            {
+                id: asteroidSpawner.id,
+                updater: asteroidSpawner
+            },
+            {
+                id: asteroidSpawner2.id,
+                updater: asteroidSpawner2
+            }
         ]
     }
 
