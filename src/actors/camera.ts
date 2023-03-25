@@ -5,6 +5,10 @@ import World from '../engine/scene/world';
 
 export default interface Camera extends Updatable, Renderable {
     fov: number
+    screenX: number,
+    screenY: number,
+    resolutionX: number
+    resoltuionY: number
     world: World
 }
 
@@ -12,18 +16,21 @@ export function renderCamera(camera: Camera, drawRange: boolean, context: Canvas
     // console.log(`Rendering camera  ${getContextDataString(context)}`)
 
     const { x, y } = camera.position
-    context.translate(-x, -y)
 
     if (drawRange) {
         context.save()
 
-        const { width, height } = context.canvas
+        const { resolutionX, resoltuionY, screenX, screenY } = camera
+
+        context.resetTransform()
+        context.translate(screenX, screenY)
+
         context.fillStyle = 'rgb(13, 84, 15, .5)'
-        context.fillRect(0, 0, width, height)
+        context.fillRect(0, 0, resolutionX, resoltuionY)
 
         context.lineWidth = 10
         context.strokeStyle = 'red'
-        context.strokeRect(0, 0, width, height)
+        context.strokeRect(0, 0, resolutionX, resoltuionY)
 
         context.restore()
     }

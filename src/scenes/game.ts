@@ -135,7 +135,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         },
         update: () => {
             if (isPaused) return
-            ship.targetPosition = addPositions(camera.position, getMousePosition())
+            ship.targetPosition = getMousePosition()
             updateShip(ship)
         }
     }
@@ -209,9 +209,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const camera: Camera = {
         id: 'camera',
         fov: 1,
+        screenX: 0,
+        screenY: 0,
+        resolutionX: canvasWidth / 2,
+        resoltuionY: canvasHeight,
         position: {
-            x: -500,
-            y: 500 - canvasHeight / 2
+            x: -10,
+            y: -10
         },
         world: world,
         zIndex: -1000,
@@ -222,6 +226,10 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const camera2: Camera = {
         id: 'camera2',
         fov: 1,
+        screenX: canvasWidth / 2,
+        screenY: 0,
+        resolutionX: canvasWidth / 2,
+        resoltuionY: canvasHeight,
         position: {
             x: -600,
             y: 500 - canvasHeight / 2
