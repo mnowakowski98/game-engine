@@ -3,11 +3,7 @@ import { Position, subtractPositions } from './positionable'
 import Renderable from './renderable'
 import Updatable from './updatable'
 
-type Actor = {
-    id: string
-    rendering?: Renderable
-    updater?: Updatable
-}
+type Actor = Renderable | Updatable
 
 export default interface World extends Renderable, Updatable {
     id: string
@@ -34,19 +30,19 @@ export function renderWorld(world: World, screenOrigin: Position, context: Canva
     context.restore()
 
     for (const actor of world.actors) {
-        if (!actor.rendering) continue
+        if (!("render" in actor)) continue
+
         // console.log(`Starting rendering ${rendering.id} ${getContextDataString(context)}`)
 
         context.save()
-        const rendering = actor.rendering
-        const renderPosition = subtractPositions(rendering.position, screenOrigin)
+        const renderPosition = subtractPositions(actor.position, screenOrigin)
         context.translate(renderPosition.x, renderPosition.y)
-        rendering.render(context)
+        actor.render(context)
         context.restore()
     }
 }
 
 export function updateWorld(world: World, deltaTime: number) {
     for (const actor of world.actors)
-        if (actor.updater) actor.updater.update(deltaTime)
+        if ("update" in actor) actor.update(deltaTime)
 }

@@ -8,14 +8,13 @@ import Command, { addCommandAction, registerCommand } from '../engine/command'
 import World, { defaultWorldPosition, renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { renderCamera, updateCamera } from '../actors/camera'
 import { addPositions, subtractPositions } from '../engine/scene/positionable'
-import { movementDistance } from '../math-utils'
 import DebugMenu from '../actors/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../actors/checkbox'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
-    const worldWidth = canvasWidth - 150
-    const worldHeight = canvasHeight - 75
+    const worldWidth = 1000
+    const worldHeight = 1000
 
     //#region Commands
 
@@ -143,7 +142,10 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const ship2: Ship = {
         id: 'ship2',
-        position: defaultWorldPosition(),
+        position: {
+            x: 450,
+            y: 500
+        },
         targetPosition: {
             x: worldWidth,
             y: worldHeight
@@ -153,14 +155,10 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         rotation: 135,
         zIndex: 1,
         render: context => renderShip(ship2, context),
-        update: deltaTime => {
-            if (isPaused) return
-            if (ship2.position.x < ship2.targetPosition.x) ship2.position.x += movementDistance(1, deltaTime)
-            if (ship2.position.y < ship2.targetPosition.y) ship2.position.y += movementDistance(1, deltaTime)
-        }
+        update: () => undefined
     }
 
-    const players = [ship, ship2]
+    const players: Ship[] = []
 
     let nextAsteroidId = 0
     let numAsteroids = 0
@@ -169,13 +167,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const asteroidSpawner: AsteroidSpawner = {
         id: 'asteroid-spawner',
-        maxSpeed: 5,
-        minSpeed: 2,
+        maxSpeed: 8,
+        minSpeed: 5,
         maxRadius: 10,
         minRadius: 5,
         checkCollisionsWith: players,
         position: {
-            x: worldWidth / 4,
+            x: 750,
             y: worldHeight / 2
         },
         onAsteroidCollision: endGame,
@@ -184,45 +182,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (isPaused) return
 
             timeSinceLastSpawn += deltaTime
-            if (timeSinceLastSpawn - lastAsteroidSpawnTime < 750) return
+            if (timeSinceLastSpawn - lastAsteroidSpawnTime < 200) return
             if (numAsteroids > 10) return
 
             spawnAsteroidInWorld(asteroidSpawner, world, `${nextAsteroidId++}`, 1500, () => isPaused)
             numAsteroids++
             lastAsteroidSpawnTime = performance.now()
             timeSinceLastSpawn = 0
-        }
-    }
-
-    let nextAsteroidId2 = 0
-    let numAsteroids2 = 0
-    let lastAsteroidSpawnTime2 = 0
-    let timeSinceLastSpawn2 = 0
-
-    const asteroidSpawner2: AsteroidSpawner = {
-        id: 'asteroid-spawner2',
-        maxSpeed: 15,
-        minSpeed: 10,
-        maxRadius: 10,
-        minRadius: 5,
-        checkCollisionsWith: players,
-        position: {
-            x: worldWidth - (worldWidth / 4),
-            y: worldHeight / 3
-        },
-        onAsteroidCollision: endGame,
-        onAsteroidDespawn: () => numAsteroids2--,
-        update: deltaTime => {
-            if (isPaused) return
-
-            timeSinceLastSpawn2 += deltaTime
-            if (timeSinceLastSpawn2 - lastAsteroidSpawnTime2 < 200) return
-            if (numAsteroids2 > 5) return
-
-            spawnAsteroidInWorld(asteroidSpawner2, world, `${nextAsteroidId2++}`, 1500, () => isPaused)
-            numAsteroids++
-            lastAsteroidSpawnTime = performance.now()
-            timeSinceLastSpawn2 = 0
         }
     }
 
@@ -237,34 +203,15 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         render: context => renderWorld(world, camera.position, context),
         update: deltaTime => updateWorld(world, deltaTime),
         position: defaultWorldPosition(),
-        actors: [
-            {
-                id: ship.id,
-                updater: ship,
-                rendering: ship
-            },
-            {
-                id: ship2.id,
-                updater: ship2,
-                rendering: ship2
-            },
-            {
-                id: asteroidSpawner.id,
-                updater: asteroidSpawner
-            },
-            {
-                id: asteroidSpawner2.id,
-                updater: asteroidSpawner2
-            }
-        ]
+        actors: [ship, ship2, asteroidSpawner]
     }
 
     const camera: Camera = {
         id: 'camera',
         fov: 1,
         position: {
-            x: worldWidth / 2 - canvasWidth / 2,
-            y: worldHeight / 2 - canvasHeight / 2
+            x: -500,
+            y: 500 - canvasHeight / 2
         },
         world: world,
         zIndex: -1000,
@@ -272,8 +219,24 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         update: deltaTime => updateCamera(camera, deltaTime)
     }
 
+    const camera2: Camera = {
+        id: 'camera2',
+        fov: 1,
+        position: {
+            x: -600,
+            y: 500 - canvasHeight / 2
+        },
+        world: world,
+        zIndex: -1000,
+        render: context => renderCamera(camera2, drawCameraRange, context),
+        update: deltaTime => updateCamera(camera2, deltaTime)
+    }
+
     addUpdatable(camera)
     addRendering(camera)
+
+    addUpdatable(camera2)
+    addRendering(camera2)
 
     //#endregion
 
