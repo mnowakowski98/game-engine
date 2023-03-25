@@ -17,7 +17,7 @@ export const defaultWorldPosition = (): Position => ({
     y: 0
 })
 
-export function renderWorld(world: World, screenOrigin: Position, context: CanvasRenderingContext2D) {
+export function renderWorld(world: World, context: CanvasRenderingContext2D) {
     // console.log(`Rendering world ${getContextDataString(context)}`)
 
     const { width, height } = world
@@ -25,18 +25,20 @@ export function renderWorld(world: World, screenOrigin: Position, context: Canva
     context.save()
     context.lineWidth = 5
     context.strokeStyle = 'blue'
-    context.translate(-screenOrigin.x, -screenOrigin.y)
     context.strokeRect(0, 0, width, height)
     context.restore()
 
-    for (const actor of world.actors) {
-        if (!("render" in actor)) continue
+    const renderableActors: Renderable[] = []
+    for (const actor of world.actors)
+        if ("render" in actor) renderableActors.push(actor)
 
-        // console.log(`Starting rendering ${rendering.id} ${getContextDataString(context)}`)
+    renderableActors.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
+
+    for (const actor of renderableActors) {
+        console.log(`Starting rendering ${actor.id}: ${getContextDataString(context)}`)
 
         context.save()
-        const renderPosition = subtractPositions(actor.position, screenOrigin)
-        context.translate(renderPosition.x, renderPosition.y)
+        context.translate(actor.position.x, actor.position.y)
         actor.render(context)
         context.restore()
     }

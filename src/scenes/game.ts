@@ -10,11 +10,12 @@ import Camera, { renderCamera, updateCamera } from '../actors/camera'
 import { addPositions, subtractPositions } from '../engine/scene/positionable'
 import DebugMenu from '../actors/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../actors/checkbox'
+import Renderable from '../engine/scene/renderable'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
-    const worldWidth = 1000
-    const worldHeight = 1000
+    const worldWidth = 500
+    const worldHeight = 500
 
     //#region Commands
 
@@ -59,7 +60,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addUpdatable(timer)
     addRendering(timer)
 
-    let drawCameraRange = false
+    let drawCameraRange = true
     const shouldDrawCameraRangeCheckBox: Checkbox = {
         id: 'debug-menu-should-draw-camera-range',
         width: 10,
@@ -135,7 +136,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         },
         update: () => {
             if (isPaused) return
-            ship.targetPosition = getMousePosition()
+            ship.targetPosition = addPositions(camera.position, getMousePosition())
             updateShip(ship)
         }
     }
@@ -143,8 +144,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const ship2: Ship = {
         id: 'ship2',
         position: {
-            x: 450,
-            y: 500
+            x: worldWidth - 50,
+            y: 50
         },
         targetPosition: {
             x: worldWidth,
@@ -158,14 +159,14 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         update: () => undefined
     }
 
-    const players: Ship[] = []
+    const players: Ship[] = [ship]
 
     let nextAsteroidId = 0
     let numAsteroids = 0
     let lastAsteroidSpawnTime = 0
     let timeSinceLastSpawn = 0
 
-    const asteroidSpawner: AsteroidSpawner = {
+    const asteroidSpawner: AsteroidSpawner & Renderable = {
         id: 'asteroid-spawner',
         maxSpeed: 8,
         minSpeed: 5,
@@ -173,11 +174,20 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         minRadius: 5,
         checkCollisionsWith: players,
         position: {
-            x: 750,
-            y: worldHeight / 2
+            x: 50,
+            y: 50
         },
+        zIndex: -2,
         onAsteroidCollision: endGame,
         onAsteroidDespawn: () => numAsteroids--,
+        render: context => {
+            context.save()
+            context.beginPath()
+            context.arc(0, 0, 25, 0, Math.PI * 2)
+            context.fillStyle = '#c75d24'
+            context.fill()
+            context.restore()
+        },
         update: deltaTime => {
             if (isPaused) return
 
@@ -200,7 +210,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         id: 'game-world',
         width: worldWidth,
         height: worldHeight,
-        render: context => renderWorld(world, camera.position, context),
+        render: context => renderWorld(world, context),
         update: deltaTime => updateWorld(world, deltaTime),
         position: defaultWorldPosition(),
         actors: [ship, ship2, asteroidSpawner]
@@ -214,11 +224,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         resolutionX: canvasWidth / 2,
         resoltuionY: canvasHeight,
         position: {
-            x: -10,
-            y: -10
+            x: -250,
+            y: -350
         },
         world: world,
-        zIndex: -1000,
+        zIndex: 1000,
         render: context => renderCamera(camera, drawCameraRange, context),
         update: deltaTime => updateCamera(camera, deltaTime)
     }
@@ -231,11 +241,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         resolutionX: canvasWidth / 2,
         resoltuionY: canvasHeight,
         position: {
-            x: -600,
-            y: 500 - canvasHeight / 2
+            x: 250,
+            y: -250
         },
         world: world,
-        zIndex: -1000,
+        zIndex: 1000,
         render: context => renderCamera(camera2, drawCameraRange, context),
         update: deltaTime => updateCamera(camera2, deltaTime)
     }
