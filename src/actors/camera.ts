@@ -13,16 +13,18 @@ export default interface Camera extends Updatable, Renderable {
 }
 
 export function renderCamera(camera: Camera, drawRange: boolean, context: CanvasRenderingContext2D) {
-    // console.log(`Rendering camera  ${getContextDataString(context)}`)
+    console.log(`Rendering camera ${getContextDataString(context)}`)
 
     const { resolutionX, resoltuionY: resolutionY, screenX, screenY } = camera
 
     context.resetTransform()
+
+    context.save()
+    context.translate(screenX, screenY)
     context.strokeRect(0, 0, resolutionX, resolutionY)
 
     if (drawRange) {
         context.save()
-        context.translate(screenX, screenY)
 
         context.fillStyle = 'rgb(13, 84, 15, .25)'
         context.fillRect(0, 0, resolutionX, resolutionY)
@@ -34,12 +36,16 @@ export function renderCamera(camera: Camera, drawRange: boolean, context: Canvas
         context.restore()
     }
 
+    context.restore()
+
     context.beginPath()
     context.rect(screenX, screenY, resolutionX, resolutionY)
     context.clip()
 
     const { x, y } = camera.position
-    context.translate(-x + screenX, -y + screenY)
+    context.translate(camera.world.position.x, camera.world.position.y)
+    context.translate(screenX + resolutionX / 2, screenY + resolutionY / 2)
+    context.translate(-x - camera.world.width / 2, -y - camera.world.height / 2)
     camera.world.render(context)
 }
 
