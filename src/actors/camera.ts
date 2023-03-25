@@ -1,7 +1,7 @@
 import { getContextDataString } from '../engine/render-loop';
 import Renderable from '../engine/scene/renderable';
 import Updatable from '../engine/scene/updatable'
-import World from '../engine/world';
+import World from '../engine/scene/world';
 
 export default interface Camera extends Updatable, Renderable {
     fov: number
