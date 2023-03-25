@@ -16,13 +16,13 @@ export function renderCamera(camera: Camera, drawRange: boolean, context: Canvas
     // console.log(`Rendering camera  ${getContextDataString(context)}`)
 
     const { x, y } = camera.position
+    const { resolutionX, resoltuionY, screenX, screenY } = camera
+
+    context.resetTransform()
 
     if (drawRange) {
         context.save()
 
-        const { resolutionX, resoltuionY, screenX, screenY } = camera
-
-        context.resetTransform()
         context.translate(screenX, screenY)
 
         context.fillStyle = 'rgb(13, 84, 15, .5)'
@@ -34,6 +34,10 @@ export function renderCamera(camera: Camera, drawRange: boolean, context: Canvas
 
         context.restore()
     }
+
+    context.beginPath()
+    context.rect(screenX, screenY, resolutionX, resoltuionY)
+    context.clip()
 
     camera.world.render(context)
 }
