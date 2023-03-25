@@ -18,7 +18,7 @@ export const defaultWorldPosition = (): Position => ({
 })
 
 export function renderWorld(world: World, context: CanvasRenderingContext2D) {
-    // console.log(`Rendering world ${getContextDataString(context)}`)
+    console.log(`Rendering world ${getContextDataString(context)}`)
 
     const { width, height } = world
 
@@ -35,10 +35,10 @@ export function renderWorld(world: World, context: CanvasRenderingContext2D) {
     renderableActors.sort((a, b) => (a.zIndex ?? 0) - (b.zIndex ?? 0))
 
     for (const actor of renderableActors) {
-        // console.log(`Starting rendering ${actor.id}: ${getContextDataString(context)}`)
+        // console.log(`Starting rendering ${actor.id} ${getContextDataString(context)}`)
 
         context.save()
-        context.translate(actor.position.x, actor.position.y)
+        context.translate(actor.position.x + world.width / 2, actor.position.y + world.height / 2)
         actor.render(context)
         context.restore()
     }
@@ -47,4 +47,20 @@ export function renderWorld(world: World, context: CanvasRenderingContext2D) {
 export function updateWorld(world: World, deltaTime: number) {
     for (const actor of world.actors)
         if ("update" in actor) actor.update(deltaTime)
+}
+
+export function getWorldBounds(world: World): [Position, Position] {
+    const halfWidth = world.width / 2
+    const halfHeight = world.height / 2
+    
+    return [
+        {
+            x: -halfWidth,
+            y: -halfHeight
+        },
+        {
+            x: halfWidth,
+            y: halfHeight
+        }
+    ]
 }

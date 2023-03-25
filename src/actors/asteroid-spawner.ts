@@ -2,7 +2,7 @@ import { deg2rad, positionDistance } from '../math-utils'
 import Positionable from '../engine/scene/positionable'
 import Updatable from '../engine/scene/updatable'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
-import World from '../engine/scene/world'
+import World, { getWorldBounds } from '../engine/scene/world'
 
 export interface AsteroidSpawner extends Updatable, Positionable {
     maxSpeed: number
@@ -32,8 +32,10 @@ export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id:
             for (const positionable of spawner.checkCollisionsWith)
                 if (asteroid.isCollidingWith(positionable.position)) spawner.onAsteroidCollision()
 
-            const outsideWorldX = asteroid.position.x < 0 || asteroid.position.x > world.width
-            const outsideWorldY = asteroid.position.y < 0 || asteroid.position.y > world.height
+
+            const worldBounds = getWorldBounds(world)
+            const outsideWorldX = asteroid.position.x < worldBounds[0].x || asteroid.position.x > worldBounds[1].x
+            const outsideWorldY = asteroid.position.y < worldBounds[0].y || asteroid.position.y > worldBounds[1].y
             const outsideMaxDistance = positionDistance(spawner.position, asteroid.position) > maxDistance
 
             if (outsideWorldX || outsideWorldY || outsideMaxDistance) {
