@@ -2,8 +2,8 @@ import Renderable from '../engine/scene/renderable'
 
 export default interface Text extends Renderable {
     text: string
-    size: number
-    color: string
+    size?: number
+    color?: string
 }
 
 export function renderText(text: Text, context: CanvasRenderingContext2D) {

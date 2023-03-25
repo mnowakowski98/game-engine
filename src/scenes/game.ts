@@ -60,7 +60,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addUpdatable(timer)
     addRendering(timer)
 
-    let drawCameraRange = true
+    let drawCameraRange = false
     const shouldDrawCameraRangeCheckBox: Checkbox = {
         id: 'debug-menu-should-draw-camera-range',
         width: 10,
@@ -164,7 +164,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     let nextAsteroidId = 0
     let numAsteroids = 0
     let lastAsteroidSpawnTime = 0
-    let timeSinceLastSpawn = 0
 
     const asteroidSpawner: AsteroidSpawner & Renderable = {
         id: 'asteroid-spawner',
@@ -191,14 +190,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         update: deltaTime => {
             if (isPaused) return
 
-            timeSinceLastSpawn += deltaTime
-            if (timeSinceLastSpawn - lastAsteroidSpawnTime < 200) return
+            
+            if (performance.now() - lastAsteroidSpawnTime < 200) return
             if (numAsteroids > 10) return
 
             spawnAsteroidInWorld(asteroidSpawner, world, `${nextAsteroidId++}`, 1500, () => isPaused)
             numAsteroids++
             lastAsteroidSpawnTime = performance.now()
-            timeSinceLastSpawn = 0
         }
     }
 
