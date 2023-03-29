@@ -1,7 +1,8 @@
+import Pausable from '../engine/scene/pausable';
 import Renderable from '../engine/scene/renderable';
 import Updatable from '../engine/scene/updatable';
 
-export default interface GameTimer extends Renderable, Updatable {
+export default interface GameTimer extends Renderable, Updatable, Pausable {
     time: number
 }
 

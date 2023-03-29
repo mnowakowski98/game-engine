@@ -3,8 +3,9 @@ import Positionable from '../engine/scene/positionable'
 import Updatable from '../engine/scene/updatable'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
 import World, { getWorldBounds } from '../engine/scene/world'
+import Pausable from '../engine/scene/pausable'
 
-export interface AsteroidSpawner extends Updatable, Positionable {
+export interface AsteroidSpawner extends Updatable, Positionable, Pausable {
     maxSpeed: number
     minSpeed: number
     maxRadius: number
@@ -14,7 +15,7 @@ export interface AsteroidSpawner extends Updatable, Positionable {
     onAsteroidDespawn: () => void
 }
 
-export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id: string, maxDistance: number, isPaused: () => boolean) {
+export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id: string, maxDistance: number) {
     const asteroid: Asteroid = {
         id: `asteroid-${id}`,
         boundingRadius: (Math.random() * (spawner.maxRadius - spawner.minRadius)) + spawner.minRadius,
@@ -25,9 +26,11 @@ export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id:
         rotation: deg2rad(Math.random() * 360),
         speed: (Math.random() * (spawner.maxSpeed - spawner.minSpeed)) + spawner.minSpeed,
         zIndex: 2,
+        isPaused: spawner.isPaused,
         update: deltaTime => {
-            if (isPaused()) return
-            updateAsteroid(asteroid, deltaTime, isPaused())
+            if (spawner.isPaused()) return
+
+            updateAsteroid(asteroid, deltaTime)
 
             for (const positionable of spawner.checkCollisionsWith)
                 if (asteroid.isCollidingWith(positionable.position)) spawner.onAsteroidCollision()

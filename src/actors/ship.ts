@@ -3,14 +3,17 @@ import Renderable from '../engine/scene/renderable'
 import { Position } from '../engine/scene/positionable'
 import Rotatable from '../engine/scene/rotatable'
 import { deg2rad } from '../math-utils'
+import Pausable from '../engine/scene/pausable'
 
-export interface Ship extends Updatable, Renderable, Rotatable {
+export interface Ship extends Updatable, Renderable, Rotatable, Pausable {
     width: number
     length: number
     targetPosition: Position
 }
 
 export function updateShip(ship: Ship) {
+    if (ship.isPaused()) return
+
     ship.position.x = ship.targetPosition.x
     ship.position.y = ship.targetPosition.y
 }
