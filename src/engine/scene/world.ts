@@ -12,11 +12,6 @@ export default interface World extends Renderable, Updatable {
     actors: Actor[]
 }
 
-export const defaultWorldPosition = (): Position => ({
-    x: 0,
-    y: 0
-})
-
 export function renderWorld(world: World, context: CanvasRenderingContext2D) {
     console.log(`Rendering world ${getContextDataString(context)}`)
 

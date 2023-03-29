@@ -1,10 +1,12 @@
 import Button, { isPointInButton, renderButton } from '../actors/button';
 import Text, { renderText } from '../actors/text';
-import { addCommandAction, registerCommand } from '../engine/command';
+import { addCommandAction } from '../engine/command';
 import { getMousePosition, mouseClickCommand } from '../engine/inputs';
 import { addRendering } from '../engine/render-loop';
-import { Position } from '../engine/scene/positionable';
+import { Position, origin } from '../engine/scene/positionable';
 import Renderable from '../engine/scene/renderable';
+import Updatable from '../engine/scene/updatable';
+import { addUpdatable } from '../engine/update-loop';
 
 export function showMenu(center: Position) {
     const background: Renderable = {
@@ -21,6 +23,7 @@ export function showMenu(center: Position) {
             context.fillRect(0, 0, context.canvas.width, context.canvas.height)
         }
     }
+
     addRendering(background)
 
     const text: Text = {

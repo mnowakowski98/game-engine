@@ -8,6 +8,7 @@ addEventListener('load', () => {
     canvas.width = innerWidth
     canvas.height = innerHeight - 6
     canvas.style.backgroundColor = '#a3a3a3'
+    canvas.style.cursor = 'none'
 
     document.body.appendChild(canvas)
     
