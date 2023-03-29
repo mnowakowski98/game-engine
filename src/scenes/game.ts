@@ -5,9 +5,9 @@ import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, registerCommand } from '../engine/command'
-import World, { defaultWorldPosition, getWorldBounds, renderWorld, updateWorld } from '../engine/scene/world'
+import World, { defaultWorldPosition, renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { renderCamera, updateCamera } from '../actors/camera'
-import { addPositions, Position, subtractPositions } from '../engine/scene/positionable'
+import { subtractPositions } from '../engine/scene/positionable'
 import DebugMenu from '../actors/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../actors/checkbox'
 import Renderable from '../engine/scene/renderable'
@@ -16,11 +16,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const worldWidth = 500
     const worldHeight = 500
-
-    const worldCenter = (): Position => ({
-        x: worldWidth / 2,
-        y: worldHeight / 2
-    })
 
     //#region Commands
 
@@ -56,6 +51,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             y: 10
         },
         zIndex: 50,
+        isPaused: () => isPaused,
         update: deltaTime => {
             if (!isPaused) timer.time += deltaTime
         },
@@ -135,6 +131,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         width: 10,
         length: 15,
         zIndex: 1,
+        isPaused: () => isPaused,
         render: context => {
             context.fillStyle = 'orange'
             renderShip(ship, context)
@@ -157,6 +154,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         length: 15,
         rotation: 90,
         zIndex: 1,
+        isPaused: () => isPaused,
         render: context => renderShip(ship2, context),
         update: () => {
             if (isPaused) return
@@ -180,6 +178,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         checkCollisionsWith: players,
         position: defaultWorldPosition(),
         zIndex: -2,
+        isPaused: () => isPaused,
         onAsteroidCollision: endGame,
         onAsteroidDespawn: () => numAsteroids--,
         render: context => {
@@ -197,7 +196,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (performance.now() - lastAsteroidSpawnTime < 200) return
             if (numAsteroids > 10) return
 
-            spawnAsteroidInWorld(asteroidSpawner, world, `${nextAsteroidId++}`, 1500, () => isPaused)
+            spawnAsteroidInWorld(asteroidSpawner, world, `${nextAsteroidId++}`, 1500)
             numAsteroids++
             lastAsteroidSpawnTime = performance.now()
         }
