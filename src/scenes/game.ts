@@ -138,7 +138,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         },
         update: () => {
             if (isPaused) return
-            ship.targetPosition = camera.position
             updateShip(ship)
         }
     }
