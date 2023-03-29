@@ -5,9 +5,9 @@ import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, registerCommand } from '../engine/command'
-import World, { defaultWorldPosition, renderWorld, updateWorld } from '../engine/scene/world'
+import World, { renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { renderCamera, updateCamera } from '../actors/camera'
-import { subtractPositions } from '../engine/scene/positionable'
+import { origin, subtractPositions } from '../engine/scene/positionable'
 import DebugMenu from '../actors/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../actors/checkbox'
 import Renderable from '../engine/scene/renderable'
@@ -125,8 +125,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     const ship: Ship = {
         id: 'ship',
-        position: defaultWorldPosition(),
-        targetPosition: defaultWorldPosition(),
+        position: origin(),
+        targetPosition: origin(),
         rotation: 90,
         width: 10,
         length: 15,
@@ -143,27 +143,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    const ship2: Ship = {
-        id: 'ship2',
-        position: defaultWorldPosition(),
-        targetPosition: {
-            x: -250,
-            y: -250
-        },
-        width: 15,
-        length: 15,
-        rotation: 90,
-        zIndex: 1,
-        isPaused: () => isPaused,
-        render: context => renderShip(ship2, context),
-        update: () => {
-            if (isPaused) return
-            //ship2.targetPosition = camera2.position
-            updateShip(ship2)
-        }
-    }
-
-    const players: Ship[] = []
+    const players: Ship[] = [ship]
 
     let nextAsteroidId = 0
     let numAsteroids = 0
@@ -176,7 +156,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         maxRadius: 10,
         minRadius: 5,
         checkCollisionsWith: players,
-        position: defaultWorldPosition(),
+        position: origin(),
         zIndex: -2,
         isPaused: () => isPaused,
         onAsteroidCollision: endGame,
@@ -212,8 +192,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         height: worldHeight,
         render: context => renderWorld(world, context),
         update: deltaTime => updateWorld(world, deltaTime),
-        position: defaultWorldPosition(),
-        actors: [ship, ship2, asteroidSpawner]
+        position: origin(),
+        actors: [ship, asteroidSpawner]
     }
 
     const camera: Camera = {
@@ -221,44 +201,17 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         fov: 1,
         screenX: 0,
         screenY: 0,
-        resolutionX: canvasWidth / 2,
-        resoltuionY: canvasHeight / 2,
-        position: defaultWorldPosition(),
+        resolutionX: canvasWidth,
+        resoltuionY: canvasHeight,
+        position: origin(),
         world: world,
         zIndex: 1000,
         render: context => renderCamera(camera, drawCameraRange, context),
-        update: deltaTime => {
-            // camera.position = addPositions({
-            //     x: camera.screenX - camera.resolutionX,
-            //     y: camera.screenY - camera.resoltuionY
-            // }, getMousePosition())
-
-            updateCamera(camera, deltaTime)
-        }
-    }
-
-    const camera2: Camera = {
-        id: 'camera2',
-        fov: 1,
-        screenX: canvasWidth / 2 + 100,
-        screenY: 200,
-        resolutionX: 500,
-        resoltuionY: 500,
-        position: {
-            x: -250,
-            y: -250
-        },
-        world: world,
-        zIndex: 1000,
-        render: context => renderCamera(camera2, drawCameraRange, context),
-        update: deltaTime => updateCamera(camera2, deltaTime)
+        update: deltaTime => updateCamera(camera, deltaTime)
     }
 
     addUpdatable(camera)
     addRendering(camera)
-
-    addUpdatable(camera2)
-    addRendering(camera2)
 
     //#endregion
 
