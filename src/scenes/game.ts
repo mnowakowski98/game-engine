@@ -142,7 +142,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    const players: Ship[] = [ship]
+    const players: Ship[] = []
 
     let nextAsteroidId = 0
     let numAsteroids = 0

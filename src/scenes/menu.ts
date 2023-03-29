@@ -56,18 +56,4 @@ export function showMenu(center: Position) {
     })
 
     addRendering(startButton)
-
-    const cursor: Renderable = {
-        id: 'cursor',
-        position: origin(),
-        zIndex: 10000,
-        render: context => {
-            const oldPosition = cursor.position
-            cursor.position = getMousePosition()
-            context.translate(cursor.position.x - oldPosition.x, cursor.position.y - oldPosition.y)
-            context.strokeRect(-5, -5, 10, 10)
-        }
-    }
-
-    addRendering(cursor)
 }
