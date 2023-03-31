@@ -1,5 +1,5 @@
 import Text, { renderText } from '../actors/text'
-import Command, { registerCommand } from '../engine/command'
+import Command, { executeCommand, registerCommand } from '../engine/command'
 import { addRendering } from '../engine/render-loop'
 
 export function showGameOver(canvasWidth: number, canvasHeight: number) {
@@ -22,4 +22,7 @@ export function showGameOver(canvasWidth: number, canvasHeight: number) {
     }
 
     registerCommand(reset)
+
+    executeCommand('global-deactivate-green-led')
+    executeCommand('global-activate-red-led')
 }

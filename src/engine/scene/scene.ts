@@ -15,20 +15,18 @@ export function getCurrentScene(): Scene {
 }
 
 export function startScene(scene: Scene, context: CanvasRenderingContext2D) {
+    removeAllUpdatables()
+    removeAllRenderings()
+    clearCommands()
+
     const stopUpdating = startUpdateLoop()
     const stopRendering = startRenderLoop(context)
 
     const stopScene = () => {
         stopUpdating()
-        removeAllUpdatables()
-
         stopRendering()
-        removeAllRenderings()
-
-        clearCommands()
-
+        
         removeEventListener(scene.endSceneEventType, stopScene)
-
         scene.onSceneEnd()
     }
 

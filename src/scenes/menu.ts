@@ -1,12 +1,10 @@
 import Button, { isPointInButton, renderButton } from '../actors/button';
 import Text, { renderText } from '../actors/text';
-import { addCommandAction } from '../engine/command';
+import { addCommandAction, executeCommand } from '../engine/command';
 import { getMousePosition, mouseClickCommand } from '../engine/inputs';
 import { addRendering } from '../engine/render-loop';
-import { Position, origin } from '../engine/scene/positionable';
+import { Position } from '../engine/scene/positionable';
 import Renderable from '../engine/scene/renderable';
-import Updatable from '../engine/scene/updatable';
-import { addUpdatable } from '../engine/update-loop';
 
 export function showMenu(center: Position) {
     const background: Renderable = {
@@ -56,4 +54,7 @@ export function showMenu(center: Position) {
     })
 
     addRendering(startButton)
+
+    executeCommand('global-activate-green-led')
+    executeCommand('global-activate-red-led')
 }
