@@ -4,7 +4,7 @@ import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawner'
-import Command, { addCommandAction, registerCommand } from '../engine/command'
+import Command, { addCommandAction, executeCommand, registerCommand } from '../engine/command'
 import World, { renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { renderCamera, screenToCameraPosition, screenToWorldPosition, updateCamera } from '../actors/camera'
 import { origin, subtractPositions } from '../engine/scene/positionable'
@@ -38,6 +38,9 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const endGame = () => {
         dispatchEvent(new Event('game-end'))
     }
+
+    executeCommand('global-deactivate-red-led')
+    executeCommand('global-activate-green-led')
 
     //#endregion
 
@@ -148,7 +151,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    const players: Ship[] = []
+    const players: Ship[] = [ship]
 
     let nextAsteroidId = 0
     let numAsteroids = 0
