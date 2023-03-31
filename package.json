@@ -2,9 +2,10 @@
   "name": "asteroids",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/bundle.js",
   "scripts": {
     "build": "webpack",
+    "package": "tar --exclude dist/asteroids.tar.gz -zcvf dist/asteroids.tar.gz package.json package-lock.json dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
