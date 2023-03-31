@@ -1,4 +1,5 @@
 import { getContextDataString } from '../engine/render-loop';
+import { addPositions, Position, subtractPositions } from '../engine/scene/positionable';
 import Renderable from '../engine/scene/renderable';
 import Updatable from '../engine/scene/updatable'
 import World from '../engine/scene/world';
@@ -8,14 +9,14 @@ export default interface Camera extends Updatable, Renderable {
     screenX: number,
     screenY: number,
     resolutionX: number
-    resoltuionY: number
+    resolutionY: number
     world: World
 }
 
 export function renderCamera(camera: Camera, drawRange: boolean, context: CanvasRenderingContext2D) {
     console.log(`Rendering camera ${getContextDataString(context)}`)
 
-    const { resolutionX, resoltuionY: resolutionY, screenX, screenY } = camera
+    const { resolutionX, resolutionY, screenX, screenY } = camera
 
     context.resetTransform()
 
@@ -51,4 +52,17 @@ export function renderCamera(camera: Camera, drawRange: boolean, context: Canvas
 
 export function updateCamera(camera: Camera, deltaTime: number) {
     camera.world.update(deltaTime)
+}
+
+export function screenToCameraPosition(camera: Camera, screenPosition: Position): Position {
+    const { resolutionX, resolutionY, screenX, screenY } = camera
+    return addPositions({
+        x: -screenX - resolutionX / 2,
+        y: -screenY - resolutionY / 2
+    }, screenPosition)
+}
+
+export function screenToWorldPosition(camera: Camera, screenPosition: Position): Position {
+    const cameraRelativePosition = screenToCameraPosition(camera, screenPosition)
+    return addPositions(cameraRelativePosition, camera.position)
 }
