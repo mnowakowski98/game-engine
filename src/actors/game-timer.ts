@@ -7,5 +7,16 @@ export default interface GameTimer extends Renderable, Updatable, Pausable {
 }
 
 export function renderGameTimer(timer: GameTimer, context: CanvasRenderingContext2D) {
-    context.fillText(timer.time.toString(), 0, 0)
+    const seconds = (timer.time / 1000)
+    const secondsClamped = seconds % 60
+    const secondsText = `${secondsClamped < 10 ? '0' + secondsClamped.toFixed(2) : secondsClamped.toFixed(2) }`
+
+    const minutes = Math.floor(seconds / 60)
+    const minutesClamped = minutes % 60
+    const minutesText = `${minutesClamped < 10 ? '0' + minutesClamped : minutesClamped}`
+
+    const hours = Math.floor(minutes / 60)
+    const timeText = `${hours} : ${minutesText} : ${secondsText}`
+
+    context.fillText(`${timeText}`, 0, 0)
 }
