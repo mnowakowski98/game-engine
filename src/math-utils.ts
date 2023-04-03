@@ -21,3 +21,9 @@ export function positionDistance(pos1: Position, pos2: Position): number {
     const distance = Math.sqrt(differenceX * differenceX + differenceY * differenceY)
     return distance
 }
+
+export function randomBetween(min: number, max: number): number {
+    const difference = max - min
+    const baseRandom = difference * Math.random()
+    return baseRandom + min
+}

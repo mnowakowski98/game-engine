@@ -1,4 +1,4 @@
-import { deg2rad, positionDistance } from '../math-utils'
+import { deg2rad, positionDistance, randomBetween } from '../math-utils'
 import Positionable from '../engine/scene/positionable'
 import Updatable from '../engine/scene/updatable'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
@@ -9,21 +9,23 @@ export interface AsteroidSpawner extends Updatable, Positionable, Pausable {
     maxSpeed: number
     minSpeed: number
     maxRadius: number
-    minRadius: number,
+    minRadius: number
+    minAngle: number
+    maxAngle: number
     checkCollisionsWith: Positionable[],
-    onAsteroidCollision: () => void,
+    onAsteroidCollision: (target: Positionable) => void,
     onAsteroidDespawn: () => void
 }
 
 export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id: string, maxDistance: number) {
     const asteroid: Asteroid = {
-        id: `asteroid-${id}`,
+        id: `${spawner.id}--asteroid-${id}`,
         boundingRadius: (Math.random() * (spawner.maxRadius - spawner.minRadius)) + spawner.minRadius,
         position: {
             x: spawner.position.x,
             y: spawner.position.y
         },
-        rotation: deg2rad(Math.random() * 360),
+        rotation: deg2rad(randomBetween(spawner.minAngle, spawner.maxAngle)),
         speed: (Math.random() * (spawner.maxSpeed - spawner.minSpeed)) + spawner.minSpeed,
         zIndex: 2,
         isPaused: spawner.isPaused,
@@ -32,9 +34,12 @@ export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id:
 
             updateAsteroid(asteroid, deltaTime)
 
-            for (const positionable of spawner.checkCollisionsWith)
-                if (asteroid.isCollidingWith(positionable.position)) spawner.onAsteroidCollision()
-
+            for (const target of spawner.checkCollisionsWith) {
+                if (asteroid.isCollidingWith(target.position)) {
+                    asteroid.rotation *= -1
+                    spawner.onAsteroidCollision(target)
+                }
+            }
 
             const worldBounds = getWorldBounds(world)
             const outsideWorldX = asteroid.position.x < worldBounds[0].x || asteroid.position.x > worldBounds[1].x
