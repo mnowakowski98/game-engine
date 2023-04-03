@@ -1,19 +1,17 @@
 import { getContextDataString } from '../engine/render-loop';
-import { addPositions, Position, subtractPositions } from '../engine/scene/positionable';
+import { addPositions, Position } from '../engine/scene/positionable';
 import Renderable from '../engine/scene/renderable';
-import Updatable from '../engine/scene/updatable'
 import World from '../engine/scene/world';
 
-export default interface Camera extends Updatable, Renderable {
+export default interface Camera extends Renderable {
     fov: number
     screenX: number,
     screenY: number,
     resolutionX: number
     resolutionY: number
-    world: World
 }
 
-export function renderCamera(camera: Camera, drawRange: boolean, context: CanvasRenderingContext2D) {
+export function renderCamera(camera: Camera, world: World, drawRange: boolean, context: CanvasRenderingContext2D) {
     console.log(`Rendering camera ${getContextDataString(context)}`)
 
     const { resolutionX, resolutionY, screenX, screenY } = camera
@@ -44,14 +42,10 @@ export function renderCamera(camera: Camera, drawRange: boolean, context: Canvas
     context.clip()
 
     const { x, y } = camera.position
-    context.translate(camera.world.position.x, camera.world.position.y)
+    context.translate(world.position.x, world.position.y)
     context.translate(screenX + resolutionX / 2, screenY + resolutionY / 2)
-    context.translate(-x - camera.world.width / 2, -y - camera.world.height / 2)
-    camera.world.render(context)
-}
-
-export function updateCamera(camera: Camera, deltaTime: number) {
-    camera.world.update(deltaTime)
+    context.translate(-x - world.width / 2, -y - world.height / 2)
+    world.render(context)
 }
 
 export function screenToCameraPosition(camera: Camera, screenPosition: Position): Position {

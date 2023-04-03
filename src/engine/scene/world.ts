@@ -1,5 +1,5 @@
 import { getContextDataString } from '../render-loop'
-import { Position, subtractPositions } from './positionable'
+import { Position } from './positionable'
 import Renderable from './renderable'
 import Updatable from './updatable'
 

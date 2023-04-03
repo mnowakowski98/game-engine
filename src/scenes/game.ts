@@ -6,11 +6,12 @@ import { getMousePosition, mouseClickCommand } from '../engine/inputs'
 import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, executeCommand, registerCommand } from '../engine/command'
 import World, { renderWorld, updateWorld } from '../engine/scene/world'
-import Camera, { renderCamera, screenToCameraPosition, screenToWorldPosition, updateCamera } from '../actors/camera'
+import Camera, { renderCamera, screenToCameraPosition, screenToWorldPosition } from '../actors/camera'
 import { origin, subtractPositions } from '../engine/scene/positionable'
 import DebugMenu from '../actors/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../actors/checkbox'
 import Renderable from '../engine/scene/renderable'
+import Updatable from '../engine/scene/updatable'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
@@ -206,6 +207,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         actors: [ship, asteroidSpawner]
     }
 
+    addUpdatable(world)
+
     const camera: Camera = {
         id: 'camera',
         fov: 1,
@@ -214,19 +217,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         resolutionX: canvasWidth,
         resolutionY: canvasHeight,
         position: origin(),
-        world: world,
         zIndex: 1000,
-        render: context => renderCamera(camera, drawCameraRange, context),
-        update: deltaTime => {
-            //camera.position = screenToCameraPosition(camera, getMousePosition())
-            updateCamera(camera, deltaTime)
-        }
+        render: context => renderCamera(camera, world, drawCameraRange, context)
     }
 
-    addUpdatable(camera)
     addRendering(camera)
 
-    const camera2: Camera = {
+    const camera2: Camera & Updatable = {
         id: 'camera-2',
         fov: 1,
         screenX: canvasWidth / 2,
@@ -234,7 +231,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         resolutionX: canvasWidth / 2,
         resolutionY: canvasHeight / 2,
         position: origin(),
-        world: world,
         zIndex: 1001,
         render: context => {
             context.save()
@@ -242,12 +238,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             context.fillStyle = 'rgb(157, 168, 165, .7)'
             context.fillRect(camera2.screenX, camera2.screenY, camera2.resolutionX, camera2.resolutionY)
             context.restore()
-            renderCamera(camera2, drawCameraRange, context)
+            renderCamera(camera2, world, drawCameraRange, context)
         },
-        update: deltaTime => {
+        update: () => {
             if (isPaused) return
             camera2.position = screenToWorldPosition(camera, getMousePosition())
-            updateCamera(camera2, deltaTime)
         }
     }
 
