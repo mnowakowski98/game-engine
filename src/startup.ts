@@ -1,7 +1,7 @@
 import { startGame } from './scenes/game'
 import { registerInputs } from './engine/inputs'
 import { showGameOver } from './scenes/game-over'
-import Scene, { getCurrentScene, startScene } from './engine/scene/scene'
+import Scene, { startScene } from './engine/scene/scene'
 import { showMenu } from './scenes/menu'
 import { addGlobalCommand } from './engine/command'
 import { connectDevice, sendLedCommand } from './engine/peripheral'
@@ -80,10 +80,7 @@ export function start(context: CanvasRenderingContext2D) {
 
     addGlobalCommand({
         id: 'global-show-menu-scene',
-        actions: [() => {
-            //dispatchEvent(new Event(getCurrentScene().endSceneEventType))
-            startScene(menu, context)
-        }]
+        actions: [() => { startScene(menu, context) }]
     })
 
     startScene(menu, context)
