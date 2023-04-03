@@ -39,8 +39,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         dispatchEvent(new Event('game-end'))
     }
 
-    executeCommand('global-deactivate-red-led')
-    executeCommand('global-activate-green-led')
+    executeCommand('global-activate-shield-leds')
+    executeCommand('global-activate-health-leds')
+
+    executeCommand('global-set-shield-leds-full')
+    executeCommand('global-set-health-leds-full')
 
     //#endregion
 

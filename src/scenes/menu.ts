@@ -55,6 +55,6 @@ export function showMenu(center: Position) {
 
     addRendering(startButton)
 
-    executeCommand('global-activate-green-led')
-    executeCommand('global-activate-red-led')
+    executeCommand('global-deactivate-shield-leds')
+    executeCommand('global-deactivate-health-leds')
 }
