@@ -1,6 +1,7 @@
 type LedCommand = {
-    led?: string
-    on?: boolean
+    leds?: 'shield' | 'health'
+    status?: 'active' | 'inactive'
+    numActive?: number
 }
 
 let socket: WebSocket

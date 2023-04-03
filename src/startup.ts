@@ -13,34 +13,50 @@ export function start(context: CanvasRenderingContext2D) {
     connectDevice('ws://raspberrypi:8080')
 
     addGlobalCommand({
-        id: 'global-activate-green-led',
+        id: 'global-activate-shield-leds',
         actions: [() => sendLedCommand({
-            led: 'green',
-            on: true
+            leds: 'shield',
+            status: 'active'
         })]
     })
 
     addGlobalCommand({
-        id: 'global-deactivate-green-led',
+        id: 'global-activate-health-leds',
         actions: [() => sendLedCommand({
-            led: 'green',
-            on: false
+            leds: 'health',
+            status: 'active'
         })]
     })
 
     addGlobalCommand({
-        id: 'global-activate-red-led',
+        id: 'global-deactivate-shield-leds',
         actions: [() => sendLedCommand({
-            led: 'red',
-            on: true
+            leds: 'shield',
+            status: 'inactive'
         })]
     })
 
     addGlobalCommand({
-        id: 'global-deactivate-red-led',
+        id: 'global-deactivate-health-leds',
         actions: [() => sendLedCommand({
-            led: 'red',
-            on: false
+            leds: 'health',
+            status: 'inactive'
+        })]
+    })
+
+    addGlobalCommand({
+        id: 'global-set-shield-leds-full',
+        actions: [() => sendLedCommand({
+            leds: 'shield',
+            numActive: 4
+        })]
+    })
+
+    addGlobalCommand({
+        id: 'global-set-health-leds-full',
+        actions: [() => sendLedCommand({
+            leds: 'health',
+            numActive: 4
         })]
     })
 
@@ -65,7 +81,7 @@ export function start(context: CanvasRenderingContext2D) {
     addGlobalCommand({
         id: 'global-show-menu-scene',
         actions: [() => {
-            dispatchEvent(new Event(getCurrentScene().endSceneEventType))
+            //dispatchEvent(new Event(getCurrentScene().endSceneEventType))
             startScene(menu, context)
         }]
     })
