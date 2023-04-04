@@ -16,8 +16,8 @@ import { movementDistance } from '../math-utils'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
-    const worldWidth = 3000
-    const worldHeight = 500
+    const worldWidth = 2500
+    const worldHeight = 2000
 
     //#region Commands
 
@@ -197,37 +197,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         context.restore()
     }
 
-    let nextAsteroidId = 0
-    let numAsteroids = 0
-    let lastAsteroidSpawnTime = 0
-
-    const asteroidSpawner: AsteroidSpawner & Renderable = {
-        id: 'asteroid-spawner',
-        maxSpeed: 8,
-        minSpeed: 5,
-        maxRadius: 10,
-        minRadius: 5,
-        minAngle: 0,
-        maxAngle: 360,
-        checkCollisionsWith: players,
-        position: origin(),
-        zIndex: -2,
-        isPaused: () => isPaused,
-        onAsteroidCollision: onAsteroidCollision,
-        onAsteroidDespawn: () => numAsteroids--,
-        render: renderSpawnerPosition,
-        update: () => {
-            if (isPaused) return
-
-            if (performance.now() - lastAsteroidSpawnTime < 200) return
-            if (numAsteroids > 10) return
-
-            spawnAsteroidInWorld(asteroidSpawner, world, `${nextAsteroidId++}`, 1500)
-            numAsteroids++
-            lastAsteroidSpawnTime = performance.now()
-        }
-    }
-
     let nextAsteroidId2 = 0
     let numAsteroids2 = 0
     let lastAsteroidSpawnTime2 = 0
@@ -242,7 +211,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         maxAngle: 110,
         checkCollisionsWith: players,
         position: {
-            x: -1450,
+            x: -(worldWidth / 2) + (worldWidth / 6),
             y: 0
         },
         zIndex: -2,
@@ -256,7 +225,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (performance.now() - lastAsteroidSpawnTime2 < 200) return
             if (numAsteroids2 > 25) return
 
-            spawnAsteroidInWorld(asteroidSpawner2, world, `${nextAsteroidId2++}`, 1500)
+            spawnAsteroidInWorld(asteroidSpawner2, world, `${nextAsteroidId2++}`, 2500)
             numAsteroids2++
             lastAsteroidSpawnTime2 = performance.now()
         }
@@ -276,7 +245,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         maxAngle: -110,
         checkCollisionsWith: players,
         position: {
-            x: 1450,
+            x: (worldWidth / 2) - (worldWidth / 6),
             y: 0
         },
         zIndex: -2,
@@ -290,7 +259,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (performance.now() - lastAsteroidSpawnTime3 < 200) return
             if (numAsteroids3 > 25) return
 
-            spawnAsteroidInWorld(asteroidSpawner3, world, `${nextAsteroidId3++}`, 1500)
+            spawnAsteroidInWorld(asteroidSpawner3, world, `${nextAsteroidId3++}`, 2500)
             numAsteroids3++
             lastAsteroidSpawnTime3 = performance.now()
         }
@@ -307,33 +276,25 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         render: context => renderWorld(world, context),
         update: deltaTime => updateWorld(world, deltaTime),
         position: origin(),
-        actors: [ship, asteroidSpawner, asteroidSpawner2, asteroidSpawner3]
+        actors: [ship, asteroidSpawner2, asteroidSpawner3]
     }
 
     addUpdatable(world)
 
-    const camera: Camera & Updatable = {
+    const cameraStart = (-world.width / 2) + (canvasWidth / 2)
+    const camera: Camera = {
         id: 'camera',
         fov: 1,
         screenX: 0,
         screenY: 0,
         resolutionX: canvasWidth,
         resolutionY: canvasHeight,
-        position: {
-            x: -1500,
-            y: 0
-        },
+        position: origin(),
         zIndex: 1000,
-        render: context => renderCamera(camera, world, drawCameraRange, context),
-        update: deltaTime => {
-            if (isPaused) return
-            camera.position.x += movementDistance(5, deltaTime)
-            if (camera.position.x > world.width / 2) camera.position.x *= -1
-        }
+        render: context => renderCamera(camera, world, drawCameraRange, context)
     }
 
     addRendering(camera)
-    addUpdatable(camera)
 
     const camera2: Camera & Updatable = {
         id: 'camera-2',
