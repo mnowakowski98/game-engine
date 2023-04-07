@@ -1,6 +1,6 @@
-import Button, { isPointInButton, renderButton } from '../actors/button';
-import Text, { renderText } from '../actors/text';
-import { addCommandAction, registerCommand } from '../engine/command';
+import Button, { isPointInButton, renderButton } from '../hud/button';
+import Text, { renderText } from '../hud/text';
+import { addCommandAction, executeCommand } from '../engine/command';
 import { getMousePosition, mouseClickCommand } from '../engine/inputs';
 import { addRendering } from '../engine/render-loop';
 import { Position } from '../engine/scene/positionable';
@@ -21,6 +21,7 @@ export function showMenu(center: Position) {
             context.fillRect(0, 0, context.canvas.width, context.canvas.height)
         }
     }
+
     addRendering(background)
 
     const text: Text = {
@@ -53,4 +54,7 @@ export function showMenu(center: Position) {
     })
 
     addRendering(startButton)
+
+    executeCommand('global-deactivate-shield-leds')
+    executeCommand('global-deactivate-health-leds')
 }

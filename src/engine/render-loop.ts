@@ -1,6 +1,25 @@
+import { getMousePosition } from './inputs'
+import { defaultCursorRenderer } from './cursor'
+import { origin } from './scene/positionable'
 import Renderable from './scene/renderable'
 
 const renderings: Renderable[] = []
+
+let renderCursor = defaultCursorRenderer
+
+const cursor: Renderable = {
+    id: 'cursor',
+    position: origin(),
+    render: context => {
+        cursor.position = getMousePosition()
+        context.translate(cursor.position.x, cursor.position.y)
+        renderCursor(context)
+    }
+}
+
+export function setCursorRenderer(renderFunction: (context: CanvasRenderingContext2D) => void) {
+    renderCursor = renderFunction
+}
 
 export function addRendering(rendering: Renderable) {
     renderings.push(rendering)
@@ -43,6 +62,10 @@ export function startRenderLoop(context: CanvasRenderingContext2D): () => void {
             rendering.render(context)
             context.restore()
         }
+
+        context.save()
+        cursor.render(context)
+        context.restore()
 
         requestId = requestAnimationFrame(renderFrame)
     }

@@ -1,39 +1,50 @@
-import { deg2rad, positionDistance } from '../math-utils'
+import { deg2rad, positionDistance, randomBetween } from '../math-utils'
 import Positionable from '../engine/scene/positionable'
 import Updatable from '../engine/scene/updatable'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
-import World from '../engine/scene/world'
+import World, { getWorldBounds } from '../engine/scene/world'
+import Pausable from '../engine/scene/pausable'
 
-export interface AsteroidSpawner extends Updatable, Positionable {
+export interface AsteroidSpawner extends Updatable, Positionable, Pausable {
     maxSpeed: number
     minSpeed: number
     maxRadius: number
-    minRadius: number,
+    minRadius: number
+    minAngle: number
+    maxAngle: number
     checkCollisionsWith: Positionable[],
-    onAsteroidCollision: () => void,
+    onAsteroidCollision: (target: Positionable) => void,
     onAsteroidDespawn: () => void
 }
 
-export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id: string, maxDistance: number, isPaused: () => boolean) {
+export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id: string, maxDistance: number) {
     const asteroid: Asteroid = {
-        id: `asteroid-${id}`,
+        id: `${spawner.id}--asteroid-${id}`,
         boundingRadius: (Math.random() * (spawner.maxRadius - spawner.minRadius)) + spawner.minRadius,
         position: {
             x: spawner.position.x,
             y: spawner.position.y
         },
-        rotation: deg2rad(Math.random() * 360),
+        rotation: deg2rad(randomBetween(spawner.minAngle, spawner.maxAngle)),
         speed: (Math.random() * (spawner.maxSpeed - spawner.minSpeed)) + spawner.minSpeed,
         zIndex: 2,
+        isPaused: spawner.isPaused,
         update: deltaTime => {
-            if (isPaused()) return
-            updateAsteroid(asteroid, deltaTime, isPaused())
+            if (spawner.isPaused()) return
 
-            for (const positionable of spawner.checkCollisionsWith)
-                if (asteroid.isCollidingWith(positionable.position)) spawner.onAsteroidCollision()
+            updateAsteroid(asteroid, deltaTime)
 
-            const outsideWorldX = asteroid.position.x < 0 || asteroid.position.x > world.width
-            const outsideWorldY = asteroid.position.y < 0 || asteroid.position.y > world.height
+            for (const target of spawner.checkCollisionsWith) {
+                if (asteroid.isCollidingWith(target.position)) {
+                    asteroid.rotation *= -1
+                    asteroid.speed *= 1.75
+                    spawner.onAsteroidCollision(target)
+                }
+            }
+
+            const worldBounds = getWorldBounds(world)
+            const outsideWorldX = asteroid.position.x < worldBounds[0].x || asteroid.position.x > worldBounds[1].x
+            const outsideWorldY = asteroid.position.y < worldBounds[0].y || asteroid.position.y > worldBounds[1].y
             const outsideMaxDistance = positionDistance(spawner.position, asteroid.position) > maxDistance
 
             if (outsideWorldX || outsideWorldY || outsideMaxDistance) {

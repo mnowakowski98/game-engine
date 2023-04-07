@@ -1,4 +1,4 @@
-import Command, { executeCommand, registerCommand } from './command';
+import Command, { addGlobalCommand, executeCommand, registerCommand } from './command';
 import { Position } from './scene/positionable';
 
 const mousePosition: Position = {
@@ -46,7 +46,7 @@ export function registerInputs(canvas: HTMLCanvasElement) {
         if (matched) event.preventDefault()
     })
 
-    registerCommand(mouseClickCommand)
+    addGlobalCommand(mouseClickCommand)
 
     canvas.addEventListener('click', () => {
         executeCommand(mouseClickCommand.id)

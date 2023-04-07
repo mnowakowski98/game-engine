@@ -2,12 +2,13 @@ import { start } from './src/startup'
 
 addEventListener('load', () => {
     document.body.style.margin = '0'
-    document.body.style.backgroundColor = '#a3a3a3'
+    document.body.style.backgroundColor = 'black'
 
     const canvas = document.createElement('canvas')
     canvas.width = innerWidth
-    canvas.height = innerHeight - 3
-    canvas.style.borderBottom = '3px solid black'
+    canvas.height = innerHeight - 6
+    canvas.style.backgroundColor = '#a3a3a3'
+    canvas.style.cursor = 'none'
 
     document.body.appendChild(canvas)
     
