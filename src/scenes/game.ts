@@ -12,7 +12,7 @@ import DebugMenu from '../actors/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../actors/checkbox'
 import Renderable from '../engine/scene/renderable'
 import Updatable from '../engine/scene/updatable'
-import { movementDistance } from '../math-utils'
+import { movementDistance, randomBetween } from '../math-utils'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
@@ -50,6 +50,65 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     //#endregion
 
     //#region HUD
+
+    type Star = Renderable & Updatable & {
+        timeSinceBlink: number
+        radius: number
+    }
+
+    const starMaxRadius = 1
+    const starMinRadius = .2
+
+    const stars: Star[] = []
+    for (let i = 0; i < 100; i++) {
+        const star: Star = {
+            id: `star-${i}`,
+            position: {
+                x: randomBetween(0, canvasWidth),
+                y: randomBetween(0, canvasHeight)
+            },
+            timeSinceBlink: 0,
+            radius: randomBetween(starMinRadius, starMaxRadius),
+            update: deltaTime => {
+                star.timeSinceBlink += deltaTime
+
+                if (star.timeSinceBlink > 200) {
+                    star.radius = randomBetween(starMinRadius, starMaxRadius)
+                    star.timeSinceBlink = 0
+                }
+
+                if (isPaused) return
+
+                star.position.x -= movementDistance(2, deltaTime)
+                if (star.position.x < 0) star.position.x = canvasWidth
+                
+            },
+            render: context => {
+                context.beginPath()
+                context.arc(star.position.x, star.position.y, star.radius, 0, Math.PI * 2)
+                context.fill()
+            }
+        }
+
+        stars.push(star)
+
+        addUpdatable(star)
+    }
+
+    const background: Renderable = {
+        id: 'game-background',
+        position: origin(),
+        zIndex: -9999,
+        render: context => {
+            context.fillStyle = '#181e29'
+            context.fillRect(0, 0, canvasWidth, canvasHeight)
+
+            context.fillStyle = 'white'
+            for (const star of stars) star.render(context)
+        }
+    }
+
+    addRendering(background)
 
     const timer: GameTimer = {
         id: 'game-timer',
@@ -148,11 +207,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         shield: 4,
         isPaused: () => isPaused,
         render: context => {
-            context.fillStyle = '#0000ff'
+            context.fillStyle = '#a8d9e3'
 
-            if (ship.shield <= 3) context.fillStyle = '0000aa'
-            if (ship.shield <= 2) context.fillStyle = '000055'
-            if (ship.shield <= 1) context.fillStyle = '000011'
+            if (ship.shield <= 3) context.fillStyle = '#6fc2e8'
+            if (ship.shield <= 2) context.fillStyle = '#2389b8'
+            if (ship.shield <= 1) context.fillStyle = '#183ead'
 
             if (ship.shield <= 0) {
                 context.fillStyle = '#00ff00'
@@ -207,8 +266,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         minSpeed: 5,
         maxRadius: 10,
         minRadius: 5,
-        minAngle: 70,
-        maxAngle: 110,
+        minAngle: 45,
+        maxAngle: 135,
         checkCollisionsWith: players,
         position: {
             x: -(worldWidth / 2) + (worldWidth / 6),
@@ -223,7 +282,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (isPaused) return
 
             if (performance.now() - lastAsteroidSpawnTime2 < 200) return
-            if (numAsteroids2 > 25) return
+            if (numAsteroids2 > 75) return
 
             spawnAsteroidInWorld(asteroidSpawner2, world, `${nextAsteroidId2++}`, 2500)
             numAsteroids2++
@@ -241,8 +300,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         minSpeed: 5,
         maxRadius: 10,
         minRadius: 5,
-        minAngle: -70,
-        maxAngle: -110,
+        minAngle: -45,
+        maxAngle: -135,
         checkCollisionsWith: players,
         position: {
             x: (worldWidth / 2) - (worldWidth / 6),
@@ -257,7 +316,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (isPaused) return
 
             if (performance.now() - lastAsteroidSpawnTime3 < 200) return
-            if (numAsteroids3 > 25) return
+            if (numAsteroids3 > 75) return
 
             spawnAsteroidInWorld(asteroidSpawner3, world, `${nextAsteroidId3++}`, 2500)
             numAsteroids3++
@@ -281,7 +340,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     addUpdatable(world)
 
-    const cameraStart = (-world.width / 2) + (canvasWidth / 2)
     const camera: Camera = {
         id: 'camera',
         fov: 1,
@@ -321,8 +379,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     addUpdatable(camera2)
     addRendering(camera2)
-
-    //setCursorRenderer(() => undefined)
 
     //#endregion
 

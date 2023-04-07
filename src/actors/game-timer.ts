@@ -18,5 +18,9 @@ export function renderGameTimer(timer: GameTimer, context: CanvasRenderingContex
     const hours = Math.floor(minutes / 60)
     const timeText = `${hours} : ${minutesText} : ${secondsText}`
 
+    context.fillStyle = 'rgb(100, 100, 100, .75)'
+    context.fillRect(-10, 0, 75, -35)
+
+    context.fillStyle = 'white'
     context.fillText(`${timeText}`, 0, 0)
 }
