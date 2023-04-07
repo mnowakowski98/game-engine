@@ -1,5 +1,5 @@
-import Button, { isPointInButton, renderButton } from '../actors/button';
-import Text, { renderText } from '../actors/text';
+import Button, { isPointInButton, renderButton } from '../hud/button';
+import Text, { renderText } from '../hud/text';
 import { addCommandAction, executeCommand } from '../engine/command';
 import { getMousePosition, mouseClickCommand } from '../engine/inputs';
 import { addRendering } from '../engine/render-loop';

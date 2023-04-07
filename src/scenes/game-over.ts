@@ -1,4 +1,4 @@
-import Text, { renderText } from '../actors/text'
+import Text, { renderText } from '../hud/text'
 import Command, { executeCommand, registerCommand } from '../engine/command'
 import { addRendering } from '../engine/render-loop'
 
