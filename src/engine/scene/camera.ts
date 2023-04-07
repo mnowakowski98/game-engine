@@ -1,7 +1,7 @@
-import { getContextDataString } from '../engine/render-loop';
-import { addPositions, Position } from '../engine/scene/positionable';
-import Renderable from '../engine/scene/renderable';
-import World from '../engine/scene/world';
+import { getContextDataString } from '../render-loop';
+import { addPositions, Position } from './positionable';
+import Renderable from './renderable';
+import World from './world';
 
 export default interface Camera extends Renderable {
     fov: number
