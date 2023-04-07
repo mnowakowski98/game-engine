@@ -37,6 +37,7 @@ export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id:
             for (const target of spawner.checkCollisionsWith) {
                 if (asteroid.isCollidingWith(target.position)) {
                     asteroid.rotation *= -1
+                    asteroid.speed *= 1.75
                     spawner.onAsteroidCollision(target)
                 }
             }
