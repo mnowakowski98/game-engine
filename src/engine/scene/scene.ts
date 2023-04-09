@@ -3,7 +3,7 @@ import { removeAllRenderings, startRenderLoop } from '../render-loop'
 import { removeAllUpdatables, startUpdateLoop } from '../update-loop'
 
 export default interface Scene {
-    endSceneEventType: string,
+    endSceneEventType: string
     init: () => void
     onSceneEnd: () => void
 }

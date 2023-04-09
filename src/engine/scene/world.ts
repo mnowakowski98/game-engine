@@ -6,7 +6,6 @@ import Updatable from './updatable'
 type Actor = Renderable | Updatable
 
 export default interface World extends Renderable, Updatable {
-    id: string
     width: number
     height: number
     actors: Actor[]
