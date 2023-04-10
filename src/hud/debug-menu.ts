@@ -6,5 +6,4 @@ export default interface DebugMenu extends Renderable {
     width: number
     height: number
     controls: Control[]
-    onShouldDrawCameraRangeChange: (callback: (shouldDraw: boolean) => void) => void
 }

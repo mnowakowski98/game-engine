@@ -52,7 +52,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     //#endregion
 
-    //#region HUD
+    //#region Background
 
     type Star = Renderable & Updatable & {
         timeSinceBlink: number
@@ -113,6 +113,10 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
     addRendering(background)
 
+    //#endregion
+
+    //#region HUD
+
     const timer: GameTimer = {
         id: 'game-timer',
         time: 0,
@@ -131,6 +135,10 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addUpdatable(timer)
     addRendering(timer)
 
+    //#endregion
+
+    //#region Debug menu
+
     let drawCameraRange = false
     const shouldDrawCameraRangeCheckBox: Checkbox = {
         id: 'debug-menu-should-draw-camera-range',
@@ -143,7 +151,20 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         },
         render: context => renderCheckBox(shouldDrawCameraRangeCheckBox, drawCameraRange, context),
         onUpdate: () => drawCameraRange = !drawCameraRange
+    }
 
+    let logRenderingDebugInfo = false
+    const logRenderingDebugInfoCheckBox: Checkbox = {
+        id: 'debug-menu-should-log-rendering-debug-info',
+        width: 10,
+        height: 10,
+        text: 'Log camera debug info',
+        position: {
+            x: 10,
+            y: 25
+        },
+        render: context => renderCheckBox(logRenderingDebugInfoCheckBox, logRenderingDebugInfo, context),
+        onUpdate: () => logRenderingDebugInfo = !logRenderingDebugInfo
     }
 
     addCommandAction(mouseClickCommand, () => {
@@ -151,6 +172,9 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
         if (isPointInCheckBox(shouldDrawCameraRangeCheckBox, subtractPositions(getMousePosition(), debugMenu.position)))
             shouldDrawCameraRangeCheckBox.onUpdate()
+
+        if (isPointInCheckBox(logRenderingDebugInfoCheckBox, subtractPositions(getMousePosition(), debugMenu.position)))
+            logRenderingDebugInfoCheckBox.onUpdate()
     })
 
     const debugMenu: DebugMenu = {
@@ -161,7 +185,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: canvasWidth - 250,
             y: 50
         },
-        controls: [shouldDrawCameraRangeCheckBox],
+        controls: [shouldDrawCameraRangeCheckBox, logRenderingDebugInfoCheckBox],
         zIndex: 100,
         render: context => {
             if (!showDebugMenu) return
@@ -182,9 +206,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
                 control.render(context)
                 context.restore()
             }
-
-        },
-        onShouldDrawCameraRangeChange: shouldDrawCameraRange => undefined
+        }
     }
 
     addRendering(debugMenu)
@@ -374,11 +396,16 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         height: worldHeight,
         render: context => renderWorld(world, context),
         update: deltaTime => updateWorld(world, deltaTime),
+        shouldLog: () => logRenderingDebugInfo,
         position: origin(),
         actors: [ship, asteroidSpawner2, asteroidSpawner3, networkShip]
     }
 
     addUpdatable(world)
+
+    //#endregion
+
+    //#region Cameras
 
     const camera: Camera = {
         id: 'camera',
@@ -389,7 +416,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         resolutionY: canvasHeight,
         position: origin(),
         zIndex: 1000,
-        render: context => renderCamera(camera, world, drawCameraRange, context)
+        render: context => renderCamera(camera, world, drawCameraRange, context),
+        shouldLog: () => logRenderingDebugInfo
     }
 
     addRendering(camera)
@@ -414,7 +442,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         update: () => {
             if (isPaused) return
             camera2.position = screenToWorldPosition(camera, getMousePosition())
-        }
+        },
+        shouldLog: () => false
     }
 
     addUpdatable(camera2)
