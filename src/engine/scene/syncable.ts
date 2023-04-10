@@ -1,5 +1,6 @@
 import Unique from './Unique'
 
 export default interface Syncable extends Unique {
-    update: (data: any) => void
+    sync?: (data: any) => void
+    getSyncData?: () => ((Unique & any) | null)
 }
