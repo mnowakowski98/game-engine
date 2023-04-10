@@ -1,4 +1,4 @@
-import Unique from './Unique'
+import Unique from './unique'
 import Positionable from './positionable'
 
 export default interface Renderable extends Positionable, Unique {

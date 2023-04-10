@@ -1,4 +1,4 @@
-import Unique from './scene/Unique'
+import Unique from './scene/unique'
 import Syncable from './scene/syncable'
 
 let socket: WebSocket

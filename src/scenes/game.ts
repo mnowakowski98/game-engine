@@ -15,7 +15,7 @@ import Updatable from '../engine/scene/updatable'
 import { movementDistance, randomBetween } from '../math-utils'
 import Syncable from '../engine/scene/syncable'
 import { addSyncable, connect } from '../engine/network'
-import Unique from '../engine/scene/Unique'
+import Unique from '../engine/scene/unique'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 

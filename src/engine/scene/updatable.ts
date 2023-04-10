@@ -1,4 +1,4 @@
-import Unique from './Unique'
+import Unique from './unique'
 
 export default interface Updatable extends Unique {
     update: (deltaTime: number) => void
