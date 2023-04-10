@@ -1,18 +1,19 @@
 import { getContextDataString } from '../render-loop'
+import Logable from './logable'
 import { Position } from './positionable'
 import Renderable from './renderable'
 import Updatable from './updatable'
 
 type Actor = Renderable | Updatable
 
-export default interface World extends Renderable, Updatable {
+export default interface World extends Renderable, Updatable, Logable {
     width: number
     height: number
     actors: Actor[]
 }
 
 export function renderWorld(world: World, context: CanvasRenderingContext2D) {
-    console.log(`Rendering world ${getContextDataString(context)}`)
+    if (world.shouldLog()) console.log(`Rendering world ${getContextDataString(context)}`)
 
     const { width, height } = world
 

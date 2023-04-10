@@ -1,18 +1,19 @@
 import { getContextDataString } from '../render-loop';
+import Logable from './logable';
 import { addPositions, Position } from './positionable';
 import Renderable from './renderable';
 import World from './world';
 
-export default interface Camera extends Renderable {
+export default interface Camera extends Renderable, Logable {
     fov: number
-    screenX: number,
-    screenY: number,
+    screenX: number
+    screenY: number
     resolutionX: number
     resolutionY: number
 }
 
 export function renderCamera(camera: Camera, world: World, drawRange: boolean, context: CanvasRenderingContext2D) {
-    console.log(`Rendering camera ${getContextDataString(context)}`)
+    if (camera.shouldLog()) console.log(`Rendering camera ${getContextDataString(context)}`)
 
     const { resolutionX, resolutionY, screenX, screenY } = camera
 
