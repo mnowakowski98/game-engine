@@ -1,11 +1,13 @@
 export function defaultCursorRenderer(context: CanvasRenderingContext2D) {
     context.beginPath()
 
-    context.moveTo(-5, 0)
-    context.lineTo(5, 0)
+    context.rect(-1, -10, 2, 20)
+    context.rect(-10, -1, 20, 2)
 
-    context.moveTo(0, -5)
-    context.lineTo(0, 5)
+    context.strokeStyle = '#fafafa'
+    context.lineWidth = 1
 
+    context.fillStyle = 'white'
+    context.fill()
     context.stroke()
 }
