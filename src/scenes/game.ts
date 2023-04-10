@@ -7,12 +7,15 @@ import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawne
 import Command, { addCommandAction, executeCommand, registerCommand } from '../engine/command'
 import World, { renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { renderCamera, screenToCameraPosition, screenToWorldPosition } from '../engine/scene/camera'
-import Positionable, { addPositions, origin, subtractPositions } from '../engine/scene/positionable'
+import Positionable, { addPositions, origin, Position, subtractPositions } from '../engine/scene/positionable'
 import DebugMenu from '../hud/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../hud/checkbox'
 import Renderable from '../engine/scene/renderable'
 import Updatable from '../engine/scene/updatable'
 import { movementDistance, randomBetween } from '../math-utils'
+import Syncable from '../engine/scene/syncable'
+import { addSyncable, connect } from '../engine/network'
+import Unique from '../engine/scene/unique'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
@@ -81,7 +84,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
                 star.position.x -= movementDistance(2, deltaTime)
                 if (star.position.x < 0) star.position.x = canvasWidth
-                
+
             },
             render: context => {
                 context.beginPath()
@@ -195,7 +198,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         shield: number
     }
 
-    const ship: HealthyShip = {
+    const ship: HealthyShip & Syncable = {
         id: 'ship',
         position: origin(),
         targetPosition: origin(),
@@ -207,18 +210,19 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         shield: 4,
         isPaused: () => isPaused,
         render: context => {
-            context.fillStyle = '#a8d9e3'
 
-            if (ship.shield <= 3) context.fillStyle = '#6fc2e8'
-            if (ship.shield <= 2) context.fillStyle = '#2389b8'
-            if (ship.shield <= 1) context.fillStyle = '#183ead'
+            // Shield
+            context.strokeStyle = '#a8d9e3'
+            if (ship.shield <= 3) context.strokeStyle = '#6fc2e8'
+            if (ship.shield <= 2) context.strokeStyle = '#2389b8'
+            if (ship.shield <= 1) context.strokeStyle = '#183ead'
+            if (ship.shield <= 0) context.lineWidth = 0
 
-            if (ship.shield <= 0) {
-                context.fillStyle = '#00ff00'
-                if (ship.health <= 3) context.fillStyle = '#00aa00'
-                if (ship.health <= 2) context.fillStyle = 'orange'
-                if (ship.health <= 1) context.fillStyle = 'red'
-            }
+            // Health
+            context.fillStyle = '#00ff00'
+            if (ship.health <= 3) context.fillStyle = '#00aa00'
+            if (ship.health <= 2) context.fillStyle = 'orange'
+            if (ship.health <= 1) context.fillStyle = 'red'
 
             renderShip(ship, context)
         },
@@ -227,10 +231,46 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             ship.targetPosition = camera.position
             ship.targetPosition = addPositions(ship.targetPosition, screenToCameraPosition(camera, getMousePosition()))
             updateShip(ship)
+        },
+        getSyncData: () => ({
+            id: networkShip.id,
+            x: ship.position.x,
+            y: ship.position.y
+        })
+    }
+
+    const networkShip: Ship & Syncable = {
+        id: 'network-ship',
+        position: origin(),
+        targetPosition: origin(),
+        rotation: 90,
+        width: 10,
+        length: 10,
+        zIndex: 0,
+        isPaused: () => isPaused,
+        render: context => {
+            context.strokeStyle = 'white'
+            context.fillStyle = '#357515'
+            renderShip(networkShip, context)
+        },
+        update: () => updateShip(networkShip),
+        sync: (updateData: Position & Unique) => {
+            if (updateData.x == null || updateData.y == null) {
+                console.warn(`Attempted to sync ship without position data`)
+                return
+            }
+
+            networkShip.targetPosition = {
+                x: updateData.x,
+                y: updateData.y
+            }
         }
     }
 
-    const players: Ship[] = [ship]
+    addSyncable(ship)
+    addSyncable(networkShip)
+
+    const players: Ship[] = []
 
     let lastPlayerHitTime = 0
 
@@ -335,7 +375,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         render: context => renderWorld(world, context),
         update: deltaTime => updateWorld(world, deltaTime),
         position: origin(),
-        actors: [ship, asteroidSpawner2, asteroidSpawner3]
+        actors: [ship, asteroidSpawner2, asteroidSpawner3, networkShip]
     }
 
     addUpdatable(world)
@@ -383,4 +423,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     //#endregion
 
     dispatchEvent(new Event('game-start'))
+
+    connect('ws://localhost:3000')
 }
