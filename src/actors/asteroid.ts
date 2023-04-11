@@ -33,5 +33,5 @@ export function updateAsteroid(asteroid: Asteroid, deltaTime: number) {
 
     const distance = movementDistance(asteroid.speed, deltaTime)
     asteroid.position.x += Math.sin(asteroid.rotation) * distance
-    asteroid.position.y += Math.cos(asteroid.rotation) * distance
+    asteroid.position.y -= Math.cos(asteroid.rotation) * distance
 }
