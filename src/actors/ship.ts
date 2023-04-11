@@ -33,7 +33,6 @@ export function renderShip(ship: Ship, context: CanvasRenderingContext2D): void 
 
     context.closePath()
 
-    context.lineWidth = 2
     context.fill()
     context.stroke()
 }

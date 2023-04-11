@@ -4,17 +4,43 @@ import Updatable from '../engine/scene/updatable'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
 import World, { getWorldBounds } from '../engine/scene/world'
 import Pausable from '../engine/scene/pausable'
+import Renderable from '../engine/scene/renderable'
 
-export interface AsteroidSpawner extends Updatable, Positionable, Pausable {
+export interface AsteroidSpawner extends Updatable, Renderable, Pausable {
     maxSpeed: number
     minSpeed: number
     maxRadius: number
     minRadius: number
     minAngle: number
     maxAngle: number
-    checkCollisionsWith: Positionable[],
-    onAsteroidCollision: (target: Positionable) => void,
-    onAsteroidDespawn: () => void
+    checkCollisionsWith: Positionable[]
+    maxSpawns: number
+    minTimeBetweenSpawns: number
+    nextAsteroidId: number
+    numAsteroids: number
+    timeSinceLastSpawn: number
+    maxTravelDistance: number
+    onAsteroidCollision: (target: Positionable) => void
+}
+
+export function renderSpawner(context: CanvasRenderingContext2D) {
+    context.beginPath()
+    context.arc(0, 0, 5, 0, Math.PI * 2)
+    context.fillStyle = '#c75d24'
+    context.fill()
+}
+
+export function updateSpawner(spawner: AsteroidSpawner, world: World, deltaTime: number) {
+    if (spawner.isPaused()) return
+
+    spawner.timeSinceLastSpawn += deltaTime
+
+    if (spawner.timeSinceLastSpawn < spawner.minTimeBetweenSpawns) return
+    if (spawner.numAsteroids > spawner.maxSpawns) return
+
+    spawnAsteroidInWorld(spawner, world, (spawner.nextAsteroidId).toString(), spawner.maxTravelDistance)
+    spawner.numAsteroids++
+    spawner.timeSinceLastSpawn = 0
 }
 
 export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id: string, maxDistance: number) {
@@ -49,7 +75,7 @@ export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id:
 
             if (outsideWorldX || outsideWorldY || outsideMaxDistance) {
                 world.actors.splice(world.actors.findIndex(_ => asteroid.id === _.id), 1)
-                spawner.onAsteroidDespawn()
+                spawner.numAsteroids--
             }
         },
         render: context => renderAsteroid(asteroid, context),

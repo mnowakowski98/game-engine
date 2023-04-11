@@ -3,7 +3,7 @@ import { addRendering } from '../engine/render-loop'
 import { renderShip, Ship, updateShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
-import { AsteroidSpawner, spawnAsteroidInWorld } from '../actors/asteroid-spawner'
+import { AsteroidSpawner, renderSpawner, spawnAsteroidInWorld, updateSpawner } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, executeCommand, registerCommand } from '../engine/command'
 import World, { renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { renderCamera, screenToCameraPosition, screenToWorldPosition } from '../engine/scene/camera'
@@ -167,6 +167,20 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         onUpdate: () => logRenderingDebugInfo = !logRenderingDebugInfo
     }
 
+    let drawSpawnerPositions = false
+    const drawSpawnerPositionsCheckBox: Checkbox = {
+        id: 'debug-menu-should-draw-spawner-positions',
+        width: 10,
+        height: 10,
+        text: 'Draw spawner positions',
+        position: {
+            x: 10,
+            y: 40
+        },
+        render: context => renderCheckBox(drawSpawnerPositionsCheckBox, drawSpawnerPositions, context),
+        onUpdate: () => drawSpawnerPositions = !drawSpawnerPositions
+    }
+
     addCommandAction(mouseClickCommand, () => {
         if (!showDebugMenu) return
 
@@ -175,6 +189,9 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
         if (isPointInCheckBox(logRenderingDebugInfoCheckBox, subtractPositions(getMousePosition(), debugMenu.position)))
             logRenderingDebugInfoCheckBox.onUpdate()
+
+        if (isPointInCheckBox(drawSpawnerPositionsCheckBox, subtractPositions(getMousePosition(), debugMenu.position)))
+            drawSpawnerPositionsCheckBox.onUpdate()
     })
 
     const debugMenu: DebugMenu = {
@@ -185,7 +202,11 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: canvasWidth - 250,
             y: 50
         },
-        controls: [shouldDrawCameraRangeCheckBox, logRenderingDebugInfoCheckBox],
+        controls: [
+            shouldDrawCameraRangeCheckBox,
+            logRenderingDebugInfoCheckBox,
+            drawSpawnerPositionsCheckBox
+        ],
         zIndex: 100,
         render: context => {
             if (!showDebugMenu) return
@@ -218,6 +239,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     type HealthyShip = Ship & {
         health: number
         shield: number
+        shieldRechargeTime: number
+        lastHitTime: number
     }
 
     const ship: HealthyShip & Syncable = {
@@ -230,15 +253,17 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         zIndex: 1,
         health: 4,
         shield: 4,
+        shieldRechargeTime: 0,
+        lastHitTime: 0,
         isPaused: () => isPaused,
         render: context => {
-
             // Shield
             context.strokeStyle = '#a8d9e3'
+            context.lineWidth = 3
             if (ship.shield <= 3) context.strokeStyle = '#6fc2e8'
             if (ship.shield <= 2) context.strokeStyle = '#2389b8'
             if (ship.shield <= 1) context.strokeStyle = '#183ead'
-            if (ship.shield <= 0) context.lineWidth = 0
+            if (ship.shield <= 0) context.strokeStyle = 'rgb(0, 0, 0, 0)'
 
             // Health
             context.fillStyle = '#00ff00'
@@ -248,8 +273,15 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
             renderShip(ship, context)
         },
-        update: () => {
+        update: deltaTime => {
             if (isPaused) return
+
+            ship.shieldRechargeTime += deltaTime
+            if (ship.shieldRechargeTime > 5000 && ship.shield < 4) {
+                ship.shield += 1
+                ship.shieldRechargeTime = 0
+            }
+
             ship.targetPosition = camera.position
             ship.targetPosition = addPositions(ship.targetPosition, screenToCameraPosition(camera, getMousePosition()))
             updateShip(ship)
@@ -292,44 +324,43 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addSyncable(ship)
     addSyncable(networkShip)
 
-    const players: Ship[] = []
-
-    let lastPlayerHitTime = 0
+    const players: Ship[] = [ship]
 
     const onAsteroidCollision = (target: Positionable) => {
-        if (performance.now() - lastPlayerHitTime < 500) return
-
         const targetAsShip = target as HealthyShip
+        if (performance.now() - targetAsShip.lastHitTime < 200) return
+
         if (targetAsShip.shield <= 0) {
             targetAsShip.health--
             if (targetAsShip.health <= 0) endGame()
         }
-        else targetAsShip.shield--
+        else {
+            targetAsShip.shield--
+            targetAsShip.shieldRechargeTime = 0
+        }
 
-        lastPlayerHitTime = performance.now()
+        targetAsShip.lastHitTime = performance.now()
     }
 
     const renderSpawnerPosition = (context: CanvasRenderingContext2D) => {
-        context.save()
-        context.beginPath()
-        context.arc(0, 0, 5, 0, Math.PI * 2)
-        context.fillStyle = '#c75d24'
-        context.fill()
-        context.restore()
+        if (!drawSpawnerPositions) return
+        renderSpawner(context)
     }
 
-    let nextAsteroidId2 = 0
-    let numAsteroids2 = 0
-    let lastAsteroidSpawnTime2 = 0
-
-    const asteroidSpawner2: AsteroidSpawner & Renderable = {
-        id: 'asteroid-spawner2',
+    const leftSpawner: AsteroidSpawner = {
+        id: 'asteroid-spawner-left',
         maxSpeed: 8,
         minSpeed: 5,
         maxRadius: 10,
         minRadius: 5,
         minAngle: 45,
         maxAngle: 135,
+        maxSpawns: 25,
+        minTimeBetweenSpawns: 200,
+        nextAsteroidId: 0,
+        numAsteroids: 0,
+        timeSinceLastSpawn: 0,
+        maxTravelDistance: 2000,
         checkCollisionsWith: players,
         position: {
             x: -(worldWidth / 2) + (worldWidth / 6),
@@ -338,32 +369,24 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         zIndex: -2,
         isPaused: () => isPaused,
         onAsteroidCollision: onAsteroidCollision,
-        onAsteroidDespawn: () => numAsteroids2--,
         render: renderSpawnerPosition,
-        update: () => {
-            if (isPaused) return
-
-            if (performance.now() - lastAsteroidSpawnTime2 < 200) return
-            if (numAsteroids2 > 75) return
-
-            spawnAsteroidInWorld(asteroidSpawner2, world, `${nextAsteroidId2++}`, 2500)
-            numAsteroids2++
-            lastAsteroidSpawnTime2 = performance.now()
-        }
+        update: deltaTime => updateSpawner(leftSpawner, world, deltaTime)
     }
 
-    let nextAsteroidId3 = 0
-    let numAsteroids3 = 0
-    let lastAsteroidSpawnTime3 = 0
-
-    const asteroidSpawner3: AsteroidSpawner & Renderable = {
-        id: 'asteroid-spawner3',
+    const rightSpawner: AsteroidSpawner = {
+        id: 'asteroid-spawner-right',
         maxSpeed: 8,
         minSpeed: 5,
         maxRadius: 10,
         minRadius: 5,
         minAngle: -45,
         maxAngle: -135,
+        maxSpawns: 25,
+        minTimeBetweenSpawns: 200,
+        nextAsteroidId: 0,
+        numAsteroids: 0,
+        timeSinceLastSpawn: 0,
+        maxTravelDistance: 2000,
         checkCollisionsWith: players,
         position: {
             x: (worldWidth / 2) - (worldWidth / 6),
@@ -372,18 +395,31 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         zIndex: -2,
         isPaused: () => isPaused,
         onAsteroidCollision: onAsteroidCollision,
-        onAsteroidDespawn: () => numAsteroids3--,
         render: renderSpawnerPosition,
-        update: () => {
-            if (isPaused) return
+        update: deltaTime => updateSpawner(rightSpawner, world, deltaTime)
+    }
 
-            if (performance.now() - lastAsteroidSpawnTime3 < 200) return
-            if (numAsteroids3 > 75) return
-
-            spawnAsteroidInWorld(asteroidSpawner3, world, `${nextAsteroidId3++}`, 2500)
-            numAsteroids3++
-            lastAsteroidSpawnTime3 = performance.now()
-        }
+    const centerSpawner: AsteroidSpawner = {
+        id: 'asteroid-spawner-center',
+        maxSpeed: 8,
+        minSpeed: 5,
+        maxRadius: 10,
+        minRadius: 5,
+        minAngle: 0,
+        maxAngle: 360,
+        maxSpawns: 25,
+        minTimeBetweenSpawns: 200,
+        nextAsteroidId: 0,
+        numAsteroids: 0,
+        timeSinceLastSpawn: 0,
+        maxTravelDistance: 2000,
+        checkCollisionsWith: players,
+        position: origin(),
+        zIndex: -2,
+        isPaused: () => isPaused,
+        onAsteroidCollision: onAsteroidCollision,
+        render: renderSpawnerPosition,
+        update: deltaTime => updateSpawner(centerSpawner, world, deltaTime)
     }
 
     //#endregion
@@ -398,7 +434,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         update: deltaTime => updateWorld(world, deltaTime),
         shouldLog: () => logRenderingDebugInfo,
         position: origin(),
-        actors: [ship, asteroidSpawner2, asteroidSpawner3, networkShip]
+        actors: [
+            ship,
+            networkShip,
+            leftSpawner,
+            rightSpawner,
+            centerSpawner
+        ]
     }
 
     addUpdatable(world)
