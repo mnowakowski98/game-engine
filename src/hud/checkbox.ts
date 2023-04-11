@@ -8,7 +8,12 @@ export default interface Checkbox extends Control {
 
 export function renderCheckBox(checkbox: Checkbox, isChecked: boolean, context: CanvasRenderingContext2D) {
     context.strokeRect(0, 0, checkbox.width, checkbox.height)
-    if (isChecked) context.fillRect(0, 0, checkbox.width, checkbox.height)
+    if (isChecked) {
+        const oldStyle = context.fillStyle
+        context.fillStyle = 'green'
+        context.fillRect(0, 0, checkbox.width, checkbox.height)
+        context.fillStyle = oldStyle
+    }
     context.fillText(checkbox.text, checkbox.width + 5, checkbox.height * .8)
 }
 

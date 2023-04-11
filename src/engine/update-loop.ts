@@ -19,22 +19,17 @@ export function startUpdateLoop(): () => void {
     let isUpdating = true
 
     const loop = () => {
-        if(!isUpdating) return
+        if (!isUpdating) return
 
-        setTimeout(() => {
-            const now = performance.now()
+        const now = performance.now()
 
-            // Deny the possibility that two updates were called in the same second
-            // as it was causing some issues with distance calculations
-            const deltaTime = now - lastUpdateTime || 1 
+        // Deny the possibility that two updates were called in the same second
+        // as it was causing some issues with distance calculations
+        const deltaTime = now - lastUpdateTime || 1
+        for (const updatable of updatables) updatable.update(deltaTime)
 
-            for (const updatable of updatables) {
-                if (isUpdating) updatable.update(deltaTime)
-            }
-            
-            lastUpdateTime = now
-            loop()
-        })
+        lastUpdateTime = now
+        setTimeout(loop)
     }
 
     loop()
