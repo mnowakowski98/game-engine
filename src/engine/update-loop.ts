@@ -18,6 +18,8 @@ export function startUpdateLoop(): () => void {
     let lastUpdateTime = performance.now()
     let isUpdating = true
 
+    let timeout: NodeJS.Timeout
+
     const loop = () => {
         if (!isUpdating) return
 
@@ -29,10 +31,13 @@ export function startUpdateLoop(): () => void {
         for (const updatable of updatables) updatable.update(deltaTime)
 
         lastUpdateTime = now
-        setTimeout(loop)
+        timeout = setTimeout(loop)
     }
 
     loop()
 
-    return () => isUpdating = false
+    return () => {
+        isUpdating = false
+        clearTimeout(timeout)
+    }
 }

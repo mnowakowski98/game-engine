@@ -1,13 +1,13 @@
 import GameTimer, { renderGameTimer } from '../hud/game-timer'
 import { addRendering } from '../engine/render-loop'
-import { renderShip, Ship, updateShip } from '../actors/ship'
+import { renderShip, Ship, moveShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
-import { AsteroidSpawner, renderSpawner, spawnAsteroidInWorld, updateSpawner } from '../actors/asteroid-spawner'
+import { AsteroidSpawner, renderSpawner, updateSpawner } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, executeCommand, registerCommand } from '../engine/command'
-import World, { renderWorld, updateWorld } from '../engine/scene/world'
-import Camera, { renderCamera, screenToCameraPosition, screenToWorldPosition } from '../engine/scene/camera'
-import Positionable, { addPositions, origin, Position, subtractPositions } from '../engine/scene/positionable'
+import World, { isOutsideWorldBounds, renderWorld, updateWorld } from '../engine/scene/world'
+import Camera, { renderCamera, screenToWorldPosition } from '../engine/scene/camera'
+import Positionable, { origin, Position, subtractPositions } from '../engine/scene/positionable'
 import DebugMenu from '../hud/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../hud/checkbox'
 import Renderable from '../engine/scene/renderable'
@@ -19,8 +19,8 @@ import Unique from '../engine/scene/unique'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
-    const worldWidth = 2500
-    const worldHeight = 2000
+    const worldWidth = 500
+    const worldHeight = 500
 
     //#region Commands
 
@@ -247,9 +247,14 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         id: 'ship',
         position: origin(),
         targetPosition: origin(),
-        rotation: 90,
-        width: 10,
+        // targetPosition: {
+        //     x: worldWidth / 2,
+        //     y: worldHeight / 2
+        // },
+        rotation: 0,
+        width: 8,
         length: 15,
+        speed: 2,
         zIndex: 1,
         health: 4,
         shield: 4,
@@ -281,10 +286,13 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
                 ship.shield += 1
                 ship.shieldRechargeTime = 0
             }
-
-            ship.targetPosition = camera.position
-            ship.targetPosition = addPositions(ship.targetPosition, screenToCameraPosition(camera, getMousePosition()))
-            updateShip(ship)
+            
+            if (isOutsideWorldBounds(world, ship.position)) ship.position = {
+                x: (-worldWidth / 2) + 20,
+                y: (-worldHeight / 2) + 20
+            }
+            //ship.targetPosition = screenToWorldPosition(camera, getMousePosition())
+            moveShip(ship, deltaTime)
         },
         getSyncData: () => ({
             id: networkShip.id,
@@ -300,6 +308,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         rotation: 90,
         width: 10,
         length: 10,
+        speed: 2,
         zIndex: 0,
         isPaused: () => isPaused,
         render: context => {
@@ -307,14 +316,14 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             context.fillStyle = '#357515'
             renderShip(networkShip, context)
         },
-        update: () => updateShip(networkShip),
+        update: () => undefined,
         sync: (updateData: Position & Unique) => {
             if (updateData.x == null || updateData.y == null) {
                 console.warn(`Attempted to sync ship without position data`)
                 return
             }
 
-            networkShip.targetPosition = {
+            networkShip.position = {
                 x: updateData.x,
                 y: updateData.y
             }
@@ -436,9 +445,9 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         position: origin(),
         actors: [
             ship,
-            networkShip,
-            leftSpawner,
-            rightSpawner,
+            // networkShip,
+            // // leftSpawner,
+            // // rightSpawner,
             centerSpawner
         ]
     }

@@ -59,3 +59,10 @@ export function getWorldBounds(world: World): [Position, Position] {
         }
     ]
 }
+
+export function isOutsideWorldBounds(world: World, position: Position): boolean {
+    const worldBounds = getWorldBounds(world)
+    const outsideX = position.x < worldBounds[0].x || position.x > worldBounds[1].x
+    const outsideY = position.y < worldBounds[0].y || position.y > worldBounds[1].y
+    return outsideX || outsideY
+}

@@ -1,7 +1,7 @@
 // Functions that should probably be replaced by an external library if there's a lot
 // I'm not ever gonna do that tho probably
 
-import { Position } from "./engine/scene/positionable"
+import { Position } from './engine/scene/positionable'
 
 export function deg2rad(degrees: number): number {
     return (degrees * Math.PI) / 180
@@ -12,7 +12,11 @@ export function rad2deg(radians: number): number {
 }
 
 export function movementDistance(speed: number, time: number): number {
-    return speed / time
+    return speed * (time / 50)
+}
+
+export function linearDistance(a: number, b: number): number {
+    return Math.abs(b - a)
 }
 
 export function positionDistance(pos1: Position, pos2: Position): number {
