@@ -1,40 +1,99 @@
 import Updatable from '../engine/scene/updatable'
 import Renderable from '../engine/scene/renderable'
-import { Position, addPositions } from '../engine/scene/positionable'
-import Rotatable from '../engine/scene/rotatable'
-import { linearDistance, movementDistance } from '../math-utils'
+import { Position, addPositions, dividePositions, subtractPositions } from '../engine/scene/positionable'
+import { deg2rad, linearDistance, movementDistance, pi2, rad2deg } from '../math-utils'
 import Pausable from '../engine/scene/pausable'
-import { positionDistance } from '../math-utils'
 
-export interface Ship extends Updatable, Renderable, Rotatable, Pausable {
+export interface Ship extends Updatable, Renderable, Pausable {
     width: number
     length: number
     speed: number
     targetPosition: Position
 }
 
-export function moveShip(ship: Ship, deltaTime: number) {
+const getTargetRotationFromDistance = (distance: Position): number => {
+    const { x: A, y: O } = distance
+    const H = Math.sqrt((A * A) + (O * O))
+    const rotation = Math.asin(O / H)
+    return rotation
+}
+
+export function moveShip(ship: Ship, deltaTime2: number) {
     if (ship.isPaused()) return
+    const deltaTime = 40
+
+    const targetDistance = subtractPositions(ship.targetPosition, ship.position)
+    if (Math.abs(targetDistance.x) < 5 && Math.abs(targetDistance.y) < 5) return
+
+    const rotation = getTargetRotationFromDistance(targetDistance)
+    if (!Number.isNaN(rotation)) ship.rotation = rotation
 
     const distance = movementDistance(ship.speed, deltaTime)
-
-    const H = positionDistance(ship.position, ship.targetPosition)
-    // const O = linearDistance(ship.position.y, ship.targetPosition.y)
-    const O = ship.targetPosition.y - ship.position.y
-    const rotation = Math.asin(O/ H)
-    if (rotation) ship.rotation = rotation
-
     const distanceX = Math.sin(ship.rotation) * distance
     const distanceY = Math.cos(ship.rotation) * distance
-    ship.position = addPositions(ship.position, {
-        x: distanceX,
-        y: -distanceY
-    })
+    // ship.position = addPositions(ship.position, {
+    //     x: distanceX,
+    //     y: -distanceY
+    // })
+}
+
+export function drawMovementData(ship: Ship, context: CanvasRenderingContext2D) {
+    context.save()
+    context.rotate(-ship.rotation)
+
+    // Draw path to target (currently not the real path)
+    context.save()
+
+    context.fillStyle = '#1a5cc7'
+    context.strokeStyle = '#1a5cc7'
+
+    const relativeTargetPosition = subtractPositions(ship.targetPosition, ship.position)
+
+    const controlPointDistance = ship.speed * 50
+    const controlPoint = {
+        x: controlPointDistance * Math.sin(ship.rotation) + relativeTargetPosition.x / 2,
+        y: -controlPointDistance * Math.cos(ship.rotation) + relativeTargetPosition.y / 2
+    }
+
+    context.beginPath()
+    context.moveTo(0, 0)
+    context.quadraticCurveTo(controlPoint.x, controlPoint.y, relativeTargetPosition.x, relativeTargetPosition.y)
+    context.stroke()
+
+    context.beginPath()
+    context.arc(relativeTargetPosition.x, relativeTargetPosition.y, 5, 0, pi2)
+    context.fill()
+
+    context.beginPath()
+    context.arc(controlPoint.x, controlPoint.y, 5, 0, pi2)
+    context.fill()
+
+    context.restore()
+
+    // Draw rotation text
+    const textX = -(ship.width + ship.width * 2)
+    const textY = -(ship.length + ship.length / 2)
+
+    context.fillStyle = 'rgb(0, 0, 0, .75'
+    context.fillRect(textX - 3, textY - 10, 35, 13)
+
+    context.fillStyle = '#00ff04'
+    context.strokeStyle = '#00ff04'
+    context.beginPath()
+    context.fillText(`${rad2deg(ship.rotation).toFixed(2)}`, textX, textY)
+
+    // Draw rotation arc
+    context.rotate(deg2rad(-90))
+    context.beginPath()
+    context.moveTo(0, 0)
+    context.arc(0, 0, ship.length + 5, 0, ship.rotation, ship.rotation < 0)
+    context.closePath()
+    context.stroke()
+
+    context.restore()
 }
 
 export function renderShip(ship: Ship, context: CanvasRenderingContext2D): void {
-    context.rotate(ship.rotation)
-
     context.beginPath()
 
     const halfWidth = ship.width / 2

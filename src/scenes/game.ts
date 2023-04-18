@@ -1,18 +1,18 @@
 import GameTimer, { renderGameTimer } from '../hud/game-timer'
 import { addRendering } from '../engine/render-loop'
-import { renderShip, Ship, moveShip } from '../actors/ship'
+import { renderShip, Ship, moveShip, drawMovementData } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
 import { AsteroidSpawner, renderSpawner, updateSpawner } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, executeCommand, registerCommand } from '../engine/command'
 import World, { isOutsideWorldBounds, renderWorld, updateWorld } from '../engine/scene/world'
-import Camera, { renderCamera, screenToWorldPosition } from '../engine/scene/camera'
+import Camera, { isOutSideCameraBounds, renderCamera, screenToWorldPosition } from '../engine/scene/camera'
 import Positionable, { origin, Position, subtractPositions } from '../engine/scene/positionable'
 import DebugMenu from '../hud/debug-menu'
 import Checkbox, { isPointInCheckBox, renderCheckBox } from '../hud/checkbox'
 import Renderable from '../engine/scene/renderable'
 import Updatable from '../engine/scene/updatable'
-import { movementDistance, randomBetween } from '../math-utils'
+import { deg2rad, movementDistance, randomBetween } from '../math-utils'
 import Syncable from '../engine/scene/syncable'
 import { addSyncable, connect } from '../engine/network'
 import Unique from '../engine/scene/unique'
@@ -70,6 +70,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
                 x: randomBetween(0, canvasWidth),
                 y: randomBetween(0, canvasHeight)
             },
+            rotation: 0,
             timeSinceBlink: 0,
             radius: randomBetween(starMinRadius, starMaxRadius),
             update: deltaTime => {
@@ -101,6 +102,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const background: Renderable = {
         id: 'game-background',
         position: origin(),
+        rotation: 0,
         zIndex: -9999,
         render: context => {
             context.fillStyle = '#181e29'
@@ -111,7 +113,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    addRendering(background)
+    //addRendering(background)
 
     //#endregion
 
@@ -124,6 +126,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: 10,
             y: 10
         },
+        rotation: 0,
         zIndex: 50,
         isPaused: () => isPaused,
         update: deltaTime => {
@@ -149,6 +152,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: 10,
             y: 10
         },
+        rotation: 0,
         render: context => renderCheckBox(shouldDrawCameraRangeCheckBox, drawCameraRange, context),
         onUpdate: () => drawCameraRange = !drawCameraRange
     }
@@ -163,6 +167,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: 10,
             y: 25
         },
+        rotation: 0,
         render: context => renderCheckBox(logRenderingDebugInfoCheckBox, logRenderingDebugInfo, context),
         onUpdate: () => logRenderingDebugInfo = !logRenderingDebugInfo
     }
@@ -177,6 +182,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: 10,
             y: 40
         },
+        rotation: 0,
         render: context => renderCheckBox(drawSpawnerPositionsCheckBox, drawSpawnerPositions, context),
         onUpdate: () => drawSpawnerPositions = !drawSpawnerPositions
     }
@@ -202,18 +208,19 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: canvasWidth - 250,
             y: 50
         },
+        rotation: 0,
         controls: [
             shouldDrawCameraRangeCheckBox,
             logRenderingDebugInfoCheckBox,
             drawSpawnerPositionsCheckBox
         ],
-        zIndex: 100,
+        zIndex: 1001,
         render: context => {
             if (!showDebugMenu) return
 
             context.save()
 
-            context.fillStyle = 'rgb(14, 188, 194, .2)'
+            context.fillStyle = 'rgb(14, 188, 194, .5)'
             context.fillRect(0, 0, debugMenu.width, debugMenu.height)
             context.strokeRect(0, 0, debugMenu.width, debugMenu.height)
 
@@ -224,6 +231,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
 
                 context.save()
                 context.translate(x, y)
+                context.strokeStyle = 'white'
+                context.fillStyle ='white'
                 control.render(context)
                 context.restore()
             }
@@ -243,14 +252,15 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         lastHitTime: number
     }
 
+    const previousShipPositions: Position[] = []
     const ship: HealthyShip & Syncable = {
         id: 'ship',
         position: origin(),
-        targetPosition: origin(),
-        // targetPosition: {
-        //     x: worldWidth / 2,
-        //     y: worldHeight / 2
-        // },
+        // targetPosition: origin(),
+        targetPosition: {
+            x: worldWidth / 7,
+            y: worldHeight / 3
+        },
         rotation: 0,
         width: 8,
         length: 15,
@@ -275,11 +285,23 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (ship.health <= 3) context.fillStyle = '#00aa00'
             if (ship.health <= 2) context.fillStyle = 'orange'
             if (ship.health <= 1) context.fillStyle = 'red'
-
+            
             renderShip(ship, context)
+            drawMovementData(ship, context)
+
+            context.strokeStyle = 'wheat'
+            context.rotate(-ship.rotation)
+            context.translate(-ship.position.x, -ship.position.y)
+            context.beginPath()
+            for (const _ of previousShipPositions)
+                context.lineTo(_.x, _.y)
+            context.stroke()
         },
         update: deltaTime => {
             if (isPaused) return
+
+            previousShipPositions.unshift(ship.position)
+            if (previousShipPositions.length > 1000) previousShipPositions.pop()
 
             ship.shieldRechargeTime += deltaTime
             if (ship.shieldRechargeTime > 5000 && ship.shield < 4) {
@@ -287,11 +309,8 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
                 ship.shieldRechargeTime = 0
             }
             
-            if (isOutsideWorldBounds(world, ship.position)) ship.position = {
-                x: (-worldWidth / 2) + 20,
-                y: (-worldHeight / 2) + 20
-            }
-            //ship.targetPosition = screenToWorldPosition(camera, getMousePosition())
+            if (isOutSideCameraBounds(camera, ship.position)) ship.position = origin()
+            ship.targetPosition = screenToWorldPosition(camera, getMousePosition())
             moveShip(ship, deltaTime)
         },
         getSyncData: () => ({
@@ -333,7 +352,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addSyncable(ship)
     addSyncable(networkShip)
 
-    const players: Ship[] = [ship]
+    const players: Ship[] = []
 
     const onAsteroidCollision = (target: Positionable) => {
         const targetAsShip = target as HealthyShip
@@ -375,6 +394,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: -(worldWidth / 2) + (worldWidth / 6),
             y: 0
         },
+        rotation: 0,
         zIndex: -2,
         isPaused: () => isPaused,
         onAsteroidCollision: onAsteroidCollision,
@@ -401,6 +421,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             x: (worldWidth / 2) - (worldWidth / 6),
             y: 0
         },
+        rotation: 0,
         zIndex: -2,
         isPaused: () => isPaused,
         onAsteroidCollision: onAsteroidCollision,
@@ -424,6 +445,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         maxTravelDistance: 2000,
         checkCollisionsWith: players,
         position: origin(),
+        rotation: 0,
         zIndex: -2,
         isPaused: () => isPaused,
         onAsteroidCollision: onAsteroidCollision,
@@ -443,6 +465,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         update: deltaTime => updateWorld(world, deltaTime),
         shouldLog: () => logRenderingDebugInfo,
         position: origin(),
+        rotation: 0,
         actors: [
             ship,
             // networkShip,
@@ -466,6 +489,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         resolutionX: canvasWidth,
         resolutionY: canvasHeight,
         position: origin(),
+        rotation: 0,
         zIndex: 1000,
         render: context => renderCamera(camera, world, drawCameraRange, context),
         shouldLog: () => logRenderingDebugInfo
@@ -481,6 +505,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         resolutionX: canvasWidth / 4,
         resolutionY: canvasHeight / 4,
         position: origin(),
+        rotation: deg2rad(45),
         zIndex: 1001,
         render: context => {
             context.save()

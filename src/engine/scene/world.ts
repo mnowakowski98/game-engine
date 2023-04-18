@@ -34,6 +34,7 @@ export function renderWorld(world: World, context: CanvasRenderingContext2D) {
 
         context.save()
         context.translate(actor.position.x + world.width / 2, actor.position.y + world.height / 2)
+        context.rotate(actor.rotation)
         actor.render(context)
         context.restore()
     }
@@ -47,7 +48,6 @@ export function updateWorld(world: World, deltaTime: number) {
 export function getWorldBounds(world: World): [Position, Position] {
     const halfWidth = world.width / 2
     const halfHeight = world.height / 2
-    
     return [
         {
             x: -halfWidth,
@@ -62,7 +62,9 @@ export function getWorldBounds(world: World): [Position, Position] {
 
 export function isOutsideWorldBounds(world: World, position: Position): boolean {
     const worldBounds = getWorldBounds(world)
-    const outsideX = position.x < worldBounds[0].x || position.x > worldBounds[1].x
-    const outsideY = position.y < worldBounds[0].y || position.y > worldBounds[1].y
+    const x = position.x + world.position.x
+    const y = position.y + world.position.y
+    const outsideX = x < worldBounds[0].x || x > worldBounds[1].x
+    const outsideY = y < worldBounds[0].y || y > worldBounds[1].y
     return outsideX || outsideY
 }

@@ -2,7 +2,7 @@ import { deg2rad, positionDistance, randomBetween } from '../math-utils'
 import Positionable from '../engine/scene/positionable'
 import Updatable from '../engine/scene/updatable'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
-import World, { getWorldBounds, isOutsideWorldBounds } from '../engine/scene/world'
+import World, { isOutsideWorldBounds } from '../engine/scene/world'
 import Pausable from '../engine/scene/pausable'
 import Renderable from '../engine/scene/renderable'
 
@@ -51,8 +51,7 @@ export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id:
             x: spawner.position.x,
             y: spawner.position.y
         },
-        // rotation: deg2rad(randomBetween(spawner.minAngle, spawner.maxAngle)),
-        rotation: deg2rad(270),
+        rotation: deg2rad(randomBetween(spawner.minAngle, spawner.maxAngle)),
         speed: (Math.random() * (spawner.maxSpeed - spawner.minSpeed)) + spawner.minSpeed,
         zIndex: 2,
         isPaused: spawner.isPaused,

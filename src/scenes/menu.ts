@@ -13,6 +13,7 @@ export function showMenu(center: Position) {
             x: 0,
             y: 0
         },
+        rotation: 0,
         render: context => {
             const gradient = context.createLinearGradient(0, 0, context.canvas.width, context.canvas.height)
             gradient.addColorStop(0, '#0cc25b')
@@ -33,7 +34,8 @@ export function showMenu(center: Position) {
         position: {
             x: center.x - 60,
             y: center.y - 25
-        }
+        },
+        rotation: 0
     }
 
     addRendering(text)
@@ -44,6 +46,7 @@ export function showMenu(center: Position) {
         height: 25,
         text: 'Start Game',
         position: center,
+        rotation: 0,
         onActivate: () => dispatchEvent(new Event('menu-end')),
         render: context => renderButton(startButton, context)
     }

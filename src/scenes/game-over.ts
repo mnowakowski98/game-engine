@@ -12,6 +12,7 @@ export function showGameOver(canvasWidth: number, canvasHeight: number) {
             x: canvasWidth / 2,
             y: canvasHeight / 2
         },
+        rotation: 0,
         render: context => renderText(text, context)
     }
     addRendering(text)
