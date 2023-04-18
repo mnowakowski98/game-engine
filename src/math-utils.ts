@@ -3,6 +3,8 @@
 
 import { Position } from './engine/scene/positionable'
 
+export const pi2 = Math.PI * 2
+
 export function deg2rad(degrees: number): number {
     return (degrees * Math.PI) / 180
 }
