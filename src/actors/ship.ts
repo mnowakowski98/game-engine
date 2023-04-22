@@ -13,8 +13,20 @@ export interface Ship extends Updatable, Renderable, Pausable {
 
 const getTargetRotationFromDistance = (distance: Position): number => {
     const { x: A, y: O } = distance
-    const H = Math.sqrt((A * A) + (O * O))
-    const rotation = Math.asin(O / H)
+    let rotation = Math.atan(O / A)
+
+    // Detect quadrant and correct rotation
+    // I have no idea why these are offset and trying to figure out trig hurts
+    if (A <= 0 && O <= 0) rotation -= deg2rad(90)
+    if (A >= 0 && O <= 0) rotation += deg2rad(90)
+    if (A >= 0 && O >= 0) rotation += deg2rad(90)
+    if (A <= 0 && O >= 0) rotation -= deg2rad(90)
+
+    // Corrections for 0 cases
+    if (A == 0) rotation += deg2rad(90)
+    if (O == 0) rotation -= deg2rad(90)
+    if (O == 0 && A <= 0) rotation += deg2rad(180)
+
     return rotation
 }
 
