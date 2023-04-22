@@ -1,4 +1,4 @@
-import Command, { addGlobalCommand, executeCommand, registerCommand } from './command';
+import Command, { addGlobalCommand, executeCommand } from './command';
 import { Position } from './scene/positionable';
 
 const mousePosition: Position = {

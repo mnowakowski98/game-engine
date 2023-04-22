@@ -2,7 +2,7 @@ import { deg2rad, positionDistance, randomBetween } from '../math-utils'
 import Positionable from '../engine/scene/positionable'
 import Updatable from '../engine/scene/updatable'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
-import World, { getWorldBounds } from '../engine/scene/world'
+import World, { isOutsideWorldBounds } from '../engine/scene/world'
 import Pausable from '../engine/scene/pausable'
 import Renderable from '../engine/scene/renderable'
 
@@ -68,12 +68,9 @@ export function spawnAsteroidInWorld(spawner: AsteroidSpawner, world: World, id:
                 }
             }
 
-            const worldBounds = getWorldBounds(world)
-            const outsideWorldX = asteroid.position.x < worldBounds[0].x || asteroid.position.x > worldBounds[1].x
-            const outsideWorldY = asteroid.position.y < worldBounds[0].y || asteroid.position.y > worldBounds[1].y
+            const outsideWorldBounds = isOutsideWorldBounds(world, asteroid.position)
             const outsideMaxDistance = positionDistance(spawner.position, asteroid.position) > maxDistance
-
-            if (outsideWorldX || outsideWorldY || outsideMaxDistance) {
+            if (outsideWorldBounds || outsideMaxDistance) {
                 world.actors.splice(world.actors.findIndex(_ => asteroid.id === _.id), 1)
                 spawner.numAsteroids--
             }

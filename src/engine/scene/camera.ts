@@ -61,3 +61,25 @@ export function screenToWorldPosition(camera: Camera, screenPosition: Position):
     const cameraRelativePosition = screenToCameraPosition(camera, screenPosition)
     return addPositions(cameraRelativePosition, camera.position)
 }
+
+export function getCameraBounds(camera: Camera): [Position, Position] {
+    const halfWidth = camera.resolutionX / 2
+    const halfHeight = camera.resolutionY / 2
+    return [
+        {
+            x: -halfWidth,
+            y: -halfHeight
+        },
+        {
+            x: halfWidth,
+            y: halfHeight
+        }
+    ]
+}
+
+export function isOutSideCameraBounds(camera: Camera, position: Position): boolean {
+    const cameraBounds = getCameraBounds(camera)
+    const outsideX = position.x < cameraBounds[0].x || position.x > cameraBounds[1].x
+    const outsideY = position.y < cameraBounds[0].y || position.y > cameraBounds[1].y
+    return outsideX || outsideY
+}

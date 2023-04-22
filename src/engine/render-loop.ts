@@ -10,6 +10,7 @@ let renderCursor = defaultCursorRenderer
 const cursor: Renderable = {
     id: 'cursor',
     position: origin(),
+    rotation: 0,
     render: context => {
         cursor.position = getMousePosition()
         context.translate(cursor.position.x, cursor.position.y)
