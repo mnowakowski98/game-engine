@@ -28,6 +28,26 @@ export function positionDistance(pos1: Position, pos2: Position): number {
     return distance
 }
 
+export function rotationToPosition(position: Position): number {
+    const { x: A, y: O } = position
+    let rotation = Math.atan(O / A)
+
+    // Detect quadrant and correct rotation
+    // I have no idea why these are offset and trying to figure out trig hurts
+    // Probably cause canvas uses flipped y values
+    if (A <= 0 && O <= 0) rotation -= deg2rad(90) // Q2
+    if (A >= 0 && O <= 0) rotation += deg2rad(90) // Q1
+    if (A >= 0 && O >= 0) rotation += deg2rad(90) // Q4
+    if (A <= 0 && O >= 0) rotation -= deg2rad(90) // Q3
+
+    // Corrections for 0 cases
+    if (A == 0) rotation += deg2rad(90)
+    if (O == 0) rotation -= deg2rad(90)
+    if (O == 0 && A <= 0) rotation += deg2rad(180)
+
+    return rotation
+}
+
 export function randomBetween(min: number, max: number): number {
     const difference = max - min
     const baseRandom = difference * Math.random()

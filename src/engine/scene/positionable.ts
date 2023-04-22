@@ -1,11 +1,10 @@
+import { Coordinate } from "./coordinate"
+
 export default interface Positionable {
     position: Position
 }
 
-export interface Position {
-    x: number
-    y: number
-}
+export type Position = Coordinate
 
 export function origin(): Position {
     return {

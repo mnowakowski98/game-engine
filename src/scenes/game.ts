@@ -1,11 +1,11 @@
 import GameTimer, { renderGameTimer } from '../hud/game-timer'
 import { addRendering } from '../engine/render-loop'
-import { renderShip, Ship, moveShip, drawMovementData } from '../actors/ship'
+import { renderShip, Ship, moveShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
 import { AsteroidSpawner, renderSpawner, updateSpawner } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, executeCommand, registerCommand } from '../engine/command'
-import World, { isOutsideWorldBounds, renderWorld, updateWorld } from '../engine/scene/world'
+import World, { renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { isOutSideCameraBounds, renderCamera, screenToWorldPosition } from '../engine/scene/camera'
 import Positionable, { origin, Position, subtractPositions } from '../engine/scene/positionable'
 import DebugMenu from '../hud/debug-menu'
@@ -113,7 +113,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         }
     }
 
-    //addRendering(background)
+    addRendering(background)
 
     //#endregion
 
@@ -255,16 +255,15 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const previousShipPositions: Position[] = []
     const ship: HealthyShip & Syncable = {
         id: 'ship',
-        position: origin(),
-        // targetPosition: origin(),
-        targetPosition: {
-            x: worldWidth / 7,
-            y: worldHeight / 3
+        position: {
+            x: -worldWidth / 3,
+            y: 0
         },
+        targetPosition: origin(),
         rotation: 0,
         width: 8,
         length: 15,
-        speed: 2,
+        speed: 5,
         zIndex: 1,
         health: 4,
         shield: 4,
@@ -287,21 +286,21 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
             if (ship.health <= 1) context.fillStyle = 'red'
             
             renderShip(ship, context)
-            drawMovementData(ship, context)
+            //drawMovementData(ship, context)
 
-            context.strokeStyle = 'wheat'
-            context.rotate(-ship.rotation)
-            context.translate(-ship.position.x, -ship.position.y)
-            context.beginPath()
-            for (const _ of previousShipPositions)
-                context.lineTo(_.x, _.y)
-            context.stroke()
+            // context.strokeStyle = 'wheat'
+            // context.rotate(-ship.rotation)
+            // context.translate(-ship.position.x, -ship.position.y)
+            // context.beginPath()
+            // for (const _ of previousShipPositions)
+            //     context.lineTo(_.x, _.y)
+            // context.stroke()
         },
         update: deltaTime => {
             if (isPaused) return
 
-            previousShipPositions.unshift(ship.position)
-            if (previousShipPositions.length > 1000) previousShipPositions.pop()
+            // previousShipPositions.unshift(ship.position)
+            // if (previousShipPositions.length > 1000) previousShipPositions.pop()
 
             ship.shieldRechargeTime += deltaTime
             if (ship.shieldRechargeTime > 5000 && ship.shield < 4) {
@@ -352,7 +351,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     addSyncable(ship)
     addSyncable(networkShip)
 
-    const players: Ship[] = []
+    const players: Ship[] = [ship]
 
     const onAsteroidCollision = (target: Positionable) => {
         const targetAsShip = target as HealthyShip
@@ -373,60 +372,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
     const renderSpawnerPosition = (context: CanvasRenderingContext2D) => {
         if (!drawSpawnerPositions) return
         renderSpawner(context)
-    }
-
-    const leftSpawner: AsteroidSpawner = {
-        id: 'asteroid-spawner-left',
-        maxSpeed: 8,
-        minSpeed: 5,
-        maxRadius: 10,
-        minRadius: 5,
-        minAngle: 45,
-        maxAngle: 135,
-        maxSpawns: 25,
-        minTimeBetweenSpawns: 200,
-        nextAsteroidId: 0,
-        numAsteroids: 0,
-        timeSinceLastSpawn: 0,
-        maxTravelDistance: 2000,
-        checkCollisionsWith: players,
-        position: {
-            x: -(worldWidth / 2) + (worldWidth / 6),
-            y: 0
-        },
-        rotation: 0,
-        zIndex: -2,
-        isPaused: () => isPaused,
-        onAsteroidCollision: onAsteroidCollision,
-        render: renderSpawnerPosition,
-        update: deltaTime => updateSpawner(leftSpawner, world, deltaTime)
-    }
-
-    const rightSpawner: AsteroidSpawner = {
-        id: 'asteroid-spawner-right',
-        maxSpeed: 8,
-        minSpeed: 5,
-        maxRadius: 10,
-        minRadius: 5,
-        minAngle: -45,
-        maxAngle: -135,
-        maxSpawns: 25,
-        minTimeBetweenSpawns: 200,
-        nextAsteroidId: 0,
-        numAsteroids: 0,
-        timeSinceLastSpawn: 0,
-        maxTravelDistance: 2000,
-        checkCollisionsWith: players,
-        position: {
-            x: (worldWidth / 2) - (worldWidth / 6),
-            y: 0
-        },
-        rotation: 0,
-        zIndex: -2,
-        isPaused: () => isPaused,
-        onAsteroidCollision: onAsteroidCollision,
-        render: renderSpawnerPosition,
-        update: deltaTime => updateSpawner(rightSpawner, world, deltaTime)
     }
 
     const centerSpawner: AsteroidSpawner = {
@@ -468,9 +413,7 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         rotation: 0,
         actors: [
             ship,
-            // networkShip,
-            // // leftSpawner,
-            // // rightSpawner,
+            networkShip,
             centerSpawner
         ]
     }

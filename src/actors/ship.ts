@@ -1,7 +1,7 @@
 import Updatable from '../engine/scene/updatable'
 import Renderable from '../engine/scene/renderable'
-import { Position, addPositions, dividePositions, subtractPositions } from '../engine/scene/positionable'
-import { deg2rad, linearDistance, movementDistance, pi2, rad2deg } from '../math-utils'
+import { Position, addPositions, subtractPositions } from '../engine/scene/positionable'
+import { deg2rad, movementDistance, pi2, rad2deg, rotationToPosition } from '../math-utils'
 import Pausable from '../engine/scene/pausable'
 
 export interface Ship extends Updatable, Renderable, Pausable {
@@ -11,49 +11,28 @@ export interface Ship extends Updatable, Renderable, Pausable {
     targetPosition: Position
 }
 
-const getTargetRotationFromDistance = (distance: Position): number => {
-    const { x: A, y: O } = distance
-    let rotation = Math.atan(O / A)
-
-    // Detect quadrant and correct rotation
-    // I have no idea why these are offset and trying to figure out trig hurts
-    if (A <= 0 && O <= 0) rotation -= deg2rad(90)
-    if (A >= 0 && O <= 0) rotation += deg2rad(90)
-    if (A >= 0 && O >= 0) rotation += deg2rad(90)
-    if (A <= 0 && O >= 0) rotation -= deg2rad(90)
-
-    // Corrections for 0 cases
-    if (A == 0) rotation += deg2rad(90)
-    if (O == 0) rotation -= deg2rad(90)
-    if (O == 0 && A <= 0) rotation += deg2rad(180)
-
-    return rotation
-}
-
-export function moveShip(ship: Ship, deltaTime2: number) {
+export function moveShip(ship: Ship, deltaTime: number) {
     if (ship.isPaused()) return
-    const deltaTime = 40
 
     const targetDistance = subtractPositions(ship.targetPosition, ship.position)
-    if (Math.abs(targetDistance.x) < 5 && Math.abs(targetDistance.y) < 5) return
+    if (Math.abs(targetDistance.x) <= 1 && Math.abs(targetDistance.y) <= 1) return
 
-    const rotation = getTargetRotationFromDistance(targetDistance)
-    if (!Number.isNaN(rotation)) ship.rotation = rotation
+    ship.rotation = rotationToPosition(targetDistance)
 
     const distance = movementDistance(ship.speed, deltaTime)
     const distanceX = Math.sin(ship.rotation) * distance
     const distanceY = Math.cos(ship.rotation) * distance
-    // ship.position = addPositions(ship.position, {
-    //     x: distanceX,
-    //     y: -distanceY
-    // })
+    ship.position = addPositions(ship.position, {
+        x: distanceX,
+        y: -distanceY
+    })
 }
 
 export function drawMovementData(ship: Ship, context: CanvasRenderingContext2D) {
     context.save()
     context.rotate(-ship.rotation)
 
-    // Draw path to target (currently not the real path)
+    // Draw bezier path to target (currently not the real path)
     context.save()
 
     context.fillStyle = '#1a5cc7'
