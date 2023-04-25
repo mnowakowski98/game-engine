@@ -1,8 +1,9 @@
 import Updatable from '../engine/scene/updatable'
 import Renderable from '../engine/scene/renderable'
 import { Position, addPositions, subtractPositions } from '../engine/scene/positionable'
-import { deg2rad, movementDistance, pi2, rad2deg, rotationToPosition } from '../math-utils'
+import { movementDistance, pi2, rotationToPosition } from '../math-utils'
 import Pausable from '../engine/scene/pausable'
+import { drawRotationData } from '../debug/renderable-data'
 
 export interface Ship extends Updatable, Renderable, Pausable {
     width: number
@@ -61,27 +62,7 @@ export function drawMovementData(ship: Ship, context: CanvasRenderingContext2D) 
 
     context.restore()
 
-    // Draw rotation text
-    const textX = -(ship.width + ship.width * 2)
-    const textY = -(ship.length + ship.length / 2)
-
-    context.fillStyle = 'rgb(0, 0, 0, .75'
-    context.fillRect(textX - 3, textY - 10, 35, 13)
-
-    context.fillStyle = '#00ff04'
-    context.strokeStyle = '#00ff04'
-    context.beginPath()
-    context.fillText(`${rad2deg(ship.rotation).toFixed(2)}`, textX, textY)
-
-    // Draw rotation arc
-    context.rotate(deg2rad(-90))
-    context.beginPath()
-    context.moveTo(0, 0)
-    context.arc(0, 0, ship.length + 5, 0, ship.rotation, ship.rotation < 0)
-    context.closePath()
-    context.stroke()
-
-    context.restore()
+    drawRotationData(ship, context)
 }
 
 export function renderShip(ship: Ship, context: CanvasRenderingContext2D): void {

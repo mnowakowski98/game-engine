@@ -3,32 +3,26 @@
 
 import { Position } from './engine/scene/positionable'
 
+//#region Constants
+
 export const pi2 = Math.PI * 2
 
-export function deg2rad(degrees: number): number {
+//#endregion
+
+//#region Angles & rotation
+
+export type Radians = number
+export type Degrees = number
+
+export function deg2rad(degrees: Degrees): Radians {
     return (degrees * Math.PI) / 180
 }
 
-export function rad2deg(radians: number): number {
+export function rad2deg(radians: Radians): Degrees {
     return (radians * 180) / Math.PI
 }
 
-export function movementDistance(speed: number, time: number): number {
-    return speed * (time / 50)
-}
-
-export function linearDistance(a: number, b: number): number {
-    return Math.abs(b - a)
-}
-
-export function positionDistance(pos1: Position, pos2: Position): number {
-    const differenceX = pos2.x - pos1.x
-    const differenceY = pos2.y - pos1.y
-    const distance = Math.sqrt(differenceX * differenceX + differenceY * differenceY)
-    return distance
-}
-
-export function rotationToPosition(position: Position): number {
+export function rotationToPosition(position: Position): Radians {
     const { x: A, y: O } = position
     let rotation = Math.atan(O / A)
 
@@ -48,8 +42,35 @@ export function rotationToPosition(position: Position): number {
     return rotation
 }
 
+//#endregion
+
+//#region Distance
+
+export type Distance = number
+
+export function movementDistance(speed: number, time: number): Distance {
+    return speed * (time / 50)
+}
+
+export function linearDistance(a: number, b: number): Distance {
+    return Math.abs(b - a)
+}
+
+export function positionDistance(pos1: Position, pos2: Position): Distance {
+    const differenceX = pos2.x - pos1.x
+    const differenceY = pos2.y - pos1.y
+    const distance = Math.sqrt(differenceX * differenceX + differenceY * differenceY)
+    return distance
+}
+
+//#endregion
+
+//#region Randomization
+
 export function randomBetween(min: number, max: number): number {
     const difference = max - min
     const baseRandom = difference * Math.random()
     return baseRandom + min
 }
+
+//#endregion
