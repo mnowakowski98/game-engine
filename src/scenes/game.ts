@@ -3,7 +3,7 @@ import { addRendering } from '../engine/render-loop'
 import { renderShip, Ship, moveShip } from '../actors/ship'
 import { addUpdatable } from '../engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../engine/inputs'
-import { AsteroidSpawner, renderSpawner, updateSpawner } from '../actors/asteroid-spawner'
+import { AsteroidSpawner, updateSpawner } from '../actors/asteroid-spawner'
 import Command, { addCommandAction, executeCommand, registerCommand } from '../engine/command'
 import World, { renderWorld, updateWorld } from '../engine/scene/world'
 import Camera, { isOutSideCameraBounds, renderCamera, screenToWorldPosition } from '../engine/scene/camera'
@@ -16,6 +16,7 @@ import { deg2rad, movementDistance, randomBetween } from '../math-utils'
 import Syncable from '../engine/scene/syncable'
 import { addSyncable, connect } from '../engine/network'
 import Unique from '../engine/scene/unique'
+import { renderCoordinate } from '../engine/scene/coordinate'
 
 export function startGame(canvasWidth: number, canvasHeight: number) {
 
@@ -369,11 +370,6 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         targetAsShip.lastHitTime = performance.now()
     }
 
-    const renderSpawnerPosition = (context: CanvasRenderingContext2D) => {
-        if (!drawSpawnerPositions) return
-        renderSpawner(context)
-    }
-
     const centerSpawner: AsteroidSpawner = {
         id: 'asteroid-spawner-center',
         maxSpeed: 8,
@@ -394,7 +390,9 @@ export function startGame(canvasWidth: number, canvasHeight: number) {
         zIndex: -2,
         isPaused: () => isPaused,
         onAsteroidCollision: onAsteroidCollision,
-        render: renderSpawnerPosition,
+        render: context => {
+            if (drawSpawnerPositions) renderCoordinate(centerSpawner.position, context)
+        },
         update: deltaTime => updateSpawner(centerSpawner, world, deltaTime)
     }
 

@@ -23,13 +23,6 @@ export interface AsteroidSpawner extends Updatable, Renderable, Pausable {
     onAsteroidCollision: (target: Positionable) => void
 }
 
-export function renderSpawner(context: CanvasRenderingContext2D) {
-    context.beginPath()
-    context.arc(0, 0, 5, 0, Math.PI * 2)
-    context.fillStyle = '#c75d24'
-    context.fill()
-}
-
 export function updateSpawner(spawner: AsteroidSpawner, world: World, deltaTime: number) {
     if (spawner.isPaused()) return
 
