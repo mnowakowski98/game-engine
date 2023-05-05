@@ -1,10 +1,10 @@
 import { startGame } from './scenes/game'
-import { registerInputs } from './engine/inputs'
+import { registerInputs } from './foundation/engine/inputs'
 import { showGameOver } from './scenes/game-over'
-import Scene, { startScene } from './engine/scene/scene'
+import Scene, { startScene } from './foundation/engine/scene/scene'
 import { showMenu } from './scenes/menu'
-import { addGlobalCommand } from './engine/command'
-import { connectDevice, sendLedCommand } from './engine/peripheral'
+import { addGlobalCommand } from './foundation/engine/command'
+import { connectDevice, sendLedCommand } from './foundation/engine/peripheral'
 
 export function start(context: CanvasRenderingContext2D) {
     const canvas = context.canvas

@@ -1,10 +1,10 @@
 import Button, { isPointInButton, renderButton } from '../hud/button';
 import Text, { renderText } from '../hud/text';
-import { addCommandAction, executeCommand } from '../engine/command';
-import { getMousePosition, mouseClickCommand } from '../engine/inputs';
-import { addRendering } from '../engine/render-loop';
-import { Position } from '../engine/scene/positionable';
-import Renderable from '../engine/scene/renderable';
+import { addCommandAction, executeCommand } from '../foundation/engine/command';
+import { getMousePosition, mouseClickCommand } from '../foundation/engine/inputs';
+import { addRendering } from '../foundation/engine/render-loop';
+import { Position } from '../foundation/engine/scene/positionable';
+import Renderable from '../foundation/engine/scene/renderable';
 
 export function showMenu(center: Position) {
     const background: Renderable = {

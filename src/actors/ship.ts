@@ -1,8 +1,8 @@
-import Updatable from '../engine/scene/updatable'
-import Renderable from '../engine/scene/renderable'
-import { Position, addPositions, subtractPositions } from '../engine/scene/positionable'
+import Updatable from '../foundation/engine/scene/updatable'
+import Renderable from '../foundation/engine/scene/renderable'
+import { Position, addPositions, subtractPositions } from '../foundation/engine/scene/positionable'
 import { movementDistance, pi2, rotationToPosition } from '../math-utils'
-import Pausable from '../engine/scene/pausable'
+import Pausable from '../foundation/engine/scene/pausable'
 import { drawRotationData } from '../debug/renderable-data'
 
 export interface Ship extends Updatable, Renderable, Pausable {

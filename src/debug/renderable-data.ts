@@ -1,4 +1,4 @@
-import Renderable from '../engine/scene/renderable'
+import Renderable from '../foundation/engine/scene/renderable'
 import { deg2rad, rad2deg } from '../math-utils'
 
 export function drawRotationData(rendering: Renderable, context: CanvasRenderingContext2D) {

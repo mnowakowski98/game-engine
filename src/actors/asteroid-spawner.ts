@@ -1,10 +1,10 @@
 import { deg2rad, positionDistance, randomBetween } from '../math-utils'
-import Positionable from '../engine/scene/positionable'
-import Updatable from '../engine/scene/updatable'
+import Positionable from '../foundation/engine/scene/positionable'
+import Updatable from '../foundation/engine/scene/updatable'
 import { Asteroid, checkCollision, renderAsteroid, updateAsteroid } from './asteroid'
-import World, { isOutsideWorldBounds } from '../engine/scene/world'
-import Pausable from '../engine/scene/pausable'
-import Renderable from '../engine/scene/renderable'
+import World, { isOutsideWorldBounds } from '../foundation/engine/scene/world'
+import Pausable from '../foundation/engine/scene/pausable'
+import Renderable from '../foundation/engine/scene/renderable'
 
 export interface AsteroidSpawner extends Updatable, Renderable, Pausable {
     maxSpeed: number

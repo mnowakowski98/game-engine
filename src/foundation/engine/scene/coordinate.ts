@@ -1,4 +1,4 @@
-import { pi2 } from '../../math-utils'
+import { pi2 } from '../../../math-utils'
 
 export interface Coordinate {
     x: number

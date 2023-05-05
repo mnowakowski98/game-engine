@@ -1,8 +1,8 @@
-import Collidable from '../engine/scene/collidable'
-import Pausable from '../engine/scene/pausable'
-import { Position } from '../engine/scene/positionable'
-import Renderable from '../engine/scene/renderable'
-import Updatable from '../engine/scene/updatable'
+import Collidable from '../foundation/engine/scene/collidable'
+import Pausable from '../foundation/engine/scene/pausable'
+import { Position } from '../foundation/engine/scene/positionable'
+import Renderable from '../foundation/engine/scene/renderable'
+import Updatable from '../foundation/engine/scene/updatable'
 import { movementDistance } from '../math-utils'
 
 export interface Asteroid extends Collidable, Renderable, Updatable, Pausable {

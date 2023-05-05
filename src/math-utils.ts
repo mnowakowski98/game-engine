@@ -1,7 +1,7 @@
 // Functions that should probably be replaced by an external library if there's a lot
 // I'm not ever gonna do that tho probably
 
-import { Position } from './engine/scene/positionable'
+import { Position } from './foundation/engine/scene/positionable'
 
 //#region Constants
 

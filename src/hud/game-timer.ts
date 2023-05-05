@@ -1,6 +1,6 @@
-import Pausable from '../engine/scene/pausable';
-import Renderable from '../engine/scene/renderable';
-import Updatable from '../engine/scene/updatable';
+import Pausable from '../foundation/engine/scene/pausable';
+import Renderable from '../foundation/engine/scene/renderable';
+import Updatable from '../foundation/engine/scene/updatable';
 
 export default interface GameTimer extends Renderable, Updatable, Pausable {
     time: number

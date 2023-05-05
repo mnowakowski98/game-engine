@@ -1,5 +1,5 @@
-import Control from '../engine/scene/control'
-import { Position } from '../engine/scene/positionable'
+import Control from '../foundation/engine/scene/control'
+import { Position } from '../foundation/engine/scene/positionable'
 
 export default interface Button extends Control {
     text: string

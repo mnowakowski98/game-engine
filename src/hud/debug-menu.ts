@@ -1,5 +1,5 @@
-import Control from '../engine/scene/control'
-import Renderable from '../engine/scene/renderable'
+import Control from '../foundation/engine/scene/control'
+import Renderable from '../foundation/engine/scene/renderable'
 
 export default interface DebugMenu extends Renderable {
     id: string
