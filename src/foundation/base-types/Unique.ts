@@ -1,3 +1,3 @@
 export default interface Unique {
-    id: string
+    readonly id: string
 }

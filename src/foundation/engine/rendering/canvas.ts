@@ -1,2 +1,2 @@
-type Canvas = HTMLCanvasElement
-type Context = CanvasRenderingContext2D
+export type Canvas = HTMLCanvasElement
+export type Context = CanvasRenderingContext2D

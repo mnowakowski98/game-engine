@@ -1,6 +1,6 @@
 export default interface Material {
-    diffuse: Buffer
-    normal?: Buffer
-    specular?: Buffer
-    luminosity?: Buffer
+    diffuse: Path2D
+    normal?: Path2D
+    specular?: Path2D
+    luminosity?: Path2D
 }

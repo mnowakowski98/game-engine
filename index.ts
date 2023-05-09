@@ -1,4 +1,4 @@
-import { start } from './src/startup'
+import startGame from './src/project/asteroids/startup'
 
 addEventListener('load', () => {
     document.body.style.margin = '0'
@@ -8,7 +8,7 @@ addEventListener('load', () => {
     canvas.width = innerWidth
     canvas.height = innerHeight - 6
     canvas.style.backgroundColor = '#a3a3a3'
-    canvas.style.cursor = 'none'
+    // canvas.style.cursor = 'none'
 
     document.body.appendChild(canvas)
     
@@ -18,5 +18,5 @@ addEventListener('load', () => {
         return
     }
 
-    start(context)
+    startGame(context)
 })
