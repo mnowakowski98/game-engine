@@ -1,5 +1,5 @@
 import GameTimer, { renderGameTimer } from '../hud/game-timer'
-import { addRendering } from '../foundation/engine/render-loop'
+import { addRendering } from '../foundation/engine/rendering/render-loop'
 import { renderShip, Ship, moveShip } from '../actors/ship'
 import { addUpdatable } from '../foundation/engine/update-loop'
 import { getMousePosition, mouseClickCommand } from '../foundation/engine/inputs'

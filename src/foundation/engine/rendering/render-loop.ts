@@ -1,7 +1,7 @@
-import { getMousePosition } from './inputs'
-import { defaultCursorRenderer } from './cursor'
-import { origin } from './scene/positionable'
-import Renderable from './scene/renderable'
+import { getMousePosition } from '../inputs'
+import { defaultCursorRenderer } from '../cursor'
+import { origin } from '../scene/positionable'
+import Renderable from '../scene/renderable'
 
 const renderings: Renderable[] = []
 

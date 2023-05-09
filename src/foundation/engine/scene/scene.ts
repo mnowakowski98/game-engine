@@ -1,5 +1,5 @@
 import { clearCommands } from '../command'
-import { removeAllRenderings, startRenderLoop } from '../render-loop'
+import { removeAllRenderings, startRenderLoop } from '../rendering/render-loop'
 import { removeAllUpdatables, startUpdateLoop } from '../update-loop'
 
 export default interface Scene {

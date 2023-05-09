@@ -2,7 +2,7 @@ import Button, { isPointInButton, renderButton } from '../hud/button';
 import Text, { renderText } from '../hud/text';
 import { addCommandAction, executeCommand } from '../foundation/engine/command';
 import { getMousePosition, mouseClickCommand } from '../foundation/engine/inputs';
-import { addRendering } from '../foundation/engine/render-loop';
+import { addRendering } from '../foundation/engine/rendering/render-loop';
 import { Position } from '../foundation/engine/scene/positionable';
 import Renderable from '../foundation/engine/scene/renderable';
 

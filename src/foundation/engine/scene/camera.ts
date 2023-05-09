@@ -1,4 +1,4 @@
-import { getContextDataString } from '../render-loop';
+import { getContextDataString } from '../rendering/render-loop';
 import Logable from './logable';
 import { addPositions, Position } from './positionable';
 import Renderable from './renderable';

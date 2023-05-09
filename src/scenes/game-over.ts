@@ -1,6 +1,6 @@
 import Text, { renderText } from '../hud/text'
 import Command, { executeCommand, registerCommand } from '../foundation/engine/command'
-import { addRendering } from '../foundation/engine/render-loop'
+import { addRendering } from '../foundation/engine/rendering/render-loop'
 
 export function showGameOver(canvasWidth: number, canvasHeight: number) {
     const text: Text = {
