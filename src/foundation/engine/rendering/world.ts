@@ -3,8 +3,12 @@ import Positionable from './positionable'
 import Mesh from './mesh'
 import Unique from '../../base-types/unique'
 import Renderable from './renderable'
+import Updatable from '../update/updatable'
 
-export type Actor = (Mesh | Renderable) & (Unique &Positionable & Rotatable & ActorContainer)
+export type Actor = Unique & ActorContainer
+    & (Mesh | Renderable)
+    & (Positionable | Rotatable | Updatable)
+    
 
 type ActorContainer = {
     actors?: () => Actor[]

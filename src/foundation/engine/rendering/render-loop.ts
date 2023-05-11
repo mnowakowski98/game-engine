@@ -3,7 +3,8 @@ import Scene from './scene'
 import { Actor } from './world'
 
 function renderActor(context: Context, actor: Actor) {
-    context.translate(actor.position.x, actor.position.y)
+    if ('position' in actor) context.translate(actor.position.x, actor.position.y)
+    if ('rotation' in actor) context.rotate(actor.rotation)
 
     if ('geometry' in actor) {
         context.fill(actor.geometry)

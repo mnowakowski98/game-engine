@@ -13,7 +13,8 @@ export function startGame(sceneWidth: number, sceneHeight: number): Scene {
                 y: 50
             },
             x: 0,
-            y: 0
+            y: 0,
+            update: () => undefined
         }]),
         world: () => ({
             actors: () => [{
@@ -27,6 +28,7 @@ export function startGame(sceneWidth: number, sceneHeight: number): Scene {
                 material: {
                     diffuse: new Path2D()
                 },
+                update: () => undefined,
                 actors: () => [{
                     id: 'test-sub-geometry',
                     geometry: testGeometry,
