@@ -1,4 +1,4 @@
-import Scene from '../rendering/scene'
+import Scene from '../../../feature/scene/scene'
 
 export function startUpdateLoop(scene: Scene): () => void {
     let isUpdating = true

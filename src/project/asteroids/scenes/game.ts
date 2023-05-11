@@ -1,6 +1,6 @@
-import Scene from '../../foundation/engine/rendering/scene'
+import Scene from '../../../feature/scene/scene'
 
-export function startGame(sceneWidth: number, sceneHeight: number): Scene {
+export function start(sceneWidth: number, sceneHeight: number): Scene {
     const testGeometry = new Path2D()
     testGeometry.rect(-10, -10, 20, 20)
 

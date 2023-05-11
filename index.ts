@@ -1,4 +1,4 @@
-import startGame from './src/project/asteroids/startup'
+import startGame from './src/project/asteroids/composer'
 
 addEventListener('load', () => {
     document.body.style.margin = '0'

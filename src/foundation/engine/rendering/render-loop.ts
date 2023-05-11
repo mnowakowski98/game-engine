@@ -1,5 +1,5 @@
 import { Context } from './canvas'
-import Scene from './scene'
+import Scene from '../../../feature/scene/scene'
 import { Actor } from './world'
 
 function renderActor(context: Context, actor: Actor) {
