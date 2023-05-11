@@ -5,10 +5,16 @@ addEventListener('load', () => {
     document.body.style.backgroundColor = 'black'
 
     const canvas = document.createElement('canvas')
-    canvas.width = innerWidth
-    canvas.height = innerHeight - 6
     canvas.style.backgroundColor = '#a3a3a3'
     // canvas.style.cursor = 'none'
+
+    const setCanvasSize = () => {
+        canvas.width = innerWidth
+        canvas.height = innerHeight - 6
+    }
+
+    addEventListener('resize', setCanvasSize)
+    setCanvasSize()
 
     document.body.appendChild(canvas)
     

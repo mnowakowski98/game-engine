@@ -1,13 +1,13 @@
 import Scene from '../../../feature/scene/scene'
 
-export function start(sceneWidth: number, sceneHeight: number): Scene {
+export function start(width: () => number, height: () => number): Scene {
     const testGeometry = new Path2D()
     testGeometry.rect(-10, -10, 20, 20)
 
     const gameScene: Scene = {
         cameras: () => ([{
-            resolutionX: sceneWidth,
-            resolutionY: sceneHeight,
+            resolutionX: width(),
+            resolutionY: height(),
             position: {
                 x: -50,
                 y: 50
@@ -24,11 +24,9 @@ export function start(sceneWidth: number, sceneHeight: number): Scene {
                     x: 50,
                     y: 50
                 },
-                rotation: 0,
                 material: {
                     diffuse: new Path2D()
                 },
-                update: () => undefined,
                 actors: () => [{
                     id: 'test-sub-geometry',
                     geometry: testGeometry,
@@ -36,7 +34,6 @@ export function start(sceneWidth: number, sceneHeight: number): Scene {
                         x: 50,
                         y: 50
                     },
-                    rotation: 0,
                     material: {
                         diffuse: new Path2D()
                     }

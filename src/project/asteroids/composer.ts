@@ -3,7 +3,6 @@ import { start } from './scenes/game'
 
 
 export default function startGame(context: CanvasRenderingContext2D) {
-    const { width, height } = context.canvas
-    const gameScene = start(width, height)
+    const gameScene = start(() => context.canvas.width, () => context.canvas.height)
     startScene(context, gameScene)
 }
