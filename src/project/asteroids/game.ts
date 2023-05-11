@@ -1,19 +1,33 @@
 import Scene from '../../foundation/engine/rendering/scene'
 
 export function startGame(sceneWidth: number, sceneHeight: number): Scene {
+    const testGeometry = new Path2D()
+    testGeometry.rect(-10, -10, 20, 20)
+
     const gameScene: Scene = {
         cameras: () => ([{
             resolutionX: sceneWidth,
             resolutionY: sceneHeight,
             position: {
-                x: 0,
-                y: 0
-            }
+                x: -50,
+                y: 50
+            },
+            x: 0,
+            y: 0
         }]),
         world: () => ({
-            width: 100,
-            height: 100,
-            actors: () => []
+            actors: () => [{
+                id: 'test-geometry',
+                geometry: testGeometry,
+                position: {
+                    x: 50,
+                    y: 50
+                },
+                rotation: 0,
+                material: {
+                    diffuse: new Path2D()
+                }
+            }]
         }),
         renderings: () => ([{
             position: {

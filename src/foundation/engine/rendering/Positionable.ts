@@ -1,4 +1,4 @@
-import Coordinate from '../../space/coordinates'
+import Coordinate from '../space/coordinates'
 
 export default interface Positionable {
     position: Coordinate

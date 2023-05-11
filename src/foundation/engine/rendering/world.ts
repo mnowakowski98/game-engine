@@ -1,9 +1,13 @@
+import { Rotatable } from '../space/rotation'
+import Positionable from './positionable'
 import Mesh from './mesh'
+import Unique from '../../base-types/unique'
+import Renderable from './renderable'
 
-type Actor = Mesh
+type Actor = (Mesh | Renderable) & (Unique &Positionable & Rotatable & ActorContainer)
 
-export default interface World {
-    width: number
-    height: number
-    actors: () => Actor[]
+type ActorContainer = {
+    actors?: () => Actor[]
 }
+
+export default interface World extends ActorContainer {}
