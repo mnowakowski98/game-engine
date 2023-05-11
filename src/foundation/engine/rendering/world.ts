@@ -4,7 +4,7 @@ import Mesh from './mesh'
 import Unique from '../../base-types/unique'
 import Renderable from './renderable'
 
-type Actor = (Mesh | Renderable) & (Unique &Positionable & Rotatable & ActorContainer)
+export type Actor = (Mesh | Renderable) & (Unique &Positionable & Rotatable & ActorContainer)
 
 type ActorContainer = {
     actors?: () => Actor[]

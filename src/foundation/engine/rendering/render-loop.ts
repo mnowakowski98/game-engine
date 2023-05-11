@@ -1,4 +1,23 @@
+import { Context } from './canvas'
 import Scene from './scene'
+import { Actor } from './world'
+
+function renderActor(context: Context, actor: Actor) {
+    context.translate(actor.position.x, actor.position.y)
+
+    if ('geometry' in actor) {
+        context.fill(actor.geometry)
+        context.stroke(actor.geometry)
+    }
+
+    if ('render' in actor) {
+        context.save()
+        actor.render(context)
+        context.restore()
+    }
+
+    if (actor.actors) actor.actors().forEach(subActor => renderActor(context, subActor))
+}
 
 export function startRenderLoop(context: CanvasRenderingContext2D, scene: Scene): () => void {
     let isRendering = true
@@ -13,7 +32,7 @@ export function startRenderLoop(context: CanvasRenderingContext2D, scene: Scene)
 
         if (scene.cameras && scene.world) {
             const world = scene.world()
-            if(!world.actors) return
+            if (!world.actors) return
 
             const actors = world.actors()
             scene.cameras().forEach(camera => {
@@ -28,18 +47,8 @@ export function startRenderLoop(context: CanvasRenderingContext2D, scene: Scene)
                 context.stroke()
 
                 actors.forEach(actor => {
-                    context.translate(-camera.position.x + actor.position.x, -camera.position.y + actor.position.y)
-
-                    if ('geometry' in actor) {
-                        context.fill(actor.geometry)
-                        context.stroke(actor.geometry)
-                    }
-                    
-                    if ('render' in actor) {
-                        context.save()
-                        actor.render(context)
-                        context.restore()
-                    }
+                    context.translate(-camera.position.x, -camera.position.y)
+                    renderActor(context, actor)
                 })
 
                 context.restore()

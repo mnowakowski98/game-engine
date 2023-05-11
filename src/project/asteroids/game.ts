@@ -26,7 +26,19 @@ export function startGame(sceneWidth: number, sceneHeight: number): Scene {
                 rotation: 0,
                 material: {
                     diffuse: new Path2D()
-                }
+                },
+                actors: () => [{
+                    id: 'test-sub-geometry',
+                    geometry: testGeometry,
+                    position: {
+                        x: 50,
+                        y: 50
+                    },
+                    rotation: 0,
+                    material: {
+                        diffuse: new Path2D()
+                    }
+                }]
             }]
         }),
         renderings: () => ([{
