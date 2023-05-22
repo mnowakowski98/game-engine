@@ -12,8 +12,6 @@ function renderActor(context: Context, actor: Actor, currentPosition: Coordinate
 
     }
 
-    if ('render' in actor) actor.render(context)
-
     if (actor.actors) actor.actors().forEach(subActor => renderActor(context, subActor, currentPosition, currentRotation))
 }
 
@@ -50,11 +48,6 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
                     renderActor(context, actor, currentPosition, currentRotation)
                 })
             })
-        }
-
-        if (scene.renderings) {
-            const renderings = scene.renderings().sort((a, b) => a.zIndex - b.zIndex)
-            renderings.forEach(rendering => rendering.render(context))
         }
 
         requestId = requestAnimationFrame(renderFrame)

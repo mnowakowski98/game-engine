@@ -2,11 +2,9 @@ import Rotatable from './rotatable'
 import Positionable from './positionable'
 import Mesh from './mesh'
 import Unique from '../../base-types/unique'
-import Renderable from './renderable'
 import Updatable from '../update/updatable'
 
-export type Actor = Unique & ActorContainer
-    & (Mesh | Renderable)
+export type Actor = Unique & ActorContainer & Mesh
     & (Positionable | Rotatable | Updatable)
     
 
