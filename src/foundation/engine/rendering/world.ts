@@ -1,4 +1,4 @@
-import { Rotatable } from '../space/rotation'
+import Rotatable from './rotatable'
 import Positionable from './positionable'
 import Mesh from './mesh'
 import Unique from '../../base-types/unique'

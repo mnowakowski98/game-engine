@@ -1,2 +1,2 @@
 export type Canvas = HTMLCanvasElement
-export type Context = CanvasRenderingContext2D
+export type Context = WebGL2RenderingContext

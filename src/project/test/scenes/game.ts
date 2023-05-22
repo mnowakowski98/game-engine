@@ -39,18 +39,7 @@ export function start(width: () => number, height: () => number): Scene {
                     }
                 }]
             }]
-        }),
-        renderings: () => ([{
-            position: {
-                x: 10,
-                y: 10
-            },
-            rotation: 0,
-            zIndex: 0,
-            render: context => {
-                context.fillRect(0, 0, 10, 10)
-            }
-        }])
+        })
     }
 
     return gameScene
