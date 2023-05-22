@@ -1,16 +1,12 @@
 import { Canvas, Context } from './canvas'
 import Scene from '../../../feature/scene/scene'
 import { Actor } from './world'
-import Coordinate,{
-    add as addCoords,
-    origin as coordOrigin,
-    subtract as subtractCoords
-} from '../space/coordinates'
-import Rotation, { add as addRotations, origin as rotationOrigin } from '../space/rotation'
+import Coordinate,{ add, origin, subtract } from '../space/coordinates'
+import Rotation from '../space/rotation'
 
 function renderActor(context: Context, actor: Actor, currentPosition: Coordinate, currentRotation: Rotation) {
-    if ('position' in actor) currentPosition = addCoords(currentPosition, actor.position)
-    if ('rotation' in actor) currentRotation = addRotations(currentRotation, actor.rotation)
+    if ('position' in actor) currentPosition = add(currentPosition, actor.position)
+    if ('rotation' in actor) currentRotation = add(currentRotation, actor.rotation)
 
     if ('geometry' in actor) {
 
@@ -43,14 +39,14 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
             const actors = world.actors()
             scene.cameras().forEach(camera => {
 
-                let currentPosition = coordOrigin()
-                let currentRotation = rotationOrigin()
+                let currentPosition = origin()
+                let currentRotation = origin()
 
                 const halfRes = [camera.resolutionX / 2, camera.resolutionY / 2]
-                currentPosition = addCoords(camera, { x: halfRes[0], y: halfRes[1]})
+                currentPosition = add(camera, { x: halfRes[0], y: halfRes[1]})
 
                 actors.forEach(actor => {
-                    currentPosition = subtractCoords(currentPosition, camera.position)
+                    currentPosition = subtract(currentPosition, camera.position)
                     renderActor(context, actor, currentPosition, currentRotation)
                 })
             })
