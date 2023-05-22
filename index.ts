@@ -1,14 +1,20 @@
-import { start } from './src/startup'
+import startGame from './src/project/test/composer'
 
 addEventListener('load', () => {
     document.body.style.margin = '0'
     document.body.style.backgroundColor = 'black'
 
     const canvas = document.createElement('canvas')
-    canvas.width = innerWidth
-    canvas.height = innerHeight - 6
     canvas.style.backgroundColor = '#a3a3a3'
-    canvas.style.cursor = 'none'
+    // canvas.style.cursor = 'none'
+
+    const setCanvasSize = () => {
+        canvas.width = innerWidth
+        canvas.height = innerHeight - 6
+    }
+
+    addEventListener('resize', setCanvasSize)
+    setCanvasSize()
 
     document.body.appendChild(canvas)
     
@@ -18,5 +24,5 @@ addEventListener('load', () => {
         return
     }
 
-    start(context)
+    startGame(context)
 })
