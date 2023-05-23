@@ -4,7 +4,7 @@ import { Actor } from './world'
 import Coordinate,{ add, origin, subtract } from '../space/coordinates'
 import Rotation from '../space/rotation'
 import { mat4 } from 'gl-matrix'
-import { createPositionBuffer, initializeFrameSettings, setDefaultShaders } from './gl'
+import { createPositionBuffer, initializeFrameSettings, setDefaultShaders, setPositionAttribute } from './gl'
 import { getProjectionMatrices } from './camera'
 
 function renderActor(context: Context, actor: Actor, currentPosition: Coordinate, currentRotation: Rotation) {
@@ -56,28 +56,18 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
             scene.cameras().forEach(async camera => {
                 const [projectionMatrix, modelViewMatrix] = getProjectionMatrices(camera, context)
 
-
-                const numComponents = 2
-                const dataType = context.FLOAT
-                const normalize = false
-                const stride = 0
-                const offset = 0
-        
-                context.bindBuffer(context.ARRAY_BUFFER, positionBuffer)
-                context.vertexAttribPointer(shaderInfo.attributeLocations.vertexPosition, numComponents, dataType, normalize, stride, offset)
-                context.enableVertexAttribArray(shaderInfo.attributeLocations.vertexPosition)
-        
+                // Stuff that might need to be done per mesh
+                setPositionAttribute(context, positionBuffer, shaderInfo)
                 context.useProgram(shaderInfo.shaderProgram)
         
                 context.uniformMatrix4fv(shaderInfo.uniformLocations.projectionMatrix, false, projectionMatrix)
                 context.uniformMatrix4fv(shaderInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix)
         
                 const vertexCount = 4
+                const offset = 0
                 context.drawArrays(context.TRIANGLE_STRIP, offset, vertexCount)
-
-
                 
-
+                // Set camera identity as base
                 let currentPosition = origin()
                 let currentRotation = origin()
 

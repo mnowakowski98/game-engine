@@ -91,3 +91,15 @@ export function createPositionBuffer(context: WebGL2RenderingContext, positions:
     context.bufferData(context.ARRAY_BUFFER, new Float32Array(positions), context.STATIC_DRAW)
     return buffer
 }
+
+export function setPositionAttribute(context: WebGL2RenderingContext, positionBuffer: WebGLBuffer, shaderInfo: ShaderInfo) {
+    const numComponents = 2
+    const dataType = context.FLOAT
+    const normalize = false
+    const stride = 0
+    const offset = 0
+
+    context.bindBuffer(context.ARRAY_BUFFER, positionBuffer)
+    context.vertexAttribPointer(shaderInfo.attributeLocations.vertexPosition, numComponents, dataType, normalize, stride, offset)
+    context.enableVertexAttribArray(shaderInfo.attributeLocations.vertexPosition)
+}
