@@ -1,5 +1,3 @@
-import Coordinate from "../space/coordinates"
-
 const vertexShaderSource = `
 attribute vec4 aVertexPosition;
 uniform mat4 uModelViewMatrix;

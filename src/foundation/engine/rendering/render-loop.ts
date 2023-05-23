@@ -1,21 +1,43 @@
 import { Canvas, Context } from './canvas'
 import Scene from '../../../feature/scene/scene'
-import { Actor } from './world'
-import Coordinate,{ add, origin, subtract } from '../space/coordinates'
-import Rotation from '../space/rotation'
-import { mat4 } from 'gl-matrix'
-import { createPositionBuffer, initializeFrameSettings, setDefaultShaders, setPositionAttribute } from './gl'
+import { Actor, isMesh, isPositionable } from './world'
+import { ShaderInfo, createPositionBuffer, initializeFrameSettings, setDefaultShaders, setPositionAttribute } from './gl'
 import { getProjectionMatrices } from './camera'
+import { mat4 } from 'gl-matrix'
 
-function renderActor(context: Context, actor: Actor, currentPosition: Coordinate, currentRotation: Rotation) {
-    if ('position' in actor) currentPosition = add(currentPosition, actor.position)
-    if ('rotation' in actor) currentRotation = add(currentRotation, actor.rotation)
+function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix: mat4, modelViewMatrix: mat4, actor: Actor) {
+    if (isMesh(actor)) {
+        const positions: number[] = []
+        actor.geometry.forEach(position => {
+            let x = position.x
+            let y = position.y
 
-    if ('geometry' in actor) {
+            if (isPositionable(actor)) {
+                x += actor.position.x / 100
+                y += actor.position.y / 100
+            }
 
+            positions.push(x)
+            positions.push(y)
+        })
+
+        const positionBuffer = createPositionBuffer(context, positions)
+        setPositionAttribute(context, positionBuffer, shaderInfo)
+
+        context.useProgram(shaderInfo.shaderProgram)
+        
+        context.uniformMatrix4fv(shaderInfo.uniformLocations.projectionMatrix, false, projectionMatrix)
+        context.uniformMatrix4fv(shaderInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix)
+
+        const vertexCount = actor.geometry.length
+        const offset = 0
+        context.drawArrays(context.TRIANGLE_STRIP, offset, vertexCount)
+
+        context.deleteBuffer(positionBuffer)
+        context.disableVertexAttribArray(shaderInfo.attributeLocations.vertexPosition)
     }
 
-    if (actor.actors) actor.actors().forEach(subActor => renderActor(context, subActor, currentPosition, currentRotation))
+    if (actor.actors) actor.actors().forEach(subActor => renderActor(context, shaderInfo, projectionMatrix, modelViewMatrix, subActor))
 }
 
 export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
@@ -31,11 +53,6 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
     if (!context) throw new Error('Unable to initialize context')
     const shaderInfo = setDefaultShaders(context)
     initializeFrameSettings(context)
-    
-    // Init position buffers (hardcoded square for now)
-    const mcSquarePositions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0]
-    const positionBuffer = createPositionBuffer(context, mcSquarePositions)
-    
 
     // Start render loop
     let isRendering = true
@@ -55,29 +72,7 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
             const actors = world.actors()
             scene.cameras().forEach(async camera => {
                 const [projectionMatrix, modelViewMatrix] = getProjectionMatrices(camera, context)
-
-                // Stuff that might need to be done per mesh
-                setPositionAttribute(context, positionBuffer, shaderInfo)
-                context.useProgram(shaderInfo.shaderProgram)
-        
-                context.uniformMatrix4fv(shaderInfo.uniformLocations.projectionMatrix, false, projectionMatrix)
-                context.uniformMatrix4fv(shaderInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix)
-        
-                const vertexCount = 4
-                const offset = 0
-                context.drawArrays(context.TRIANGLE_STRIP, offset, vertexCount)
-                
-                // Set camera identity as base
-                let currentPosition = origin()
-                let currentRotation = origin()
-
-                const halfRes = [camera.resolutionX / 2, camera.resolutionY / 2]
-                currentPosition = add(camera, { x: halfRes[0], y: halfRes[1]})
-
-                actors.forEach(actor => {
-                    currentPosition = subtract(currentPosition, camera.position)
-                    renderActor(context, actor, currentPosition, currentRotation)
-                })
+                actors.forEach(actor => renderActor(context, shaderInfo, projectionMatrix, modelViewMatrix, actor))
             })
         }
 

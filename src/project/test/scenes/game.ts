@@ -3,8 +3,8 @@ import Scene from '../../../feature/scene/scene'
 export function start(width: () => number, height: () => number): Scene {
     const gameScene: Scene = {
         cameras: () => ([{
-            resolutionX: width(),
-            resolutionY: height(),
+            resolutionX: width() / 2,
+            resolutionY: height() / 2,
             position: {
                 x: -50,
                 y: 50
@@ -17,22 +17,22 @@ export function start(width: () => number, height: () => number): Scene {
             actors: () => [{
                 id: 'test-geometry',
                 geometry: [
-                    { x: -10, y: -10 },
-                    { x: 10, y: -10 },
-                    { x: 10, y: 10 },
-                    { x: -10, y: 10 }
+                    { x: 1, y: 1 },
+                    { x: -1, y: 1 },
+                    { x: 1, y: -1 },
+                    { x: -1, y: -1 }
                 ],
                 position: {
-                    x: 50,
-                    y: 50
+                    x: -50,
+                    y: -50
                 },
                 actors: () => [{
                     id: 'test-sub-geometry',
                     geometry: [
-                        { x: -5, y: -5 },
-                        { x: 5, y: -5 },
-                        { x: 5, y: 5 },
-                        { x: -5, y: 5 }
+                        { x: 0.5, y: 0.5 },
+                        { x: -0.5, y: 0.5 },
+                        { x: 0.5, y: -0.5 },
+                        { x: -0.5, y: -0.5 }
                     ],
                     position: {
                         x: 50,
