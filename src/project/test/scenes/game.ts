@@ -1,5 +1,4 @@
 import Scene from '../../../feature/scene/scene'
-import Camera from '../../../foundation/engine/rendering/camera'
 import { movementDistance } from '../../../foundation/engine/space/distance'
 import { deg2rad } from '../../../foundation/engine/space/rotation'
 
@@ -8,8 +7,8 @@ export function start(width: () => number, height: () => number): Scene {
 
     const gameScene: Scene = {
         cameras: () => ([{
-            resolutionX: width() / 2,
-            resolutionY: height() / 2,
+            resolutionX: width(),
+            resolutionY: height(),
             position: {
                 x: 0,
                 y: 0,
@@ -22,9 +21,25 @@ export function start(width: () => number, height: () => number): Scene {
             x: 0,
             y: 0,
             update: (deltaTime) => {
-                const newRotation = deg2rad(movementDistance(5 / 50, deltaTime))
+                const newRotation = deg2rad(movementDistance(5 / 10, deltaTime))
                 cameraRotationY += newRotation < 180 ? newRotation : newRotation % -180
             }
+        }, {
+            resolutionX: width(),
+            resolutionY: height(),
+            position: {
+                x: 25,
+                y: -50,
+                z: -500
+            },
+            rotation: {
+                x: deg2rad(15),
+                y: deg2rad(45),
+                z: deg2rad(90)
+            },
+            update: () => undefined,
+            x: 0,
+            y: 0
         }]),
         world: () => ({
             actors: () => [{
