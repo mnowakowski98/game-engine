@@ -1,4 +1,5 @@
 import Scene from '../../../feature/scene/scene'
+import { deg2rad } from '../../../foundation/engine/space/rotation'
 
 export function start(width: () => number, height: () => number): Scene {
     const gameScene: Scene = {
@@ -35,8 +36,13 @@ export function start(width: () => number, height: () => number): Scene {
                         { x: -20, y: -20 }
                     ],
                     position: {
-                        x: 50,
+                        x: 150,
                         y: 50
+                    },
+                    rotation: {
+                        x: 0,
+                        y: deg2rad(90),
+                        z: deg2rad(45)
                     }
                 }]
             }]

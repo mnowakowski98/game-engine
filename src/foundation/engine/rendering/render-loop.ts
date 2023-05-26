@@ -1,24 +1,30 @@
 import { Canvas, Context } from './canvas'
 import Scene from '../../../feature/scene/scene'
-import { Actor, isMesh, isPositionable } from './world'
+import { Actor, isMesh, isPositionable, isRotatable } from './world'
 import { ShaderInfo, createPositionBuffer, initializeFrameSettings, setDefaultShaders, setPositionAttribute } from './gl'
 import { getProjectionMatrices } from './camera'
 import { mat4 } from 'gl-matrix'
 
 function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix: mat4, modelViewMatrix: mat4, actor: Actor) {
+    const coordinateScaling = 1000
+
     if (isMesh(actor)) {
+        if (isRotatable(actor)) {
+            mat4.rotateX(modelViewMatrix, modelViewMatrix, actor.rotation.x)
+            mat4.rotateY(modelViewMatrix, modelViewMatrix, actor.rotation.y)
+            if ('z' in actor.rotation) mat4.rotateZ(modelViewMatrix, modelViewMatrix, actor.rotation.z)
+        }
+
+        if (isPositionable(actor)) {
+            const { x, y } = actor.position
+            const z = ('z' in actor.position) ? actor.position.z : 0
+            mat4.translate(modelViewMatrix, modelViewMatrix, [x / coordinateScaling, y / coordinateScaling, z / coordinateScaling])
+        }
+
         const positions: number[] = []
-        actor.geometry.forEach(position => {
-            let x = position.x
-            let y = position.y
-
-            if (isPositionable(actor)) {
-                x += actor.position.x
-                y += actor.position.y
-            }
-
-            positions.push(x / 100)
-            positions.push(y / 100)
+        actor.geometry.forEach(point => {
+            positions.push(point.x / coordinateScaling)
+            positions.push(point.y / coordinateScaling)
         })
 
         const positionBuffer = createPositionBuffer(context, positions)
@@ -71,7 +77,9 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
 
             const actors = world.actors()
             scene.cameras().forEach(async camera => {
-                const [projectionMatrix, modelViewMatrix] = getProjectionMatrices(camera, context)
+                const projectionMatrix = getProjectionMatrices(camera)
+                const modelViewMatrix = mat4.create()
+                mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -0.5])
                 actors.forEach(actor => renderActor(context, shaderInfo, projectionMatrix, modelViewMatrix, actor))
             })
         }

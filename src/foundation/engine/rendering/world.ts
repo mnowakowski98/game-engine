@@ -7,13 +7,17 @@ import Updatable from '../update/updatable'
 type ActorBase = Unique & ActorContainer
 type ActorOptionals = (Mesh | Positionable | Rotatable | Updatable)
 export type Actor = ActorBase & ActorOptionals
-    
+  
+export function isMesh(actor: Actor): actor is ActorBase & Mesh {
+    return (actor as Mesh).geometry !== undefined
+}
+
 export function isPositionable(actor: Actor): actor is ActorBase & Positionable {
     return (actor as Positionable).position !== undefined
 }
 
-export function isMesh(actor: Actor): actor is ActorBase & Mesh {
-    return (actor as Mesh).geometry !== undefined
+export function isRotatable(actor: Actor): actor is ActorBase & Rotatable {
+    return (actor as Rotatable).rotation !== undefined
 }
 
 type ActorContainer = {
