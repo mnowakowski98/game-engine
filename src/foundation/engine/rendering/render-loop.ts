@@ -18,7 +18,7 @@ function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix:
         if (isPositionable(actor)) {
             const { x, y } = actor.position
             const z = ('z' in actor.position) ? actor.position.z : 0
-            mat4.translate(modelViewMatrix, modelViewMatrix, [x / coordinateScaling, y / coordinateScaling, z / coordinateScaling])
+            mat4.translate(modelViewMatrix, modelViewMatrix, [x / coordinateScaling, y / coordinateScaling, -(z / coordinateScaling)])
         }
 
         const positions: number[] = []
@@ -77,10 +77,8 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
 
             const actors = world.actors()
             scene.cameras().forEach(async camera => {
-                const projectionMatrix = getProjectionMatrices(camera)
-                const modelViewMatrix = mat4.create()
-                mat4.translate(modelViewMatrix, modelViewMatrix, [0, 0, -0.5])
-                actors.forEach(actor => renderActor(context, shaderInfo, projectionMatrix, modelViewMatrix, actor))
+                const { perspective, modelView } = getProjectionMatrices(camera)
+                actors.forEach(actor => renderActor(context, shaderInfo, perspective, modelView, actor))
             })
         }
 

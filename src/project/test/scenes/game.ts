@@ -7,8 +7,14 @@ export function start(width: () => number, height: () => number): Scene {
             resolutionX: width() / 2,
             resolutionY: height() / 2,
             position: {
-                x: -50,
-                y: 50
+                x: 0,
+                y: 0,
+                z: -500
+            },
+            rotation: {
+                x: deg2rad(10),
+                y: deg2rad(0),
+                z: deg2rad(0)
             },
             x: 0,
             y: 0,
@@ -24,8 +30,9 @@ export function start(width: () => number, height: () => number): Scene {
                     { x: -10, y: -10 }
                 ],
                 position: {
-                    x: -50,
-                    y: -50
+                    x: 0,
+                    y: 0,
+                    z: 0
                 },
                 actors: () => [{
                     id: 'test-sub-geometry',
@@ -36,13 +43,9 @@ export function start(width: () => number, height: () => number): Scene {
                         { x: -20, y: -20 }
                     ],
                     position: {
-                        x: 150,
-                        y: 50
-                    },
-                    rotation: {
                         x: 0,
-                        y: deg2rad(90),
-                        z: deg2rad(45)
+                        y: 0,
+                        z: -250
                     }
                 }]
             }]
