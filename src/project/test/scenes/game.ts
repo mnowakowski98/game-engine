@@ -17,10 +17,10 @@ export function start(width: () => number, height: () => number): Scene {
             actors: () => [{
                 id: 'test-geometry',
                 geometry: [
-                    { x: 1, y: 1 },
-                    { x: -1, y: 1 },
-                    { x: 1, y: -1 },
-                    { x: -1, y: -1 }
+                    { x: 10, y: 10 },
+                    { x: -10, y: 10 },
+                    { x: 10, y: -10 },
+                    { x: -10, y: -10 }
                 ],
                 position: {
                     x: -50,
@@ -29,10 +29,10 @@ export function start(width: () => number, height: () => number): Scene {
                 actors: () => [{
                     id: 'test-sub-geometry',
                     geometry: [
-                        { x: 0.5, y: 0.5 },
-                        { x: -0.5, y: 0.5 },
-                        { x: 0.5, y: -0.5 },
-                        { x: -0.5, y: -0.5 }
+                        { x: 20, y: 20 },
+                        { x: -20, y: 20 },
+                        { x: 20, y: -20 },
+                        { x: -20, y: -20 }
                     ],
                     position: {
                         x: 50,

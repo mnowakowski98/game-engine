@@ -13,12 +13,12 @@ function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix:
             let y = position.y
 
             if (isPositionable(actor)) {
-                x += actor.position.x / 100
-                y += actor.position.y / 100
+                x += actor.position.x
+                y += actor.position.y
             }
 
-            positions.push(x)
-            positions.push(y)
+            positions.push(x / 100)
+            positions.push(y / 100)
         })
 
         const positionBuffer = createPositionBuffer(context, positions)
