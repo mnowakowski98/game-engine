@@ -17,12 +17,5 @@ addEventListener('load', () => {
     setCanvasSize()
 
     document.body.appendChild(canvas)
-    
-    const context = canvas.getContext('2d')
-    if(context == null) {
-        console.error('Context was null')
-        return
-    }
-
-    startGame(context)
+    startGame(canvas)
 })

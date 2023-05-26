@@ -1,68 +1,84 @@
-import { Context } from './canvas'
+import { Canvas, Context } from './canvas'
 import Scene from '../../../feature/scene/scene'
-import { Actor } from './world'
+import { Actor, isMesh, isPositionable, isRotatable } from './world'
+import { ShaderInfo, createPositionBuffer, initializeFrameSettings, setDefaultShaders, setPositionAttribute } from './gl'
+import { getProjectionMatrices } from './camera'
+import { mat4 } from 'gl-matrix'
 
-function renderActor(context: Context, actor: Actor) {
-    if ('position' in actor) context.translate(actor.position.x, actor.position.y)
-    if ('rotation' in actor) context.rotate(actor.rotation)
+function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix: mat4, modelViewMatrix: mat4, actor: Actor) {
+    const coordinateScaling = 1000
 
-    if ('geometry' in actor) {
-        context.fill(actor.geometry)
-        context.stroke(actor.geometry)
+    if (isMesh(actor)) {
+        if (isRotatable(actor)) {
+            mat4.rotateX(modelViewMatrix, modelViewMatrix, actor.rotation.x)
+            mat4.rotateY(modelViewMatrix, modelViewMatrix, actor.rotation.y)
+            if ('z' in actor.rotation) mat4.rotateZ(modelViewMatrix, modelViewMatrix, actor.rotation.z)
+        }
+
+        if (isPositionable(actor)) {
+            const { x, y } = actor.position
+            const z = ('z' in actor.position) ? actor.position.z : 0
+            mat4.translate(modelViewMatrix, modelViewMatrix, [x / coordinateScaling, y / coordinateScaling, -(z / coordinateScaling)])
+        }
+
+        const positions: number[] = []
+        actor.geometry.forEach(point => {
+            positions.push(point.x / coordinateScaling)
+            positions.push(point.y / coordinateScaling)
+        })
+
+        const positionBuffer = createPositionBuffer(context, positions)
+        setPositionAttribute(context, positionBuffer, shaderInfo)
+
+        context.useProgram(shaderInfo.shaderProgram)
+        
+        context.uniformMatrix4fv(shaderInfo.uniformLocations.projectionMatrix, false, projectionMatrix)
+        context.uniformMatrix4fv(shaderInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix)
+
+        const vertexCount = actor.geometry.length
+        const offset = 0
+        context.drawArrays(context.TRIANGLE_STRIP, offset, vertexCount)
+
+        context.deleteBuffer(positionBuffer)
+        context.disableVertexAttribArray(shaderInfo.attributeLocations.vertexPosition)
     }
 
-    if ('render' in actor) {
-        context.save()
-        actor.render(context)
-        context.restore()
-    }
-
-    if (actor.actors) actor.actors().forEach(subActor => renderActor(context, subActor))
+    if (actor.actors) actor.actors().forEach(subActor => renderActor(context, shaderInfo, projectionMatrix, modelViewMatrix, subActor))
 }
 
-export function startRenderLoop(context: CanvasRenderingContext2D, scene: Scene): () => void {
-    let isRendering = true
+export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
+    ///
+    /// Following https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context
+    /// to draw a square as WebGL/OpenGL are new to me
+    /// TODO: Sort all the instructions into correct modules,
+    ///       Un-hardcode(?) the square
+    ///
 
+    // Initialize context
+    const context = canvas.getContext('webgl2')
+    if (!context) throw new Error('Unable to initialize context')
+    const shaderInfo = setDefaultShaders(context)
+    initializeFrameSettings(context)
+
+    // Start render loop
+    let isRendering = true
     let requestId = 0
+
     const renderFrame = () => {
         if (!isRendering) return
 
-        const canvasWidth = context.canvas.width
-        const canvasHeight = context.canvas.height
-        context.clearRect(0, 0, canvasWidth, canvasHeight)
-
+        // Clear frame
+        context.clear(context.COLOR_BUFFER_BIT)
+        
+        // Render cameras
         if (scene.cameras && scene.world) {
             const world = scene.world()
             if (!world.actors) return
 
             const actors = world.actors()
-            scene.cameras().forEach(camera => {
-                context.save()
-
-                const halfRes = [camera.resolutionX / 2, camera.resolutionY / 2]
-                context.translate(camera.x + halfRes[0], camera.y + halfRes[1])
-
-                context.beginPath()
-                context.rect(-halfRes[0], -halfRes[1], camera.resolutionX, camera.resolutionY)
-                context.clip()
-                context.stroke()
-
-                actors.forEach(actor => {
-                    context.translate(-camera.position.x, -camera.position.y)
-                    renderActor(context, actor)
-                })
-
-                context.restore()
-            })
-        }
-
-        if (scene.renderings) {
-            const renderings = scene.renderings().sort((a, b) => a.zIndex - b.zIndex)
-            renderings.forEach(rendering => {
-                context.save()
-                context.translate(rendering.position.x, rendering.position.y)
-                rendering.render(context)
-                context.restore()
+            scene.cameras().forEach(async camera => {
+                const { perspective, modelView } = getProjectionMatrices(camera)
+                actors.forEach(actor => renderActor(context, shaderInfo, perspective, modelView, actor))
             })
         }
 

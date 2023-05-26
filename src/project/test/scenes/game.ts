@@ -1,56 +1,61 @@
 import Scene from '../../../feature/scene/scene'
+import Camera from '../../../foundation/engine/rendering/camera'
+import { movementDistance } from '../../../foundation/engine/space/distance'
+import { deg2rad } from '../../../foundation/engine/space/rotation'
 
 export function start(width: () => number, height: () => number): Scene {
-    const testGeometry = new Path2D()
-    testGeometry.rect(-10, -10, 20, 20)
+    let cameraRotationY = 0
 
     const gameScene: Scene = {
         cameras: () => ([{
-            resolutionX: width(),
-            resolutionY: height(),
+            resolutionX: width() / 2,
+            resolutionY: height() / 2,
             position: {
-                x: -50,
-                y: 50
+                x: 0,
+                y: 0,
+                z: -500
+            },
+            rotation: {
+                x: 0,
+                y: cameraRotationY
             },
             x: 0,
             y: 0,
-            update: () => undefined
+            update: (deltaTime) => {
+                const newRotation = deg2rad(movementDistance(5 / 50, deltaTime))
+                cameraRotationY += newRotation < 180 ? newRotation : newRotation % -180
+            }
         }]),
         world: () => ({
             actors: () => [{
                 id: 'test-geometry',
-                geometry: testGeometry,
+                geometry: [
+                    { x: 10, y: 10 },
+                    { x: -10, y: 10 },
+                    { x: 10, y: -10 },
+                    { x: -10, y: -10 }
+                ],
                 position: {
-                    x: 50,
-                    y: 50
-                },
-                material: {
-                    diffuse: new Path2D()
+                    x: 0,
+                    y: 0,
+                    z: 0
                 },
                 actors: () => [{
                     id: 'test-sub-geometry',
-                    geometry: testGeometry,
+                    geometry: [
+                        { x: 20, y: 20 },
+                        { x: -20, y: 20 },
+                        { x: 20, y: -20 },
+                        { x: -20, y: -20 }
+                    ],
                     position: {
-                        x: 50,
-                        y: 50
-                    },
-                    material: {
-                        diffuse: new Path2D()
+                        x: 0,
+                        y: 0,
+                        z: -250
                     }
                 }]
             }]
-        }),
-        renderings: () => ([{
-            position: {
-                x: 10,
-                y: 10
-            },
-            rotation: 0,
-            zIndex: 0,
-            render: context => {
-                context.fillRect(0, 0, 10, 10)
-            }
-        }])
+        })
     }
 
     return gameScene
