@@ -3,7 +3,7 @@ attribute vec4 aVertexPosition;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 void main() {
-  gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
 }
 `
 
@@ -24,27 +24,23 @@ export interface ShaderInfo {
     }
 }
 
+function loadShader(context: WebGL2RenderingContext, source: string, shaderType: number): WebGLShader {
+    const shader = context.createShader(shaderType)
+    if (!shader) throw `Failed to create shader type: ${shaderType}`
+    context.shaderSource(shader, source)
+    context.compileShader(shader)
+    if (!context.getShaderParameter(shader, context.COMPILE_STATUS)) {
+        const message = context.getShaderInfoLog(shader)
+        context.deleteShader(shader)
+        throw `Shader failed to compile: ${message}`
+    }
+    return shader
+}
+
 export function setDefaultShaders(context: WebGL2RenderingContext): ShaderInfo {
-    // Init vertex shader
-    const vertexShader = context.createShader(context.VERTEX_SHADER)
-    if (!vertexShader) throw new Error('Unable to initialize vertex shader')
-    context.shaderSource(vertexShader, vertexShaderSource)
-    context.compileShader(vertexShader)
-    if (!context.getShaderParameter(vertexShader, context.COMPILE_STATUS)) {
-        context.deleteShader(vertexShader)
-        throw new Error(`Vertex shader failed to compile`)
-    }
-
-    // Init fragment shader
-    const fragmentShader = context.createShader(context.FRAGMENT_SHADER)
-    if (!fragmentShader) throw new Error('Unable to initialize fragment shader')
-    context.shaderSource(fragmentShader, fragmentShaderSource)
-    context.compileShader(fragmentShader)
-    if (!context.getShaderParameter(vertexShader, context.COMPILE_STATUS)) {
-        context.deleteShader(fragmentShader)
-        throw new Error('Fragment shader failed to compile')
-    }
-
+    const vertexShader = loadShader(context, vertexShaderSource, context.VERTEX_SHADER)
+    const fragmentShader = loadShader(context, fragmentShaderSource, context.FRAGMENT_SHADER)
+    
     // Init default shader program
     const shaderProgram = context.createProgram()
     if (!shaderProgram) throw new Error('Failed to create shader program')
