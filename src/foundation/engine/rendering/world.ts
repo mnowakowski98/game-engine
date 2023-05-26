@@ -20,6 +20,10 @@ export function isRotatable(actor: Actor): actor is ActorBase & Rotatable {
     return (actor as Rotatable).rotation !== undefined
 }
 
+export function isUpdatable(actor: Actor): actor is ActorBase & Updatable {
+    return (actor as Updatable).update !== undefined
+}
+
 type ActorContainer = {
     actors?: () => Actor[]
 }

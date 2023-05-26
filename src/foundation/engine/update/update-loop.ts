@@ -1,4 +1,5 @@
 import Scene from '../../../feature/scene/scene'
+import { isUpdatable } from '../rendering/world'
 
 export function startUpdateLoop(scene: Scene): () => void {
     let isUpdating = true
@@ -17,13 +18,14 @@ export function startUpdateLoop(scene: Scene): () => void {
         if (scene.world) {
             const world = scene.world()
             if (world.actors) world.actors().forEach(actor => {
-                if ('update' in actor) actor.update(deltaTime)
+                if (isUpdatable(actor)) actor.update(deltaTime)
             })
         }
 
         lastUpdateTime = now
         timeout = setTimeout(loop)
     }
+    loop()
 
     return () => {
         isUpdating = false
