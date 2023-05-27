@@ -1,9 +1,25 @@
+import Command from '../../../feature/input/command'
+import InputContext from '../../../feature/input/input-context'
 import Scene from '../../../feature/scene/scene'
 import { movementDistance } from '../../../foundation/engine/space/distance'
 import { deg2rad } from '../../../foundation/engine/space/rotation'
 
-export function start(width: () => number, height: () => number): Scene {
+export function start(width: () => number, height: () => number): [Scene, InputContext] {
     let cameraRotationY = 0
+
+    const spaceCommand: Command= {
+        id: 'game-space-command',
+        execute: () => alert('Space booaaar')
+    }
+
+    const commandsMap = new Map<string, Command[]>()
+    commandsMap.set('Space', [spaceCommand])
+
+    const inputContext: InputContext = {
+        id: 'game-input-context',
+        commands: () => commandsMap,
+        active: () => true
+    }
 
     const gameScene: Scene = {
         cameras: () => ([{
@@ -73,5 +89,5 @@ export function start(width: () => number, height: () => number): Scene {
         })
     }
 
-    return gameScene
+    return [gameScene, inputContext]
 }
