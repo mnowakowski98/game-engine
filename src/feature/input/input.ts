@@ -52,10 +52,9 @@ export function startInputContext(context: InputContext): ContextState {
         axisStates.set('mouseY', event.movementY)
     }
 
-    addEventListener('mousemove', onMouseMove)
-
     addEventListener('keydown', onKeyDown)
     addEventListener('keyup', onKeyUp)
+    addEventListener('mousemove', onMouseMove)
 
     return {
         buttonStates: buttonStates,
