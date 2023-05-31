@@ -1,25 +1,39 @@
-import Command from '../../../feature/input/command'
-import InputContext from '../../../feature/input/input-context'
+import { Command, InputContext, startInputContext } from '../../../feature/input/input'
 import Scene from '../../../feature/scene/scene'
 import { movementDistance } from '../../../foundation/engine/space/distance'
 import { deg2rad } from '../../../foundation/engine/space/rotation'
 
-export function start(width: () => number, height: () => number): [Scene, InputContext] {
-    let cameraRotationY = 0
 
-    const spaceCommand: Command= {
-        id: 'game-space-command',
-        execute: () => alert('Space booaaar')
+
+export function start(width: () => number, height: () => number): Scene {
+    let cameraRotationY = 0
+    let shouldMoveLeft = false
+    let shouldMoveRight = false
+
+    const spaceCommand: Command = {
+        code: 'Space',
+        type: 'press',
+        action: () => alert('derp')
     }
 
-    const commandsMap = new Map<string, Command[]>()
-    commandsMap.set('Space', [spaceCommand])
+    const moveLeft: Command = {
+        code: 'KeyA',
+        type: 'hold',
+        action: () => shouldMoveLeft = !shouldMoveLeft
+    }
+
+    const moveRight: Command = {
+        code: 'KeyD',
+        type: 'hold',
+        action: () => shouldMoveRight = !shouldMoveRight
+    }
 
     const inputContext: InputContext = {
         id: 'game-input-context',
-        commands: () => commandsMap,
-        active: () => true
+        commands: [spaceCommand, moveLeft, moveRight]
     }
+
+    startInputContext(inputContext)
 
     const gameScene: Scene = {
         cameras: () => ([{
@@ -37,7 +51,11 @@ export function start(width: () => number, height: () => number): [Scene, InputC
             x: 0,
             y: 0,
             update: (deltaTime) => {
-                const newRotation = deg2rad(movementDistance(5 / 10, deltaTime))
+                const speed = 5 / 10
+                let directedSpeed = 0
+                if (shouldMoveLeft) directedSpeed -= speed
+                if (shouldMoveRight) directedSpeed += speed
+                const newRotation = deg2rad(movementDistance(directedSpeed, deltaTime))
                 cameraRotationY += newRotation < 180 ? newRotation : newRotation % -180
             }
         }, {
@@ -50,8 +68,7 @@ export function start(width: () => number, height: () => number): [Scene, InputC
             },
             rotation: {
                 x: deg2rad(15),
-                y: deg2rad(45),
-                z: deg2rad(90)
+                y: deg2rad(45)
             },
             update: () => undefined,
             x: 0,
@@ -85,9 +102,28 @@ export function start(width: () => number, height: () => number): [Scene, InputC
                         z: -250
                     }
                 }]
+            },
+            {
+                id: 'test-floor',
+                geometry: [
+                    { x: 100, y: 100 },
+                    { x: -100, y: 100 },
+                    { x: 100, y: -100 },
+                    { x: -100, y: -100 }
+                ],
+                position: {
+                    x: 0,
+                    y: 0,
+                    z: -25
+                },
+                rotation: {
+                    x: deg2rad(90),
+                    y: 0,
+                    z: 0
+                }
             }]
         })
     }
 
-    return [gameScene, inputContext]
+    return gameScene
 }
