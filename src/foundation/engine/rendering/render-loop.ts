@@ -77,8 +77,10 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
 
             const actors = world.actors()
             scene.cameras().forEach(async camera => {
-                const { perspective, modelView } = getProjectionMatrices(camera)
-                actors.forEach(actor => renderActor(context, shaderInfo, perspective, modelView, actor))
+                actors.forEach(actor => {
+                    const { perspective, modelView } = getProjectionMatrices(camera)
+                    renderActor(context, shaderInfo, perspective, modelView, actor)
+                })
             })
         }
 

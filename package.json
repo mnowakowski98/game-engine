@@ -1,11 +1,11 @@
 {
-  "name": "asteroids",
+  "name": "canvas-game-engine",
   "version": "1.0.0",
   "description": "",
   "main": "dist/bundle.js",
   "scripts": {
     "build": "webpack",
-    "package": "tar --exclude dist/asteroids.tar.gz -zcvf dist/asteroids.tar.gz package.json package-lock.json dist/",
+    "package": "tar --exclude dist/engine-test.tar.gz -zcvf dist/engine-test.tar.gz package.json package-lock.json dist/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

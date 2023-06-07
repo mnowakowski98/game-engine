@@ -19,7 +19,7 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Asteroids'
+            title: 'Game Engine Test'
         })
     ],
     output: {
