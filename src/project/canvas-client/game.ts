@@ -1,7 +1,7 @@
-import { Command, InputContext, startInputContext } from '../../../feature/input/input'
-import Scene from '../../../feature/scene/scene'
-import { movementDistance } from '../../../foundation/engine/space/distance'
-import { deg2rad } from '../../../foundation/engine/space/rotation'
+import { Command, InputContext, startInputContext } from '../../feature/input/input'
+import Scene from '../../feature/scene/scene'
+import { movementDistance } from '../../foundation/engine/space/distance'
+import { deg2rad } from '../../foundation/engine/space/rotation'
 
 export function start(width: () => number, height: () => number): Scene {
     let camera1RotationY = 0

@@ -1,4 +1,5 @@
-import startGame from './src/project/test/composer'
+import { startScene } from '../../feature/scene/scene'
+import { start } from './game'
 
 addEventListener('load', () => {
     document.body.style.margin = '0'
@@ -17,5 +18,7 @@ addEventListener('load', () => {
     setCanvasSize()
 
     document.body.appendChild(canvas)
-    startGame(canvas)
+
+    const gameScene = start(() => canvas.width, () => canvas.height)
+    startScene(canvas, gameScene)
 })
