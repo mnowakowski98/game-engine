@@ -1,3 +1,3 @@
-import { startBroadcastServer } from '../../feature/network/p2p/broadcast-server'
+import { startBroadcastServer } from './broadcast-server'
 
 startBroadcastServer(3000)

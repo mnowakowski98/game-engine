@@ -1,5 +1,5 @@
 import { WebSocket, WebSocketServer } from 'ws'
-import Unique from '../../../foundation/base-types/unique'
+import Unique from '../../foundation/base-types/unique'
 
 type Connection = Unique & {
     socket: WebSocket
