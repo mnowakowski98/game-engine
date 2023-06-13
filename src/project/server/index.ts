@@ -1,3 +1,4 @@
-import { startBroadcastServer } from './broadcast-server'
+import { startCoordinator } from '../../feature/servers/p2p-coordinator'
 
-startBroadcastServer(3000)
+
+startCoordinator(3000)

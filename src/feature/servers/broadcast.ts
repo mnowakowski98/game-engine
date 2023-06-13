@@ -1,18 +1,14 @@
 import { WebSocket, WebSocketServer } from 'ws'
-import Unique from '../../foundation/base-types/unique'
-
-type Connection = Unique & {
-    socket: WebSocket
-}
+import { ConnectionPool } from '../../foundation/engine/network/connections'
 
 export function startBroadcastServer(port: number) {
-    const connections: Connection[] = []
+    const connections: ConnectionPool<WebSocket> = []
 
-    const wss = new WebSocketServer({ port: port })
-    let nextConnectionid = 0
-    wss.addListener('connection', socket => {
+    const server = new WebSocketServer({ port: port })
+    let nextConnectionId = 0
+    server.addListener('connection', socket => {
         const thisConnection = {
-            id: (nextConnectionid++).toString(),
+            id: (nextConnectionId++).toString(),
             socket: socket
         }
 
@@ -20,7 +16,7 @@ export function startBroadcastServer(port: number) {
 
         socket.addEventListener('message', event => {
             connections.forEach(connection => {
-                if(connection.id !== thisConnection.id) connection.socket.send(event.data)
+                if(connection.id !== thisConnection.id) connection.channel?.send(event.data)
             })
         })
 

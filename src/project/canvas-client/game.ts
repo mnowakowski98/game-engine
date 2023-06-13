@@ -3,7 +3,7 @@ import Scene from '../../feature/scene/scene'
 import { Actor } from '../../foundation/engine/rendering/world'
 import { movementDistance } from '../../foundation/engine/space/distance'
 import { deg2rad } from '../../foundation/engine/space/rotation'
-import { Updater, Receiver, startRemoteSyncing } from '../../feature/network/sync'
+import { Updater, Receiver, startRemoteSyncing } from '../../feature/sync/sync'
 import Camera from '../../foundation/engine/rendering/camera'
 
 export function start(width: () => number, height: () => number): Scene {
@@ -92,7 +92,11 @@ export function start(width: () => number, height: () => number): Scene {
         syncData: () => localCamera
     }
 
-    startRemoteSyncing('ws://localhost:3000', () => [cameraUpdater], () => [remoteCameraReceiver], message => alert(message))
+    startRemoteSyncing('ws://localhost:3000', {
+        updaters: () => [cameraUpdater],
+        receivers: () => [remoteCameraReceiver],
+        error: message => alert(message)
+    })
 
     const gameScene: Scene = {
         cameras: () => {
