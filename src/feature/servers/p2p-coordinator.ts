@@ -42,15 +42,15 @@ export function startCoordinator(port: number) {
         }
 
         socket.addEventListener('message', event => {
-            const data = event.data
+            const data = JSON.parse(event.data.toString())
             if (!isClientMessage(data)) return
 
-            const message = JSON.parse(event.data.toString()) as ClientMessage
+            const message = data as ClientMessage
             message.from = connection.id
             const forSocket = connectionPool.find(conn => message.for === conn.id)?.channel
             if (forSocket) {
                 console.log(`Forwarding message from ${connection.id} to ${message.for}`)
-                forSocket.send(event.data)
+                forSocket.send(JSON.stringify(message))
             }
         })
 
