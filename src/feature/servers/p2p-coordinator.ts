@@ -8,7 +8,8 @@ export function startCoordinator(port: number) {
     console.log(`Starting signaling server on port ${port}`)
 
     const connectionPool: ConnectionPool<WebSocket> = []
-    let host: Host<WebSocket>
+    let _host: Host<WebSocket> = null
+    const host = (): Host<WebSocket> => _host
 
     const server = new WebSocketServer({ port: port })
     let connectionId = 0
@@ -28,16 +29,15 @@ export function startCoordinator(port: number) {
             id: connection.id
         }))
 
-        if (!host) {
+        if (host() === null) {
             console.log(`Setting connection ${connection.id} as the host`)
-            host = connection
+            _host = connection
             socket.send(JSON.stringify({ action: 'set-host' }))
-        }
-        else {
-            console.log(`Sending host id (${host.id}) to ${connection.id}`)
+        } else {
+            console.log(`Sending host id (${host()!.id}) to ${connection.id}`)
             socket.send(JSON.stringify({
                 action: 'call-host',
-                id: host.id
+                id: host()!.id
             }))
         }
 
@@ -57,6 +57,18 @@ export function startCoordinator(port: number) {
         socket.addEventListener('close', () => {
             console.log(`Connection ${connection.id} disconnected`)
             connectionPool.splice(connectionPool.findIndex(conn => conn === connection), 1)
+            if (connection.id === host()!.id) {
+                console.log('Host disconnected')
+                if (connectionPool.length === 0) {
+                    _host = null
+                    console.log('No clients left to host')
+                }
+                else {
+                    _host = connectionPool[0]
+                    console.log(`Setting host to ${host()!.id}`)
+                }
+            }
+            
         })
     })
 }

@@ -3,8 +3,9 @@ import { ClientMessage, isClientMessage } from './p2p'
 
 type Signaler = Connection<WebSocket>
 
-export function startHosting(signaler: Signaler, receive: (data: any) => void, error?: (message: string) => void): (data: any) => void {
+export function startHosting(signaler: Signaler, id: string, receive: (data: any) => void, error?: (message: string) => void): (data: any) => void {
     const peerConnections: ConnectionPool<RTCPeerConnection> = []
+    console.log(`Starting hosting as client: ${id}`)
 
     signaler.channel.addEventListener('message', async event => {
         const data = JSON.parse(event.data)
@@ -12,6 +13,8 @@ export function startHosting(signaler: Signaler, receive: (data: any) => void, e
 
         const message = data as ClientMessage
         if (!('offer' in message)) return
+
+        console.log(`Got offer from client: ${message.from}`)
 
         const connection: Connection<RTCPeerConnection> = {
             id: `Peer - ${message.from}`,
@@ -77,12 +80,14 @@ export async function callHost(signaler: Signaler, hostId: string, receive: (dat
 
         const message = data as ClientMessage
         if ('candidate' in message) {
-            const candidate = message.candidate as RTCIceCandidateInit
+            const candidate = message.candidate as RTCIceCandidate
+            console.log(`Got trickled ice candidate: ${candidate.address}`)
             await hostConnection.channel.addIceCandidate(candidate)
         }
 
         if (!('answer' in message)) return
 
+        console.log(`Got answer from host ${hostId}`)
         const answer = message.answer as RTCSessionDescriptionInit
         await hostConnection.channel.setRemoteDescription(new RTCSessionDescription(answer))
     })

@@ -55,7 +55,7 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
                 send = await callHost(signaler, hostId, receive, error)
                 break
             case 'set-host':
-                send = startHosting(signaler, receive, error)
+                send = startHosting(signaler, myId, receive, error)
                 break
             default:
                 break
