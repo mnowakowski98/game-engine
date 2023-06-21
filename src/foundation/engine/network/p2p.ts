@@ -40,7 +40,7 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
         channel: new WebSocket(coordinatorUrl)
     }
 
-    let send = (data: any) => {}
+    let send: (data: any) => void
     signaler.channel.addEventListener('message', async event => {
         const data = JSON.parse(event.data)
         if (!isClientControl(data)) return
@@ -58,9 +58,11 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
                 send = startHosting(signaler, myId, receive, error)
                 break
             default:
+                
                 break
         }
     })
 
+    send = () => undefined
     return send
 }
