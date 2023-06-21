@@ -58,11 +58,10 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
                 send = startHosting(signaler, myId, receive, error)
                 break
             default:
-                
                 break
         }
     })
 
     send = () => undefined
-    return send
+    return (data: any) => send(data)
 }
