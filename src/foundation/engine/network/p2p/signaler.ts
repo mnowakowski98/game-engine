@@ -3,11 +3,13 @@ import { Connection } from '../connections'
 type Signaler = Connection<WebSocket>
 export default Signaler
 
+export type DataFunction = (data: any) => void
+
 export interface SignalerSettings {
     signaler: Signaler
     signalerClientId: string
     dataChannelId: string
-    onDataReceive: (data: any) => void
+    onDataReceive: DataFunction
 }
 
 export function logDataChannelOpen(id: string) {

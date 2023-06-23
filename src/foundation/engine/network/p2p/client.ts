@@ -1,13 +1,13 @@
 import { Connection } from '../connections'
 import IceMessage, { isIceCandidateMessage } from './ice'
 import { ClientMessage, isClientMessage } from './p2p'
-import { SignalerSettings, logDataChannelClosed, logDataChannelOpen, onConnectionStateChanged, onIceCandidate } from './signaler'
+import { DataFunction, SignalerSettings, logDataChannelClosed, logDataChannelOpen, onConnectionStateChanged, onIceCandidate } from './signaler'
 
 interface ClientSettings extends SignalerSettings {
     hostSignalerId: string
 }
 
-export async function callHost(settings: ClientSettings): Promise<(data: any) => void> {
+export async function callHost(settings: ClientSettings): Promise<DataFunction> {
     console.log(`Calling host connection: ${settings.hostSignalerId}`)
 
     const peerConnection = new RTCPeerConnection()

@@ -1,11 +1,11 @@
-import { SignalerSettings, logDataChannelClosed, logDataChannelOpen, onConnectionStateChanged, onIceCandidate } from './signaler'
+import { DataFunction, SignalerSettings, logDataChannelClosed, logDataChannelOpen, onConnectionStateChanged, onIceCandidate } from './signaler'
 import { Connection, ConnectionPool } from '../connections'
 import { ClientMessage, isClientMessage } from './p2p'
 import IceMessage, { isIceCandidateMessage } from './ice'
 
 interface HostSettings extends SignalerSettings {}
 
-export function startHosting(settings: HostSettings): (data: any) => void {
+export function startHosting(settings: HostSettings): DataFunction {
     type PoolType = [RTCDataChannel, RTCPeerConnection]
     const connections: ConnectionPool<PoolType> = []
     console.log(`Starting hosting as client: ${settings.signalerClientId}`)

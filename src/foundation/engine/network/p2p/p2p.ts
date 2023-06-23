@@ -1,6 +1,7 @@
 import { Connection } from '../connections'
 import { callHost } from './client'
 import { startHosting } from './host'
+import { DataFunction } from './signaler'
 
 export type ClientMessage = {
     for: string
@@ -32,7 +33,7 @@ export function isClientControl(object: any): object is ClientControl {
     return object.id !== undefined
 }
 
-export function startP2PConnection(coordinatorUrl: string, receive:(data: any) => void): (data: any) => void {
+export function startP2PConnection(coordinatorUrl: string, receive:(data: any) => void): DataFunction {
     let myId = ''
     let hostId = ''
     const dataChannelId = 'data'
@@ -42,7 +43,7 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
         channel: new WebSocket(coordinatorUrl)
     }
 
-    let send: (data: any) => void
+    let send: DataFunction
     signaler.channel.addEventListener('message', async event => {
         const data = JSON.parse(event.data)
         if (!isClientControl(data)) return
