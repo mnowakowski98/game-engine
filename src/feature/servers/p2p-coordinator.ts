@@ -1,6 +1,6 @@
 import { WebSocket, WebSocketServer } from 'ws'
 import { Connection, ConnectionPool } from '../../foundation/engine/network/connections'
-import { ClientMessage, isClientMessage } from '../../foundation/engine/network/p2p'
+import { ClientMessage, isClientMessage } from '../../foundation/engine/network/p2p/p2p'
 
 export type Host<ChannelType> = Connection<ChannelType> | null
 

@@ -1,5 +1,6 @@
-import { Connection } from './connections'
-import { callHost, startHosting } from './signaling'
+import { Connection } from '../connections'
+import { callHost } from './client'
+import { startHosting } from './host'
 
 export type ClientMessage = {
     for: string
@@ -31,9 +32,10 @@ export function isClientControl(object: any): object is ClientControl {
     return object.id !== undefined
 }
 
-export function startP2PConnection(coordinatorUrl: string, receive:(data: any) => void, error?: (message: string) => void): (data: any) => void {
+export function startP2PConnection(coordinatorUrl: string, receive:(data: any) => void): (data: any) => void {
     let myId = ''
     let hostId = ''
+    const dataChannelId = 'data'
 
     const signaler: Connection<WebSocket> = {
         id: 'signaler',
@@ -52,10 +54,21 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
                 break
             case 'call-host':
                 hostId = control.id!
-                send = await callHost(signaler, hostId, receive, error)
+                send = await callHost({
+                    hostSignalerId: hostId,
+                    signaler: signaler,
+                    signalerClientId: myId,
+                    dataChannelId: dataChannelId,
+                    onDataReceive: receive
+                })
                 break
             case 'set-host':
-                send = startHosting(signaler, myId, receive, error)
+                send = startHosting({
+                    signaler: signaler,
+                    signalerClientId: myId,
+                    dataChannelId: dataChannelId,
+                    onDataReceive: receive
+                })
                 break
             default:
                 break

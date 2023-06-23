@@ -1,5 +1,5 @@
 import Unique from '../../foundation/base-types/unique'
-import { startP2PConnection } from '../../foundation/engine/network/p2p'
+import { startP2PConnection } from '../../foundation/engine/network/p2p/p2p'
 
 
 export interface UpdateData<T> {
@@ -41,7 +41,7 @@ export async function startRemoteSyncing(remoteUrl: string, config: RemoteSyncCo
         }
     }
 
-    const sendData = startP2PConnection(remoteUrl, dataHandler, config.error)
+    const sendData = startP2PConnection(remoteUrl, dataHandler)
 
     const syncLoop = () => {
         if (!isSyncing) return
