@@ -59,7 +59,7 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
                     hostSignalerId: hostId,
                     signaler: signaler,
                     signalerClientId: myId,
-                    dataChannelId: dataChannelId,
+                    dataChannelLabel: dataChannelId,
                     onDataReceive: receive
                 })
                 break
@@ -67,7 +67,7 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
                 send = startHosting({
                     signaler: signaler,
                     signalerClientId: myId,
-                    dataChannelId: dataChannelId,
+                    dataChannelLabel: dataChannelId,
                     onDataReceive: receive
                 })
                 break
@@ -77,5 +77,5 @@ export function startP2PConnection(coordinatorUrl: string, receive:(data: any) =
     })
 
     send = () => undefined
-    return (data: any) => send(data)
+    return (data: any) => { send(data) }
 }

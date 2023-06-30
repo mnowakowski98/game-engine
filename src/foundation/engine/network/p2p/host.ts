@@ -28,14 +28,6 @@ export function startHosting(settings: HostSettings): DataFunction {
         console.log(`Got offer from peer: ${peerId}`)
 
         const peerConnection = new RTCPeerConnection()
-        const dataChannel = peerConnection.createDataChannel(settings.dataChannelId)
-
-        const connection: Connection<PoolType> = {
-            id: `peer-${peerId}`,
-            channel: [dataChannel, peerConnection]
-        }
-
-        connections.push(connection)
 
         const offer = message.offer as RTCSessionDescriptionInit
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offer))
@@ -48,18 +40,29 @@ export function startHosting(settings: HostSettings): DataFunction {
             answer: answer
         }))
 
+        peerConnection.addEventListener('datachannel', event => {
+            const dataChannel = event.channel
+
+            const connection: Connection<PoolType> = {
+                id: `peer-${peerId}`,
+                channel: [dataChannel, peerConnection]
+            }
+    
+            connections.push(connection)
+
+            dataChannel.addEventListener('open', () => logDataChannelOpen(connection.id))
+            dataChannel.addEventListener('close', () => logDataChannelClosed(connection.id))
+            dataChannel.addEventListener('message', event => settings.onDataReceive(JSON.parse(event.data)))
+        })
+
         peerConnection.addEventListener('icecandidate', event => onIceCandidate(settings.signaler, event, peerId))
         peerConnection.addEventListener('connectionstatechange', () => onConnectionStateChanged(peerConnection, peerId))
-
-        dataChannel.addEventListener('open', () => logDataChannelOpen(connection.id))
-        dataChannel.addEventListener('close', () => logDataChannelClosed(connection.id))
-        dataChannel.addEventListener('message', event => settings.onDataReceive(JSON.parse(event.data)))
     })
 
     return (data: any) => {
-        connections.forEach(dataChannel => {
-            if (dataChannel.channel[0].readyState !== 'open') return
-            dataChannel.channel[0].send(JSON.stringify(data))
+        connections.forEach(connection => {
+            if (connection.channel[0].readyState !== 'open') return
+            connection.channel[0].send(JSON.stringify(data))
         })
     }
 }

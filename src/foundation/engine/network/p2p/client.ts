@@ -11,12 +11,16 @@ export async function callHost(settings: ClientSettings): Promise<DataFunction> 
     console.log(`Calling host connection: ${settings.hostSignalerId}`)
 
     const peerConnection = new RTCPeerConnection()
-    const dataChannel = peerConnection.createDataChannel(settings.dataChannelId)
+    const dataChannel = peerConnection.createDataChannel(settings.dataChannelLabel)
 
     const connection: Connection<RTCDataChannel> = {
         id: `host-${settings.hostSignalerId}`,
         channel: dataChannel
     }
+
+    dataChannel.addEventListener('open', () => logDataChannelOpen(connection.id))
+    dataChannel.addEventListener('close', () => logDataChannelClosed(connection.id))
+    dataChannel.addEventListener('message', event => settings.onDataReceive(JSON.parse(event.data)))
 
     const offer = await peerConnection.createOffer()
     await peerConnection.setLocalDescription(offer)
@@ -45,10 +49,6 @@ export async function callHost(settings: ClientSettings): Promise<DataFunction> 
 
     peerConnection.addEventListener('icecandidate', event => onIceCandidate(settings.signaler, event, settings.hostSignalerId))
     peerConnection.addEventListener('connectionstatechange', () => onConnectionStateChanged(peerConnection, settings.hostSignalerId))
-
-    dataChannel.addEventListener('open', () => logDataChannelOpen(connection.id))
-    dataChannel.addEventListener('close', () => logDataChannelClosed(connection.id))
-    dataChannel.addEventListener('message', event => settings.onDataReceive(JSON.parse(event.data)))
 
     return (data: any) => {
         if (dataChannel.readyState !== 'open') return

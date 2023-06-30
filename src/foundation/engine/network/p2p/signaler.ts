@@ -8,7 +8,7 @@ export type DataFunction = (data: any) => void
 export interface SignalerSettings {
     signaler: Signaler
     signalerClientId: string
-    dataChannelId: string
+    dataChannelLabel: string
     onDataReceive: DataFunction
 }
 
