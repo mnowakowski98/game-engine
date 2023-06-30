@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './index.ts',
+    entry: './src/project/canvas-client/index.ts',
     mode: 'development',
     devtool: 'inline-source-map',
     module: {
@@ -23,7 +23,7 @@ module.exports = {
         })
     ],
     output: {
-        filename: 'bundle.js',
+        filename: 'client.js',
         path: path.resolve(__dirname, 'dist')
     }
 };

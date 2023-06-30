@@ -6,7 +6,7 @@ import { startRenderLoop } from '../../foundation/engine/rendering/render-loop'
 import { startUpdateLoop } from '../../foundation/engine/update/update-loop'
 
 export default interface Scene {
-    cameras?: () => (Camera & Coordinate)[]
+    cameras?: () => ({camera: Camera, position: Coordinate})[]
     world?: () => World
 }
 

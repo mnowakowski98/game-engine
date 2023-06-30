@@ -14,7 +14,7 @@ export function startUpdateLoop(scene: Scene): () => void {
         // Deny the possibility that two updates were called in the same second
         // as it was causing some issues with distance calculations
         const deltaTime = now - lastUpdateTime || 1
-        if (scene.cameras) scene.cameras().forEach(camera => camera.update(deltaTime))
+        if (scene.cameras) scene.cameras().forEach(camera => camera.camera.update(deltaTime))
         if (scene.world) {
             const world = scene.world()
             if (world.actors) world.actors().forEach(actor => {

@@ -4,8 +4,12 @@ import Mesh from './mesh'
 import Unique from '../../base-types/unique'
 import Updatable from '../update/updatable'
 
+type ActorContainer = {
+    actors?: () => Actor[]
+}
+
 type ActorBase = Unique & ActorContainer
-type ActorOptionals = (Mesh | Positionable | Rotatable | Updatable)
+type ActorOptionals = (Unique | Mesh | Positionable | Rotatable | Updatable)
 export type Actor = ActorBase & ActorOptionals
   
 export function isMesh(actor: Actor): actor is ActorBase & Mesh {
@@ -22,10 +26,6 @@ export function isRotatable(actor: Actor): actor is ActorBase & Rotatable {
 
 export function isUpdatable(actor: Actor): actor is ActorBase & Updatable {
     return (actor as Updatable).update !== undefined
-}
-
-type ActorContainer = {
-    actors?: () => Actor[]
 }
 
 export default interface World extends ActorContainer {}

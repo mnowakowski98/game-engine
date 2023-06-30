@@ -4,7 +4,7 @@
         "strict": true,
         "module": "ES6",
         "moduleResolution": "node",
-        "target": "ES5",
+        "target": "ES6",
         "jsx": "react",
         "allowJs": true,
         "sourceMap": true

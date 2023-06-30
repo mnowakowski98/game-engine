@@ -2,11 +2,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Open in Firefox",
-            "type": "firefox",
+            "name": "Node",
+            "type": "node",
             "request": "launch",
-            "reAttach": true,
-            "file": "${workspaceFolder}/dist/index.html"
+            "program": "src/project/server/dist/project/server/index.js"
         }
     ]
 }
