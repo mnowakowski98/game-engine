@@ -1,7 +1,8 @@
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-    entry: './index.ts',
+    entry: './game.ts',
     mode: 'development',
     devtool: 'inline-source-map',
     module: {
@@ -16,9 +17,13 @@ module.exports = {
     resolve: {
         extensions: ['.ts', '.js']
     },
-    plugins: [],
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'Test game'
+        })
+    ],
     output: {
-        filename: 'client.js',
+        filename: 'test-game.js',
         path: path.resolve(__dirname, 'dist')
     }
 };

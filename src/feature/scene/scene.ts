@@ -4,8 +4,9 @@ import Coordinate from '../../foundation/engine/space/coordinates'
 import { Canvas } from '../../foundation/engine/rendering/canvas'
 import { startRenderLoop } from '../../foundation/engine/rendering/render-loop'
 import { startUpdateLoop } from '../../foundation/engine/update/update-loop'
+import Unique from '../../foundation/base-types/unique'
 
-export default interface Scene {
+export default interface Scene extends Unique {
     cameras?: () => ({camera: Camera, position: Coordinate})[]
     world?: () => World
 }
