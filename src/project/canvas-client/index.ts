@@ -1,7 +1,7 @@
 import Scene, { startScene } from '../../feature/scene/scene'
 import { Receiver, Updater, startRemoteSyncing } from '../../feature/sync/sync'
 
-export { Scene }
+export { Scene, Receiver, Updater }
 export { Camera, World, Actor, Coordinate, Unique } from '../../feature/scene/scene'
 
 export interface StartupSetttings {
