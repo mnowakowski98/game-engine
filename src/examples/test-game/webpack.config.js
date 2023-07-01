@@ -1,12 +1,8 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-
 module.exports = {
-    entry: {
-        client: './index.ts',
-        standalone: './standalone.ts'
-    },
+    entry: './game.ts',
     mode: 'development',
     devtool: 'inline-source-map',
     module: {
@@ -23,11 +19,11 @@ module.exports = {
     },
     plugins: [
         new HtmlWebpackPlugin({
-            title: 'Canvas game engine client'
+            title: 'Test game'
         })
     ],
     output: {
-        filename: '[name].js',
+        filename: 'test-game.js',
         path: path.resolve(__dirname, 'dist')
     }
 };

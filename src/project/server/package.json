@@ -1,0 +1,20 @@
+{
+    "name": "game-engine-server",
+    "version": "1.0.0",
+    "description": "",
+    "scripts": {
+      "build": "tsc",
+      "package": "tar --exclude dist/server.tar.gz -zcvf dist/server.tar.gz package.json package-lock.json dist/",
+      "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+      "@types/ws": "^8.5.4",
+      "typescript": "^4.9.5"
+    },
+    "dependencies": {
+      "ws": "^8.13.0"
+    }
+  }
+  
