@@ -1,6 +1,6 @@
-import { start, Scene, Actor, Camera } from 'game-engine-canvas-client'
+import { startClient, Actor, Scene, Mesh, Camera } from 'game-engine-canvas-client'
 
-const geometry: Actor = {
+const geometry: Actor & Mesh = {
     id: 'geometry',
     geometry: [
         { x: 10, y: 10 },
@@ -39,7 +39,7 @@ const scene: Scene = {
     })
 }
 
-start({
+startClient({
     initialSceneId: 'game-scene',
     scenes: [scene]
 })
