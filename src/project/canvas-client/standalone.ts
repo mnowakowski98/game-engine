@@ -1,11 +1,11 @@
-import { start } from './index'
+import { startClient } from './client'
 import Scene from '../../feature/scene/scene'
 
 const scene: Scene = {
     id: 'blank'
 }
 
-start({
+startClient({
     initialSceneId: 'blank',
     scenes: [scene]
 })
