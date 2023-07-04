@@ -1,9 +1,12 @@
 import { Canvas, Context } from './canvas'
 import Scene from '../../../feature/scene/scene'
-import { Actor, isMesh, isPositionable, isRotatable } from './world'
+import { Actor } from './world'
 import { ShaderInfo, createPositionBuffer, initializeFrameSettings, setDefaultShaders, setPositionAttribute } from './gl'
 import { getProjectionMatrices } from './camera'
 import { mat4 } from 'gl-matrix'
+import { isMesh } from './mesh'
+import { isRotatable } from './rotatable'
+import { isPositionable } from './positionable'
 
 function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix: mat4, modelViewMatrix: mat4, actor: Actor) {
     const coordinateScaling = 1000
