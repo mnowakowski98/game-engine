@@ -21,8 +21,7 @@ const camera: Camera = {
     rotation: {
         x: 0,
         y: 0
-    },
-    update: () => undefined
+    }
 }
 
 const scene: Scene = {
