@@ -1,9 +1,9 @@
 import { mat4 } from 'gl-matrix'
+import Positionable, { isPositionable } from './positionable'
 import Updatable from '../update/updatable'
-import Positionable from './positionable'
-import Rotatable from './rotatable'
+import Rotatable, { isRotatable } from './rotatable'
 
-export default interface Camera extends Positionable, Updatable, Rotatable {
+interface CameraBase {
     resolutionX: number
     resolutionY: number
     fieldOfView?: number
@@ -11,6 +11,9 @@ export default interface Camera extends Positionable, Updatable, Rotatable {
     zNear?: number
     zFar?: number
 }
+
+type Camera = CameraBase & (Positionable | Rotatable | Updatable)
+export default Camera
 
 interface CameraMatrices {
     perspective: mat4,
@@ -27,16 +30,21 @@ export function getProjectionMatrices(camera: Camera): CameraMatrices {
     const projectionMatrix = mat4.create()
     mat4.perspective(projectionMatrix, fieldOfView, aspect, zNear, zFar)
 
-    const { x: xPos, y: yPos } = camera.position
-    const zPos = ('z' in camera.position) ? camera.position.z : 0
     const modelViewMatrix = mat4.create()
-    mat4.translate(modelViewMatrix, modelViewMatrix, [-xPos / 1000, -yPos / 1000, zPos / 1000])
 
-    const { x: xRot, y: yRot } = camera.rotation
-    const zRot = ('z' in camera.rotation) ? camera.rotation.z : 0
-    mat4.rotateX(modelViewMatrix, modelViewMatrix, xRot)
-    mat4.rotateY(modelViewMatrix, modelViewMatrix, -yRot)
-    mat4.rotateZ(modelViewMatrix, modelViewMatrix, zRot)
+    if (isPositionable(camera)) {
+        const { x: xPos, y: yPos } = camera.position
+        const zPos = ('z' in camera.position) ? camera.position.z : 0
+        mat4.translate(modelViewMatrix, modelViewMatrix, [-xPos / 1000, -yPos / 1000, zPos / 1000])
+    }
+
+    if (isRotatable(camera)) {
+        const { x: xRot, y: yRot } = camera.rotation
+        const zRot = ('z' in camera.rotation) ? camera.rotation.z : 0
+        mat4.rotateX(modelViewMatrix, modelViewMatrix, xRot)
+        mat4.rotateY(modelViewMatrix, modelViewMatrix, -yRot)
+        mat4.rotateZ(modelViewMatrix, modelViewMatrix, zRot)
+    }
 
 
     return {
