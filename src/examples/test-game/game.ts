@@ -17,18 +17,14 @@ const camera: Camera = {
         z: -250
     },
     resolutionX: 1280,
-    resolutionY: 720,
-    rotation: {
-        x: 0,
-        y: 0
-    }
+    resolutionY: 720
 }
 
 const scene: Scene = {
     id: 'game-scene',
     cameras: () => [{
         camera: camera,
-        position: {
+        screenPosition: {
             x: 0,
             y: 0
         }

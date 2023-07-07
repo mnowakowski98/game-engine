@@ -8,7 +8,7 @@ export type ActorContainer = {
 }
 
 type ActorBase = Unique & ActorContainer
-export type ActorOptionals = (Positionable | Rotatable | Updatable)
+export type ActorOptionals = (Unique | Positionable | Rotatable | Updatable)
 
 type Actor = ActorBase & ActorOptionals
 export default Actor
