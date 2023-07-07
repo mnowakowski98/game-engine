@@ -1,4 +1,4 @@
-import Scene from '../rendering/scene'
+import Scene from '../scene/scene'
 import { isUpdatable } from './updatable'
 
 export function startUpdateLoop(scene: Scene): () => void {

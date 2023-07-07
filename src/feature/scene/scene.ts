@@ -1,7 +1,7 @@
 import { Canvas } from '../../foundation/engine/rendering/canvas'
 import { startRenderLoop } from '../../foundation/engine/rendering/render-loop'
 import { startUpdateLoop } from '../../foundation/engine/update/update-loop'
-import Scene from '../../foundation/engine/rendering/scene'
+import Scene from '../../foundation/engine/scene/scene'
 
 export default Scene
 
