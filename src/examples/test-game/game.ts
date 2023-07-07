@@ -1,4 +1,4 @@
-import { startClient, Actor, Scene, Mesh, Camera } from 'game-engine-canvas-client'
+import { startClient, Actor, Scene, Mesh, Camera, Rotatable } from 'game-engine-canvas-client'
 
 const geometry: Actor & Mesh = {
     id: 'geometry',
@@ -16,8 +16,18 @@ const camera: Camera = {
         y: 0,
         z: -250
     },
+    rotation: {
+        x: 0,
+        y: 0
+    },
     resolutionX: 1280,
-    resolutionY: 720
+    resolutionY: 720,
+    update: deltaTime => {
+        const cameraRotation = (camera as Rotatable).rotation
+        const distance = (5 / 100) / deltaTime
+        cameraRotation.y += distance
+        if(cameraRotation.y > 255) cameraRotation.y -= 255
+    }
 }
 
 const scene: Scene = {
