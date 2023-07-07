@@ -1,4 +1,4 @@
-import Scene from '../rendering/scene'
+import Scene from '../scene/scene'
 import { isUpdatable } from './updatable'
 
 export function startUpdateLoop(scene: Scene): () => void {
@@ -14,6 +14,7 @@ export function startUpdateLoop(scene: Scene): () => void {
         // Deny the possibility that two updates were called in the same second
         // as it was causing some issues with distance calculations
         const deltaTime = now - lastUpdateTime || 1
+        lastUpdateTime = now
         if (scene.cameras) scene.cameras().forEach(camera => {
             if (isUpdatable(camera.camera)) camera.camera.update(deltaTime)
         })
@@ -24,7 +25,6 @@ export function startUpdateLoop(scene: Scene): () => void {
             })
         }
 
-        lastUpdateTime = now
         timeout = setTimeout(loop)
     }
     loop()

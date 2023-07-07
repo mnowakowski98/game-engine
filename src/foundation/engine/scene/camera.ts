@@ -1,7 +1,7 @@
 import { mat4 } from 'gl-matrix'
-import Positionable, { isPositionable } from './positionable'
-import Updatable from '../update/updatable'
-import Rotatable, { isRotatable } from './rotatable'
+import { isPositionable } from '../rendering/positionable'
+import { isRotatable } from '../rendering/rotatable'
+import { ActorOptionals } from './actor'
 
 interface CameraBase {
     resolutionX: number
@@ -12,7 +12,7 @@ interface CameraBase {
     zFar?: number
 }
 
-type Camera = CameraBase & (Positionable | Rotatable | Updatable)
+type Camera = CameraBase & ActorOptionals
 export default Camera
 
 interface CameraMatrices {
@@ -41,11 +41,10 @@ export function getProjectionMatrices(camera: Camera): CameraMatrices {
     if (isRotatable(camera)) {
         const { x: xRot, y: yRot } = camera.rotation
         const zRot = ('z' in camera.rotation) ? camera.rotation.z : 0
-        mat4.rotateX(modelViewMatrix, modelViewMatrix, xRot)
-        mat4.rotateY(modelViewMatrix, modelViewMatrix, -yRot)
-        mat4.rotateZ(modelViewMatrix, modelViewMatrix, zRot)
+        mat4.rotateX(projectionMatrix, projectionMatrix, xRot / 1000)
+        mat4.rotateY(projectionMatrix, projectionMatrix, yRot / 1000)
+        mat4.rotateZ(projectionMatrix, projectionMatrix, zRot / 1000)
     }
-
 
     return {
         perspective: projectionMatrix,
