@@ -1,15 +1,20 @@
 const vertexShaderSource = `
 attribute vec4 aVertexPosition;
+attribute vec4 aVertexColor;
+varying vec4 vVertexColor;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 void main() {
     gl_Position = uProjectionMatrix * uModelViewMatrix * aVertexPosition;
+    vVertexColor = aVertexColor;
 }
 `
 
 const fragmentShaderSource = `
+precision mediump float;
+varying vec4 vVertexColor;
 void main() {
-  gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+  gl_FragColor = vVertexColor;
 }
 `
 
@@ -17,6 +22,7 @@ export interface ShaderInfo {
     shaderProgram: WebGLProgram
     attributeLocations: {
         vertexPosition: number
+        vertexColor: number
     }
     uniformLocations: {
         projectionMatrix: WebGLUniformLocation
@@ -53,6 +59,8 @@ export function setDefaultShaders(context: WebGL2RenderingContext): ShaderInfo {
 
     // Get attribute/uniform locations
     const aVertexPosition = context.getAttribLocation(shaderProgram, 'aVertexPosition')
+    const aVertexColor = context.getAttribLocation(shaderProgram, 'aVertexColor')
+
     const uProjectionMatrix = context.getUniformLocation(shaderProgram, 'uProjectionMatrix')
     if (!uProjectionMatrix) throw new Error('uProjectionMatrix not found in shader program')
     const uModelViewMatrix = context.getUniformLocation(shaderProgram, 'uModelViewMatrix')
@@ -62,6 +70,7 @@ export function setDefaultShaders(context: WebGL2RenderingContext): ShaderInfo {
         shaderProgram: shaderProgram,
         attributeLocations: {
             vertexPosition: aVertexPosition,
+            vertexColor: aVertexColor
         },
         uniformLocations: {
             projectionMatrix: uProjectionMatrix,
@@ -84,6 +93,26 @@ export function createPositionBuffer(context: WebGL2RenderingContext, positions:
     context.bindBuffer(context.ARRAY_BUFFER, buffer)
     context.bufferData(context.ARRAY_BUFFER, new Float32Array(positions), context.STATIC_DRAW)
     return buffer
+}
+
+export function createColorBuffer(context: WebGL2RenderingContext, colors: number[]): WebGLBuffer {
+    const buffer = context.createBuffer()
+    if (!buffer) throw new Error('Failed to create color buffer')
+    context.bindBuffer(context.ARRAY_BUFFER, buffer)
+    context.bufferData(context.ARRAY_BUFFER, new Float32Array(colors), context.STATIC_DRAW)
+    return buffer
+}
+
+export function setColorAttribute(context: WebGL2RenderingContext, colorBuffer: WebGLBuffer, shaderInfo: ShaderInfo) {
+    const numComponents = 4
+    const dataType = context.FLOAT
+    const normalize = false
+    const stride = 0
+    const offset = 0
+
+    context.bindBuffer(context.ARRAY_BUFFER, colorBuffer)
+    context.vertexAttribPointer(shaderInfo.attributeLocations.vertexColor, numComponents, dataType, normalize, stride, offset)
+    context.enableVertexAttribArray(shaderInfo.attributeLocations.vertexColor)
 }
 
 export function setPositionAttribute(context: WebGL2RenderingContext, positionBuffer: WebGLBuffer, shaderInfo: ShaderInfo) {

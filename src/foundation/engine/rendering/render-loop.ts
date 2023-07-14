@@ -1,7 +1,7 @@
 import { Canvas, Context } from './canvas'
 import Scene from '../../../feature/scene/scene'
 import Actor from '../scene/actor'
-import { ShaderInfo, createPositionBuffer, initializeFrameSettings, setDefaultShaders, setPositionAttribute } from './gl'
+import { ShaderInfo, createColorBuffer, createPositionBuffer, initializeFrameSettings, setColorAttribute, setDefaultShaders, setPositionAttribute } from './gl'
 import { getProjectionMatrices } from '../scene/camera'
 import { mat4 } from 'gl-matrix'
 import { isMesh } from './mesh'
@@ -28,11 +28,21 @@ function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix:
         actor.geometry.forEach(point => {
             positions.push(point.x / coordinateScaling)
             positions.push(point.y / coordinateScaling)
-        })
+        }) 
 
         const positionBuffer = createPositionBuffer(context, positions)
         setPositionAttribute(context, positionBuffer, shaderInfo)
 
+        if (actor.material) {
+            const colors: number[] = []
+            actor.material.diffuse.forEach(color => colors.push(color.red / 255, color.green / 255, color.blue / 255, 1))
+            
+            const colorBuffer = createColorBuffer(context, colors)
+            setColorAttribute(context, colorBuffer, shaderInfo)
+        } else {
+            context.vertexAttrib4fv(shaderInfo.attributeLocations.vertexColor, [1, 1, 1, 1])
+        }
+        
         context.useProgram(shaderInfo.shaderProgram)
         
         context.uniformMatrix4fv(shaderInfo.uniformLocations.projectionMatrix, false, projectionMatrix)
@@ -42,8 +52,8 @@ function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix:
         const offset = 0
         context.drawArrays(context.TRIANGLE_STRIP, offset, vertexCount)
 
-        context.deleteBuffer(positionBuffer)
-        context.disableVertexAttribArray(shaderInfo.attributeLocations.vertexPosition)
+        // context.deleteBuffer(positionBuffer)
+        // context.disableVertexAttribArray(shaderInfo.attributeLocations.vertexPosition)
     }
 
     if (actor.actors) actor.actors().forEach(subActor => renderActor(context, shaderInfo, projectionMatrix, modelViewMatrix, subActor))

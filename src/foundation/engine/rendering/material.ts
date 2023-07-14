@@ -1,6 +1,9 @@
+export type Color = {
+    red: number
+    green: number
+    blue: number
+}
+
 export default interface Material {
-    diffuse: Buffer
-    normal?: Buffer
-    specular?: Buffer
-    luminosity?: Buffer
+    diffuse: Color[]
 }
