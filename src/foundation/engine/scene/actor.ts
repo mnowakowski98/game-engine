@@ -4,7 +4,23 @@ import Rotatable from '../rendering/rotatable'
 import Updatable from '../update/updatable'
 
 export type ActorContainer = {
-    actors?: () => Actor[]
+    actors?: ReadonlyMap<string, Actor>
+    onActorAdded?: (actor: Actor) => void
+    onActorRemoved?: (actor: Actor) => void
+}
+
+export const actorAddedEvent = 'engine-actor-adde'
+
+export function addActor(container: ActorContainer, actor: Actor) {
+    const map = new Map<string, Actor>(container.actors)
+    map.set(actor.id, actor)
+    container.onActorAdded?.(actor)
+}
+
+export function removeActor(container: ActorContainer, actor: Actor) {
+    const map = new Map<string, Actor>(container.actors)
+    map.delete(actor.id)
+    container.onActorRemoved?.(actor)
 }
 
 type ActorBase = Unique & ActorContainer

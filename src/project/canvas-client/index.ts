@@ -1,7 +1,6 @@
 export {
     Scene,
     Camera,
-    World,
     Actor,
     Mesh,
     Positionable,

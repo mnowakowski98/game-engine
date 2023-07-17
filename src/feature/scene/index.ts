@@ -1,4 +1,3 @@
-export { default as World } from '../../foundation/engine/scene/world'
 export { default as Mesh } from '../../foundation/engine/rendering/mesh'
 export { default as Positionable } from '../../foundation/engine/rendering/positionable'
 export { default as Rotatable } from '../../foundation/engine/rendering/rotatable'

@@ -15,15 +15,12 @@ export function startUpdateLoop(scene: Scene): () => void {
         // as it was causing some issues with distance calculations
         const deltaTime = now - lastUpdateTime || 1
         lastUpdateTime = now
-        if (scene.cameras) scene.cameras().forEach(camera => {
+        if (scene.cameras) scene.cameras.forEach(camera => {
             if (isUpdatable(camera.camera)) camera.camera.update(deltaTime)
         })
-        if (scene.world) {
-            const world = scene.world()
-            if (world.actors) world.actors().forEach(actor => {
-                if (isUpdatable(actor)) actor.update(deltaTime)
-            })
-        }
+        scene.actors.forEach(actor => {
+            if (isUpdatable(actor)) actor.update(deltaTime)
+        })
 
         timeout = setTimeout(loop)
     }
