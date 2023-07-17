@@ -1,78 +1,42 @@
 import { Canvas, Context } from './canvas'
 import Scene from '../../../feature/scene/scene'
 import Actor from '../scene/actor'
-import { ShaderInfo, createColorBuffer, createPositionBuffer, initializeFrameSettings, setColorAttribute, setDefaultShaders, setPositionAttribute } from './gl'
-import { getProjectionMatrices } from '../scene/camera'
+import glRenderingPipeline from './gl'
+import { CameraMatrices, getProjectionMatrices } from '../scene/camera'
 import { mat4 } from 'gl-matrix'
-import { isMesh } from './mesh'
+import Mesh, { isMesh } from './mesh'
 import { isRotatable } from './rotatable'
 import { isPositionable } from './positionable'
 
-function renderActor(context: Context, shaderInfo: ShaderInfo, projectionMatrix: mat4, modelViewMatrix: mat4, actor: Actor) {
-    const coordinateScaling = 1000
+type AssetFunctions = {
+    draw: (matrices: CameraMatrices) => void
+    unload: () => void
+}
 
-    if (isMesh(actor)) {
-        if (isRotatable(actor)) {
-            mat4.rotateX(modelViewMatrix, modelViewMatrix, actor.rotation.x)
-            mat4.rotateY(modelViewMatrix, modelViewMatrix, actor.rotation.y)
-            if ('z' in actor.rotation) mat4.rotateZ(modelViewMatrix, modelViewMatrix, actor.rotation.z)
-        }
-
-        if (isPositionable(actor)) {
-            const { x, y } = actor.position
-            const z = ('z' in actor.position) ? actor.position.z : 0
-            mat4.translate(modelViewMatrix, modelViewMatrix, [x / coordinateScaling, y / coordinateScaling, -(z / coordinateScaling)])
-        }
-
-        const positions: number[] = []
-        actor.geometry.forEach(point => {
-            positions.push(point.x / coordinateScaling)
-            positions.push(point.y / coordinateScaling)
-        }) 
-
-        const positionBuffer = createPositionBuffer(context, positions)
-        setPositionAttribute(context, positionBuffer, shaderInfo)
-
-        if (actor.material) {
-            const colors: number[] = []
-            actor.material.diffuse.forEach(color => colors.push(color.red / 255, color.green / 255, color.blue / 255, 1))
-            
-            const colorBuffer = createColorBuffer(context, colors)
-            setColorAttribute(context, colorBuffer, shaderInfo)
-        } else {
-            context.vertexAttrib4fv(shaderInfo.attributeLocations.vertexColor, [1, 1, 1, 1])
-        }
-        
-        context.useProgram(shaderInfo.shaderProgram)
-        
-        context.uniformMatrix4fv(shaderInfo.uniformLocations.projectionMatrix, false, projectionMatrix)
-        context.uniformMatrix4fv(shaderInfo.uniformLocations.modelViewMatrix, false, modelViewMatrix)
-
-        const vertexCount = actor.geometry.length
-        const offset = 0
-        context.drawArrays(context.TRIANGLE_STRIP, offset, vertexCount)
-
-        // context.deleteBuffer(positionBuffer)
-        // context.disableVertexAttribArray(shaderInfo.attributeLocations.vertexPosition)
+export interface RenderPipeline {
+    init: (canvas: Canvas) => {
+        context: Context
+        loadMesh: (mesh: Mesh) => AssetFunctions
     }
-
-    if (actor.actors) actor.actors().forEach(subActor => renderActor(context, shaderInfo, projectionMatrix, modelViewMatrix, subActor))
+    frame: (context: Context) => {
+        clear: () => void
+        draw?: (matrices: CameraMatrices) => void
+        end?: () => void
+    }
+    
 }
 
 export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
-    ///
-    /// Following https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Tutorial/Adding_2D_content_to_a_WebGL_context
-    /// to draw a square as WebGL/OpenGL are new to me
-    /// TODO: Sort all the instructions into correct modules,
-    ///       Un-hardcode(?) the square
-    ///
+    // TODO: Make the pipeline injectable
+    const pipelineInit = glRenderingPipeline.init(canvas)
+    const context = pipelineInit.context
 
-    // Initialize context
-    const context = canvas.getContext('webgl2')
-    if (!context) throw new Error('Unable to initialize context')
-    const shaderInfo = setDefaultShaders(context)
-    initializeFrameSettings(context)
-
+    // Load initial assets
+    const loadedMeshes = new Map<string, AssetFunctions>()
+    scene.actors.forEach(actor => {
+        if (isMesh(actor)) loadedMeshes.set(actor.id, pipelineInit.loadMesh(actor))
+    })
+    
     // Start render loop
     let isRendering = true
     let requestId = 0
@@ -80,27 +44,44 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
     const renderFrame = () => {
         if (!isRendering) return
 
-        // Clear frame
-        context.clear(context.COLOR_BUFFER_BIT)
-        
-        // Render cameras
-        if (scene.cameras && scene.world) {
-            const world = scene.world()
-            if (!world.actors) return
+        const { clear } = glRenderingPipeline.frame(context)
+        clear()
 
-            const actors = world.actors()
-            scene.cameras().forEach(async camera => {
-                actors.forEach(actor => {
-                    const { perspective, modelView } = getProjectionMatrices(camera.camera)
-                    renderActor(context, shaderInfo, perspective, modelView, actor)
-                })
-            })
-        }
+        scene.cameras.forEach(camera => {
+            const matrices = getProjectionMatrices(camera.camera)
+
+            const renderActor = (actor: Actor) => {
+                const { modelView } = matrices
+                if (isRotatable(actor)) {
+                    mat4.rotateX(modelView, modelView, actor.rotation.x)
+                    mat4.rotateY(modelView, modelView, actor.rotation.y)
+                    if ('z' in actor.rotation) mat4.rotateZ(modelView, modelView, actor.rotation.z)
+                }
+        
+                if (isPositionable(actor)) {
+                    const { x, y } = actor.position
+                    const z = ('z' in actor.position) ? actor.position.z : 0
+                    mat4.translate(modelView, modelView, [x, y, -z])
+                }
+
+                if (isMesh(actor)) {
+                    let mesh = loadedMeshes.get(actor.id)
+                    if (!mesh) {
+                        mesh = pipelineInit.loadMesh(actor)
+                        loadedMeshes.set(actor.id, mesh)
+                    }
+                    mesh.draw(matrices)
+                }
+
+                actor.actors?.forEach(renderActor)
+            }
+            scene.actors.forEach(renderActor)
+        })
 
         requestId = requestAnimationFrame(renderFrame)
     }
 
-    renderFrame()
+    requestId = requestAnimationFrame(renderFrame)
     return () => {
         isRendering = false
         cancelAnimationFrame(requestId)
