@@ -24,7 +24,7 @@ export interface CameraMatrices {
 export function getProjectionMatrices(camera: Camera): CameraMatrices {
     const fieldOfView = camera.fieldOfView ?? (45 * Math.PI) / 180
     const aspect = camera.aspect ?? camera.resolutionX / camera.resolutionY
-    const zNear = camera.zNear ?? 0.1 / 1000
+    const zNear = camera.zNear ?? 1
     const zFar = camera.zFar ?? 1000
 
     // Create projection/model view matrices (using gl matrix)
