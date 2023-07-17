@@ -22,6 +22,7 @@ export interface RenderPipeline {
         clear: () => void
         draw?: (matrices: CameraMatrices) => void
         end?: () => void
+        transition?: () => void 
     }
     
 }
@@ -48,9 +49,9 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
         clear()
 
         scene.cameras.forEach(camera => {
-            const matrices = getProjectionMatrices(camera.camera)
-
             const renderActor = (actor: Actor) => {
+                const matrices = getProjectionMatrices(camera.camera)
+
                 const { modelView } = matrices
                 if (isRotatable(actor)) {
                     mat4.rotateX(modelView, modelView, actor.rotation.x)
