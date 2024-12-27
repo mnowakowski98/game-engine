@@ -1,11 +1,14 @@
 {
     "name": "game-engine-canvas-client",
     "version": "1.0.0",
-    "main": "index.ts",
+    "main": "dist/index.js",
     "description": "",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1"
     },
+    "files":[
+        "dist/**"
+    ],
     "author": "",
     "license": "ISC",
     "devDependencies": {

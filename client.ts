@@ -2,6 +2,7 @@ import Scene, { startScene } from './src/feature/scene/scene'
 import { Receiver, Updater, startRemoteSyncing } from './src/feature/sync/sync'
 
 interface CanvasSettings {
+    autosize?: boolean;
     backgroundColor?: string;
     cursorStyle?: string;
 }
@@ -20,20 +21,20 @@ export interface StartupSettings {
 }
 
 function setupCanvas(canvas: HTMLCanvasElement, settings?: CanvasSettings) {
-    const toSet = {
-        backgroundColor: settings?.backgroundColor ?? '#00000000',
-        cursorStyle: settings?.cursorStyle ?? 'none',
+    const autosize = settings?.autosize ?? false;
+    const backgroundColor = settings?.backgroundColor ?? '#00000000'
+    const cursorStyle = settings?.cursorStyle ?? 'pointer'
+
+    canvas.style.backgroundColor = backgroundColor
+    canvas.style.cursor = cursorStyle
+
+    if (autosize) {
+        const setCanvasSize = () => {
+            canvas.width = innerWidth
+            canvas.height = innerHeight - 6
+        }
+        addEventListener('resize', setCanvasSize)
     }
-
-    canvas.style.backgroundColor = toSet.backgroundColor
-    canvas.style.cursor = toSet.cursorStyle
-
-    const setCanvasSize = () => {
-        canvas.width = innerWidth
-        canvas.height = innerHeight - 6
-    }
-
-    addEventListener('resize', setCanvasSize)
 }
 
 export function startClient(settings: StartupSettings, canvas?: HTMLCanvasElement) {

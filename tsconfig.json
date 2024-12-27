@@ -2,11 +2,13 @@
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
         "strict": true,
-        "module": "ES6",
-        "moduleResolution": "node",
-        "target": "ES6",
+        "module": "NodeNext",
+        "moduleResolution": "nodenext",
+        "target": "ESNext",
         "allowJs": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "outDir": "dist/",
+        "declaration": true
     },
     "include": [
         "**/*.ts",
