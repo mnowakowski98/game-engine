@@ -49,6 +49,9 @@ export function startRenderLoop(canvas: Canvas, scene: Scene): () => void {
         clear()
 
         scene.cameras.forEach(camera => {
+            // Setup clipping region for camera
+            
+
             const renderActor = (actor: Actor) => {
                 const matrices = getProjectionMatrices(camera.camera)
 

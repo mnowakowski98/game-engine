@@ -9,8 +9,8 @@ export {
     Coordinate,
     Coordinate2d,
     Coordinate3d
-} from '../../feature/scene'
+} from './src/feature/scene'
 
-export { Receiver, Updater } from '../../feature/sync/sync'
+export { Receiver, Updater } from './src/feature/sync/sync'
 
 export { startClient, StartupSettings } from './client'
