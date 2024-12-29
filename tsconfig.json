@@ -1,11 +1,13 @@
 {
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
-        "strict": true,
+        "declaration": true,
         "module": "NodeNext",
         "moduleResolution": "nodenext",
+        "outDir": "dist/",
+        "sourceMap": true,
+        "strict": true,
         "target": "ESNext",
-        "sourceMap": true
     },
     "include": [
         "**/*.ts",

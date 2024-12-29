@@ -4,7 +4,7 @@ import { isUpdatable } from './updatable'
 export function startUpdateLoop(scene: Scene): () => void {
     let isUpdating = true
     let lastUpdateTime = performance.now()
-    let timeout: NodeJS.Timeout
+    let timeout: number
 
     const loop = () => {
         if (!isUpdating) return
