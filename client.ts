@@ -20,10 +20,10 @@ export interface StartupSettings {
     canvas?: CanvasSettings
 }
 
-function setupCanvas(canvas: HTMLCanvasElement, settings?: CanvasSettings) {
-    const autosize = settings?.autosize ?? false;
-    const backgroundColor = settings?.backgroundColor ?? '#00000000'
-    const cursorStyle = settings?.cursorStyle ?? 'pointer'
+function setupCanvas(canvas: HTMLCanvasElement, settings: CanvasSettings) {
+    const autosize = settings.autosize ?? false;
+    const backgroundColor = settings.backgroundColor ?? '#00000000'
+    const cursorStyle = settings.cursorStyle ?? 'none'
 
     canvas.style.backgroundColor = backgroundColor
     canvas.style.cursor = cursorStyle
@@ -37,9 +37,9 @@ function setupCanvas(canvas: HTMLCanvasElement, settings?: CanvasSettings) {
     }
 }
 
-export function startClient(settings: StartupSettings, canvas?: HTMLCanvasElement) {
+export function startClient(canvas: HTMLCanvasElement, settings: StartupSettings) {
     canvas = canvas ?? document.createElement('canvas')
-    setupCanvas(canvas, settings.canvas)
+    if (settings.canvas) setupCanvas(canvas, settings.canvas)
 
     const initialScene = settings.scenes.find(scene => scene.id === settings.initialSceneId)
     if (!initialScene) throw `Can't find scene: ${settings.initialSceneId}`
