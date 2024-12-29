@@ -1,10 +1,11 @@
 {
-    "name": "test-game",
+    "name": "game-engine-features",
     "version": "1.0.0",
+    "main": "index.ts",
     "description": "",
     "scripts": {
       "build": "webpack",
-      "package": "tar --exclude dist/test-game.tar.gz -zcvf dist/test-game.tar.gz package.json package-lock.json dist/",
+      "package": "tar --exclude dist/canvas-client.tar.gz -zcvf dist/canvas-client.tar.gz package.json package-lock.json dist/",
       "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "",
@@ -18,6 +19,8 @@
       "webpack-cli": "^5.0.1",
       "webpack-stream": "^7.0.0"
     },
-    "dependencies": {}
+    "dependencies": {
+      "gl-matrix": "^3.4.3"
+    }
   }
   
